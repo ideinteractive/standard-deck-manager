@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System.Collections.Generic;
-using System.IO;
+using UnityEditorInternal;
 
 /// <summary>
 /// DeckEditor
@@ -12,22 +11,36 @@ using System.IO;
 public class DeckEditor : Editor
 {
     // reference to the DeckManager
-    private DeckManager deckManager;   
+    private DeckManager deckManager;
 
-    // json file that contains our standard deck
-    private string jsonStandardDeck = File.ReadAllText(Application.dataPath + "/Data/Standard52CardDesk.json");     
+    // create reorderable lists for each deck
+    private ReorderableList deck;
 
     private void OnEnable()
     {
         // set the reference to the current inspected object
         deckManager = (DeckManager)target;
 
-        // if the deck contains less than 52 cards
-        if (deckManager.deck.Count < 52)
+        // set the reordered deck list to the current deck
+        deck = new ReorderableList(serializedObject, serializedObject.FindProperty("deck"), true, true, true, true)
         {
-            // import the standard deck template
-            ImportStandardDeck();
-        }
+            // render the title of the list
+            drawHeaderCallback = (Rect rect) =>
+            {
+                EditorGUI.LabelField(rect, "Deck");
+            }
+        };
+
+        // render each card detail in the list
+        deck.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+        {
+            var element = deck.serializedProperty.GetArrayElementAtIndex(index);
+            rect.y += 2;
+            EditorGUI.PropertyField(new Rect(rect.x + 5, rect.y, 60, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("color"), GUIContent.none);
+            EditorGUI.PropertyField(new Rect(rect.x + 75, rect.y, 60, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("rank"), GUIContent.none);
+            EditorGUI.LabelField(new Rect(rect.x + 145, rect.y, 20, EditorGUIUtility.singleLineHeight), "of");
+            EditorGUI.PropertyField(new Rect(rect.x + 170, rect.y, 80, EditorGUIUtility.singleLineHeight), element.FindPropertyRelative("suit"), GUIContent.none);
+        };
     }
 
     // overwrite inspector interface
@@ -38,19 +51,10 @@ public class DeckEditor : Editor
 
         EditorGUILayout.Space();
 
-        // if there are cards in the deck
-        if (deckManager.deck.Count > 0)
-        {
-            // for each card in the deck
-            foreach (Cards card in deckManager.deck)
-            {
-                EditorGUILayout.LabelField(card.rank + " of " + card.suit + " [" + card.color + "]");
-            }
-        } else
-        {
-            // import the standard deck template
-            ImportStandardDeck();
-        }
+        // disiplay the reorderable deck list
+        serializedObject.Update();
+        deck.DoLayoutList();
+        serializedObject.ApplyModifiedProperties();
 
         EditorGUILayout.Space();
     }
@@ -58,13 +62,6 @@ public class DeckEditor : Editor
     // import the standard deck template
     private void ImportStandardDeck()
     {
-        // create a new list of cards from the standard json template
-        ListOfCards listOfCards = JsonUtility.FromJson<ListOfCards>(jsonStandardDeck);
-
-        // create a new deck based on that list
-        deckManager.deck = new List<Cards>(listOfCards.deck);
-
-        // inform the user the deck has been updated
-        Debug.Log("Standard 52 Playing Card Deck - Imported ");
+        
     }
 }

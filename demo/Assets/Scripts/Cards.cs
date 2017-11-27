@@ -8,9 +8,39 @@
 [System.Serializable]
 public class Cards
 {
-    public string suit;
-    public string color;
-    public string rank;
+    public enum Suit
+    {
+        Clubs,
+        Diamonds,
+        Hearts,
+        Spades
+    }
+    public Suit suit;
+
+    public enum Color
+    {
+        Black,
+        Red
+    }
+    public Color color;
+
+    public enum Rank
+    {
+        Ace,
+        Two,
+        Three,
+        Four,
+        Five,
+        Six,
+        Seven,
+        Eight,
+        Nine,
+        Ten,
+        Jack,
+        Queen,
+        King
+    }
+    public Rank rank;
 }
 
 /// <summary>

@@ -1,264 +1,264 @@
 {
     "deck": [
         {
-            "suit": "Clubs",
-            "color": "Black",
-            "rank": "Ace"
+            "suit": "0",
+            "color": "0",
+            "rank": "0"
         },
         {
-            "suit": "Clubs",
-            "color": "Black",
+            "suit": "0",
+            "color": "0",
+            "rank": "1"
+        },
+        {
+            "suit": "0",
+            "color": "0",
             "rank": "2"
         },
         {
-            "suit": "Clubs",
-            "color": "Black",
+            "suit": "0",
+            "color": "0",
             "rank": "3"
         },
         {
-            "suit": "Clubs",
-            "color": "Black",
+            "suit": "0",
+            "color": "0",
             "rank": "4"
         },
         {
-            "suit": "Clubs",
-            "color": "Black",
+            "suit": "0",
+            "color": "0",
             "rank": "5"
         },
         {
-            "suit": "Clubs",
-            "color": "Black",
+            "suit": "0",
+            "color": "0",
             "rank": "6"
         },
         {
-            "suit": "Clubs",
-            "color": "Black",
+            "suit": "0",
+            "color": "0",
             "rank": "7"
         },
         {
-            "suit": "Clubs",
-            "color": "Black",
+            "suit": "0",
+            "color": "0",
             "rank": "8"
         },
         {
-            "suit": "Clubs",
-            "color": "Black",
+            "suit": "0",
+            "color": "0",
             "rank": "9"
         },
         {
-            "suit": "Clubs",
-            "color": "Black",
+            "suit": "0",
+            "color": "0",
             "rank": "10"
         },
         {
-            "suit": "Clubs",
-            "color": "Black",
-            "rank": "Jack"
+            "suit": "0",
+            "color": "0",
+            "rank": "11"
         },
         {
-            "suit": "Clubs",
-            "color": "Black",
-            "rank": "Queen"
+            "suit": "0",
+            "color": "0",
+            "rank": "12"
         },
         {
-            "suit": "Clubs",
-            "color": "Black",
-            "rank": "King"
+            "suit": "1",
+            "color": "1",
+            "rank": "0"
         },
         {
-            "suit": "Diamonds",
-            "color": "Red",
-            "rank": "Ace"
+            "suit": "1",
+            "color": "1",
+            "rank": "1"
         },
         {
-            "suit": "Diamonds",
-            "color": "Red",
+            "suit": "1",
+            "color": "1",
             "rank": "2"
         },
         {
-            "suit": "Diamonds",
-            "color": "Red",
+            "suit": "1",
+            "color": "1",
             "rank": "3"
         },
         {
-            "suit": "Diamonds",
-            "color": "Red",
+            "suit": "1",
+            "color": "1",
             "rank": "4"
         },
         {
-            "suit": "Diamonds",
-            "color": "Red",
+            "suit": "1",
+            "color": "1",
             "rank": "5"
         },
         {
-            "suit": "Diamonds",
-            "color": "Red",
+            "suit": "1",
+            "color": "1",
             "rank": "6"
         },
         {
-            "suit": "Diamonds",
-            "color": "Red",
+            "suit": "1",
+            "color": "1",
             "rank": "7"
         },
         {
-            "suit": "Diamonds",
-            "color": "Red",
+            "suit": "1",
+            "color": "1",
             "rank": "8"
         },
         {
-            "suit": "Diamonds",
-            "color": "Red",
+            "suit": "1",
+            "color": "1",
             "rank": "9"
         },
         {
-            "suit": "Diamonds",
-            "color": "Red",
+            "suit": "1",
+            "color": "1",
             "rank": "10"
         },
         {
-            "suit": "Diamonds",
-            "color": "Red",
-            "rank": "Jack"
+            "suit": "1",
+            "color": "1",
+            "rank": "11"
         },
         {
-            "suit": "Diamonds",
-            "color": "Red",
-            "rank": "Queen"
+            "suit": "1",
+            "color": "1",
+            "rank": "12"
         },
         {
-            "suit": "Diamonds",
-            "color": "Red",
-            "rank": "King"
+            "suit": "2",
+            "color": "1",
+            "rank": "0"
         },
         {
-            "suit": "Hearts",
-            "color": "Red",
-            "rank": "Ace"
+            "suit": "2",
+            "color": "1",
+            "rank": "1"
         },
         {
-            "suit": "Hearts",
-            "color": "Red",
+            "suit": "2",
+            "color": "1",
             "rank": "2"
         },
         {
-            "suit": "Hearts",
-            "color": "Red",
+            "suit": "2",
+            "color": "1",
             "rank": "3"
         },
         {
-            "suit": "Hearts",
-            "color": "Red",
+            "suit": "2",
+            "color": "1",
             "rank": "4"
         },
         {
-            "suit": "Hearts",
-            "color": "Red",
+            "suit": "2",
+            "color": "1",
             "rank": "5"
         },
         {
-            "suit": "Hearts",
-            "color": "Red",
+            "suit": "2",
+            "color": "1",
             "rank": "6"
         },
         {
-            "suit": "Hearts",
-            "color": "Red",
+            "suit": "2",
+            "color": "1",
             "rank": "7"
         },
         {
-            "suit": "Hearts",
-            "color": "Red",
+            "suit": "2",
+            "color": "1",
             "rank": "8"
         },
         {
-            "suit": "Hearts",
-            "color": "Red",
+            "suit": "2",
+            "color": "1",
             "rank": "9"
         },
         {
-            "suit": "Hearts",
-            "color": "Red",
+            "suit": "2",
+            "color": "1",
             "rank": "10"
         },
         {
-            "suit": "Hearts",
-            "color": "Red",
-            "rank": "Jack"
+            "suit": "2",
+            "color": "1",
+            "rank": "11"
         },
         {
-            "suit": "Hearts",
-            "color": "Red",
-            "rank": "Queen"
+            "suit": "2",
+            "color": "1",
+            "rank": "12"
         },
         {
-            "suit": "Hearts",
-            "color": "Red",
-            "rank": "King"
+            "suit": "3",
+            "color": "0",
+            "rank": "0"
         },
         {
-            "suit": "Spades",
-            "color": "Black",
-            "rank": "Ace"
+            "suit": "3",
+            "color": "0",
+            "rank": "1"
         },
         {
-            "suit": "Spades",
-            "color": "Black",
+            "suit": "3",
+            "color": "0",
             "rank": "2"
         },
         {
-            "suit": "Spades",
-            "color": "Black",
+            "suit": "3",
+            "color": "0",
             "rank": "3"
         },
         {
-            "suit": "Spades",
-            "color": "Black",
+            "suit": "3",
+            "color": "0",
             "rank": "4"
         },
         {
-            "suit": "Spades",
-            "color": "Black",
+            "suit": "3",
+            "color": "0",
             "rank": "5"
         },
         {
-            "suit": "Spades",
-            "color": "Black",
+            "suit": "3",
+            "color": "0",
             "rank": "6"
         },
         {
-            "suit": "Spades",
-            "color": "Black",
+            "suit": "3",
+            "color": "0",
             "rank": "7"
         },
         {
-            "suit": "Spades",
-            "color": "Black",
+            "suit": "3",
+            "color": "0",
             "rank": "8"
         },
         {
-            "suit": "Spades",
-            "color": "Black",
+            "suit": "3",
+            "color": "0",
             "rank": "9"
         },
         {
-            "suit": "Spades",
-            "color": "Black",
+            "suit": "3",
+            "color": "0",
             "rank": "10"
         },
         {
-            "suit": "Spades",
-            "color": "Black",
-            "rank": "Jack"
+            "suit": "3",
+            "color": "0",
+            "rank": "11"
         },
         {
-            "suit": "Spades",
-            "color": "Black",
-            "rank": "Queen"
-        },
-        {
-            "suit": "Spades",
-            "color": "Black",
-            "rank": "King"
+            "suit": "3",
+            "color": "0",
+            "rank": "12"
         }
     ]
 }
