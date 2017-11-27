@@ -1,0 +1,10 @@
+demo/Library
+demo/Temp
+demo/Assembly-CSharp-Editor.csproj
+demo/Assembly-CSharp-Editor-vs.csproj
+demo/Assembly-CSharp.csproj
+demo/Assembly-CSharp-vs.csproj
+demo/demo.sln
+demo/demo-csharp.sln
+demo/obj
+demo/.vs
