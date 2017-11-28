@@ -30,8 +30,8 @@ D -> Move Card Down
 T -> Move Card To Top of Deck  
 B -> Move Card To Bottom of Deck  
 R -> Remove Card From Deck  
-- -> Move Card To Discard Pile  
-+ -> Move Card To Deck  
+"-" -> Move Card To Discard Pile  
+"+" -> Move Card To Deck  
 
 ## Useful Links
 Description To Come
