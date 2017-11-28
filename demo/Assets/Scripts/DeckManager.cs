@@ -56,25 +56,25 @@ public class DeckManager : MonoBehaviour
     #endif
 
     // move a card up the deck
-    public void MoveCardUp(Cards card)
+    public void MoveCardUp(Cards card, List<Cards> deck)
     {
 
     }
 
     // move a card down the deck
-    public void MoveCardDown(Cards card)
+    public void MoveCardDown(Cards card, List<Cards> deck)
     {
 
     }
 
     // move a card to the top of the deck
-    public void MoveCardToTop(Cards card)
+    public void MoveCardToTop(Cards card, List<Cards> deck)
     {
 
     }
 
     // move a card to the bottom of the deck
-    public void MoveCardToBottom(Cards card)
+    public void MoveCardToBottom(Cards card, List<Cards> deck)
     {
 
     }
@@ -97,6 +97,23 @@ public class DeckManager : MonoBehaviour
         deck.Remove(card);
     }
 
+    // add a new card to the deck
+    public void AddNewCard(List<Cards> deck)
+    {
+        Cards card = new Cards();
+        card.strName = "Black Ace of Clubs";
+        card.color = Cards.Color.Black;
+        card.rank = Cards.Rank.Ace;
+        card.suit = Cards.Suit.Clubs;
+        deck.Add(card);
+    }
+
+    // remove a card from the deck
+    public void RemoveCard(Cards card, List<Cards> deck)
+    {
+        deck.Remove(card);
+    }
+
     // shuffle the deck
     public void Shuffle()
     {
@@ -110,7 +127,7 @@ public class DeckManager : MonoBehaviour
     }
 
     // shuffle the discard pile and add it to the bottom of the deck
-    public void ShuffleDiscard()
+    public void ShuffleDiscardToBottom()
     {
 
     }
