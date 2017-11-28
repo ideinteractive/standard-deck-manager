@@ -47,17 +47,25 @@ public class DeckEditor : Editor
 
         EditorGUILayout.Space();
 
-        // add a new card to the deck
+        // shuffle the deck
         if (GUILayout.Button("Shuffle Deck"))
-            deckManager.AddNewCard(deckManager.discardPile);
+            deckManager.Shuffle();
 
-        // add a new card to the deck
+        // shuffle the discard pile
+        if (GUILayout.Button("Shuffle Discard Pile"))
+            deckManager.ShuffleDiscardPile();
+
+        // shuffle the deck with the discard pile
         if (GUILayout.Button("Shuffle Deck with Discard Pile"))
-            deckManager.AddNewCard(deckManager.discardPile);
+            deckManager.ShuffleWithDiscard();
 
-        // add a new card to the deck
+        // shuffle the discard pile and add it to the top of the deck
+        if (GUILayout.Button("Shuffle Discard Pile to Top"))
+            deckManager.ShuffleDiscardToTop();
+
+        // shuffle the discard pile and add it to the bottom of the deck
         if (GUILayout.Button("Shuffle Discard Pile to Bottom"))
-            deckManager.AddNewCard(deckManager.discardPile);
+            deckManager.ShuffleDiscardToBottom();
 
         // add a new card to the deck
         if (GUILayout.Button("Add New Card to Deck"))
@@ -70,7 +78,7 @@ public class DeckEditor : Editor
         EditorGUILayout.Space();
 
         EditorGUILayout.BeginHorizontal(styleRowHeader);
-        EditorGUILayout.LabelField("Deck", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("Deck [" + deckManager.deck.Count.ToString() + "]", EditorStyles.boldLabel);
         EditorGUILayout.EndHorizontal();
 
         // try and render the card info
@@ -142,7 +150,7 @@ public class DeckEditor : Editor
         // discard pile
 
         EditorGUILayout.BeginHorizontal(styleRowHeader);
-        EditorGUILayout.LabelField("Discard Pile", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("Discard Pile [" + deckManager.discardPile.Count.ToString() + "]", EditorStyles.boldLabel);
         EditorGUILayout.EndHorizontal();
 
         // try and render the card info
