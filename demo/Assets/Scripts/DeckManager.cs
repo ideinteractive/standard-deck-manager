@@ -79,6 +79,15 @@ public class DeckManager : MonoBehaviour
 
     }
 
+    // add card to the deck
+    public void AddCard(Cards card)
+    {
+        // add the card to the deck
+        // and remove it from the discard pile
+        deck.Add(card);
+        discardPile.Remove(card);
+    }
+
     // discard a card to the discard pile
     public void DiscardCard(Cards card)
     {
