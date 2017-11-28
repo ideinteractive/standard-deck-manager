@@ -8,6 +8,13 @@
 [System.Serializable]
 public class Cards
 {
+    // define our card name
+    public string strName;
+
+    // boolean to keep track of custom editor panel
+    public bool blnExpandClipPnl;       
+
+    // define the card's suit
     public enum Suit
     {
         Clubs,
@@ -17,6 +24,7 @@ public class Cards
     }
     public Suit suit;
 
+    // define the card's color
     public enum Color
     {
         Black,
@@ -24,6 +32,7 @@ public class Cards
     }
     public Color color;
 
+    // define the card's rank
     public enum Rank
     {
         Ace,
@@ -51,5 +60,6 @@ public class Cards
 [System.Serializable]
 public class ListOfCards
 {
+    // a list of cards
     public List<Cards> deck;
 }
