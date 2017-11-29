@@ -51,15 +51,3 @@ public class Cards
     }
     public Rank rank;
 }
-
-/// <summary>
-/// ListOfCards
-/// Description: Contains a list of cards.
-/// </summary>
-
-[System.Serializable]
-public class ListOfCards
-{
-    // a list of cards
-    public List<Cards> deck;
-}

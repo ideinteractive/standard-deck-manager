@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System.IO;
-using System.Security.Cryptography;
 
 /// <summary>
 /// DeckManager
@@ -34,16 +32,42 @@ public class DeckManager : MonoBehaviour
             // return and break out of this function
             return;
 
-        // create a new list of cards from the standard json template
-        ListOfCards listOfCards = JsonUtility.FromJson<ListOfCards>(File.ReadAllText(Application.dataPath + "/Data/Standard52CardDesk.json"));
+        // create a new deck 
+        deck = new List<Cards>();
 
-        // create a new deck based on that list
-        deck = new List<Cards>(listOfCards.deck);
-
-        // for each card in the deck assign a name
-        foreach (Cards card in deck)
+        // for each suit 
+        for (int i = 0; i <= (int)Cards.Suit.Spades; i++)
         {
-            card.strName = card.color.ToString() + " " + card.rank.ToString() + " of " + card.suit.ToString();
+            // if i is an odd number
+            if(i % 2 == 1)
+            {
+                // for each card
+                for (int c = 0; c <= (int)Cards.Rank.King; c++)
+                {
+                    // create a new card and add it to the deck
+                    // add the card to the deck
+                    Cards card = new Cards();
+                    card.suit = (Cards.Suit)i;
+                    card.color = (Cards.Color)1;
+                    card.rank = (Cards.Rank)c;
+                    card.strName = card.color.ToString() + " " + card.rank.ToString() + " of " + card.suit.ToString();
+                    deck.Add(card);
+                }
+            } else
+            {
+                // for each card
+                for (int c = 0; c <= (int)Cards.Rank.King; c++)
+                {
+                    // create a new card and add it to the deck
+                    // add the card to the deck
+                    Cards card = new Cards();
+                    card.suit = (Cards.Suit)i;
+                    card.color = (Cards.Color)0;
+                    card.rank = (Cards.Rank)c;
+                    card.strName = card.color.ToString() + " " + card.rank.ToString() + " of " + card.suit.ToString();
+                    deck.Add(card);
+                }
+            }
         }
 
         // create a new discard pile
