@@ -124,8 +124,8 @@ public class DeckEditor : Editor
                     EditorGUILayout.Space();
                     EditorGUILayout.BeginVertical(stylePaddingLeft);
 
-                    // show the card's name
-                    deckManager.deck[i].strName = EditorGUILayout.TextField("Name", deckManager.deck[i].strName);
+                    // automatically assign the card name if it doesn't exist
+                    deckManager.deck[i].strName = deckManager.deck[i].color.ToString() + " " + deckManager.deck[i].rank.ToString() + " of " + deckManager.deck[i].suit.ToString();
 
                     // show the card's color
                     deckManager.deck[i].color = (Cards.Color)EditorGUILayout.EnumPopup("Color", deckManager.deck[i].color);
@@ -196,8 +196,8 @@ public class DeckEditor : Editor
                     EditorGUILayout.Space();
                     EditorGUILayout.BeginVertical(stylePaddingLeft);
 
-                    // show the card's name
-                    deckManager.discardPile[i].strName = EditorGUILayout.TextField("Name", deckManager.discardPile[i].strName);
+                    // automatically assign the card name if it doesn't exist
+                    deckManager.discardPile[i].strName = deckManager.discardPile[i].color.ToString() + " " + deckManager.discardPile[i].rank.ToString() + " of " + deckManager.discardPile[i].suit.ToString();
 
                     // show the card's color
                     deckManager.discardPile[i].color = (Cards.Color)EditorGUILayout.EnumPopup("Color", deckManager.discardPile[i].color);
