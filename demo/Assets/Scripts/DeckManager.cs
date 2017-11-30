@@ -172,10 +172,10 @@ public class DeckManager : MonoBehaviour
         // create a new card with default values
         // and add it to the deck
         Cards card = new Cards();
-        card.strName = "Black Ace of Clubs";
-        card.color = Cards.Color.Black;
-        card.rank = Cards.Rank.Ace;
-        card.suit = Cards.Suit.Clubs;
+        card.color = (Cards.Color)Random.Range(0, (int)Cards.Color.Red + 1);
+        card.rank = (Cards.Rank)Random.Range(0, (int)Cards.Rank.King + 1);
+        card.suit = (Cards.Suit)Random.Range(0, (int)Cards.Suit.Spades + 1);
+        card.strName = card.color.ToString() + " " + card.rank.ToString() + " of " + card.suit.ToString();
         deck.Add(card);
     }
 
