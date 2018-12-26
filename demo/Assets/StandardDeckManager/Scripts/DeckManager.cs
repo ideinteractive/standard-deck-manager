@@ -8,6 +8,9 @@ using System.Collections.Generic;
 
 public class DeckManager : MonoBehaviour
 {
+    // global variables
+    public static DeckManager instance;     // set this object as a global object
+
     // public variables
     public List<Cards> deck = new List<Cards>();            // contains a list of cards
     public List<Cards> discardPile = new List<Cards>();     // contains a list of discarded cards
@@ -17,21 +20,34 @@ public class DeckManager : MonoBehaviour
     public bool blnExpandDeckPnl;
     public bool blnExpandDiscardPnl;
 
-    // on start
-    private void Start()
+    // private variables
+    private GameObject m_goPool;   // object to nest our pooled objects
+
+    // on awake
+    private void Awake()
     {
+        // set this object
+        instance = this;
+
         // spawn a new empty gameobject to contain our pooled objects
-        GameObject goPool = Instantiate(new GameObject(), this.transform.position, this.transform.rotation);
-        goPool.name = "Pool";
-        goPool.transform.parent = this.transform;
+        m_goPool = new GameObject();
+        m_goPool.name = "Pool";
+        m_goPool.transform.parent = this.transform;
 
         // for each object inside the deck 
         foreach (Cards card in deck)
         {
             GameObject goCard = Instantiate(card.card, this.transform.position, this.transform.rotation);
             goCard.SetActive(false);
-            goCard.transform.parent = goPool.transform;
+            goCard.transform.parent = m_goPool.transform;
+            card.card = goCard;
         }
+
+        // spawn the back face card
+        GameObject goBackFaceCard = Instantiate(cardBackFace, this.transform.position, this.transform.rotation);
+        goBackFaceCard.SetActive(false);
+        goBackFaceCard.transform.parent = m_goPool.transform;
+        cardBackFace = goBackFaceCard;
     }
 
     // move a card up the deck
@@ -254,7 +270,16 @@ public class DeckManager : MonoBehaviour
         // create a new discard pile
         discardPile = new List<Cards>();
 
+        // assign the back face card
+        cardBackFace = Resources.Load("Prefabs/Back Face") as GameObject;
+
         // inform the user the deck has been updated
         Debug.Log("Standard 52 Playing Card Deck - Imported ");
+    }
+
+    // return the deck count
+    public int Count()
+    {
+        return deck.Count;
     }
 } 
