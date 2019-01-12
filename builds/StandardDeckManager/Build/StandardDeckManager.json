@@ -1,0 +1,9 @@
+{
+"TOTAL_MEMORY": 268435456,
+"dataUrl": "StandardDeckManager.data.unityweb",
+"asmCodeUrl": "StandardDeckManager.asm.code.unityweb",
+"asmMemoryUrl": "StandardDeckManager.asm.memory.unityweb",
+"asmFrameworkUrl": "StandardDeckManager.asm.framework.unityweb",
+"splashScreenStyle": "Light",
+"backgroundColor": "#FFFFFF"
+}

@@ -134,6 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\StandardDeckManager\Editor\DeckEditor.cs" />
+    <Compile Include="Assets\StandardDeckManager\Editor\DeckOptionsEditor.cs" />
     <Compile Include="Assets\StandardDeckManager\Editor\EditorClasses.cs" />
   </ItemGroup>
   <ItemGroup>
