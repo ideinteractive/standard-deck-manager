@@ -45,32 +45,28 @@ public class BlackJackManager : MonoBehaviour
     private int m_intPlayerScore;               // the player's score
     private int m_intDealerScore;               // the dealer's score
 
-    // on awake
-    void Awake()
-    {
-        // set up our card values below
-        // for each card in the deck
-        foreach(Card card in DeckManager.instance.deck)
-        {
-            SetCardValue(card);
-        }
-
-        // for each card in the discard
-        foreach (Card card in DeckManager.instance.discardPile)
-        {
-            SetCardValue(card);
-        }
-
-        // for each card in the in use pile
-        foreach (Card card in DeckManager.instance.inUsePile)
-        {
-            SetCardValue(card);
-        }
-    }
-
     // on initialization
     void Start()
     {
+        // set up our card values below
+        // for each card in the deck
+        for (int i = 0; i < DeckManager.instance.deck.Count; i++)
+        {
+            SetCardValue(DeckManager.instance.deck[i]);
+        }
+
+        // for each card in the discard
+        for (int i = 0; i < DeckManager.instance.discardPile.Count; i++)
+        {
+            SetCardValue(DeckManager.instance.discardPile[i]);
+        }
+
+        // for each card in the in use pile
+        for (int i = 0; i < DeckManager.instance.inUsePile.Count; i++)
+        {
+            SetCardValue(DeckManager.instance.inUsePile[i]);
+        }
+
         // shuffle the deck of cards
         DeckManager.instance.Shuffle();
 
@@ -79,6 +75,12 @@ public class BlackJackManager : MonoBehaviour
 
         // deal a new hand 
         StartCoroutine(DealNewHand());
+
+        // reset our buttons
+        btnHit.gameObject.SetActive(false);
+        btnStand.gameObject.SetActive(false);
+        btnReplay.gameObject.SetActive(false);
+        btnRestart.gameObject.SetActive(false);
     }
 
     // set the card values
@@ -170,6 +172,10 @@ public class BlackJackManager : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         DealCard(col_playerHand, goPlayerCardBorder, true);
         audSrc.Play();
+
+        // turn on our buttons
+        btnHit.gameObject.SetActive(true);
+        btnStand.gameObject.SetActive(true);
 
         // update the deck count
         txtDeckCount.text = DeckManager.instance.Count().ToString();
@@ -308,6 +314,12 @@ public class BlackJackManager : MonoBehaviour
     // add a card to the player hand
     public void Hit()
     {
+        // assign the correct sfx
+        if (audSrc.clip != audClpCardSlide)
+            audSrc.clip = audClpCardSlide;
+
+        audSrc.Play();
+
         // add a new card to the player hand 
         DealCard(col_playerHand, goPlayerCardBorder, true);
 

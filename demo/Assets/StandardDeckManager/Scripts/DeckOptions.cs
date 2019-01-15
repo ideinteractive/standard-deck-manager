@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// DeckOptions
@@ -26,4 +25,3 @@ public class DeckOptions : MonoBehaviour
         }
 	}
 }
-#endif
