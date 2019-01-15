@@ -25,8 +25,8 @@ public class BlackJackManager : MonoBehaviour
     public Text txtWinMessage;                  // text object to inform who won
     public Button btnHit;                       // hit button
     public Button btnStand;                     // stand button
-    public Button btnReplay;                    // replay button
-    public Button btnRestart;                   // restart button
+    public Button btnPlayAgain;                 // replay button
+    public Button btnMainMenu;                  // main menu button
 
     [Header("Other Settings")]
     public Vector3 vecCardSpawnOffset;          // how much offset when placing the cards next to each other
@@ -48,24 +48,18 @@ public class BlackJackManager : MonoBehaviour
     // on initialization
     void Start()
     {
+        // if the audio source is null
+        if(audSrc == null)
+        {
+            // set it from this component
+            audSrc = this.GetComponent<AudioSource>();
+        }
+
         // set up our card values below
         // for each card in the deck
-        for (int i = 0; i < DeckManager.instance.deck.Count; i++)
-        {
-            SetCardValue(DeckManager.instance.deck[i]);
-        }
-
-        // for each card in the discard
-        for (int i = 0; i < DeckManager.instance.discardPile.Count; i++)
-        {
-            SetCardValue(DeckManager.instance.discardPile[i]);
-        }
-
-        // for each card in the in use pile
-        for (int i = 0; i < DeckManager.instance.inUsePile.Count; i++)
-        {
-            SetCardValue(DeckManager.instance.inUsePile[i]);
-        }
+        SetUpDeck(DeckManager.instance.deck);
+        SetUpDeck(DeckManager.instance.discardPile);
+        SetUpDeck(DeckManager.instance.inUsePile);
 
         // shuffle the deck of cards
         DeckManager.instance.Shuffle();
@@ -79,8 +73,8 @@ public class BlackJackManager : MonoBehaviour
         // reset our buttons
         btnHit.gameObject.SetActive(false);
         btnStand.gameObject.SetActive(false);
-        btnReplay.gameObject.SetActive(false);
-        btnRestart.gameObject.SetActive(false);
+        btnPlayAgain.gameObject.SetActive(false);
+        btnMainMenu.gameObject.SetActive(false);
     }
 
     // set the card values
@@ -135,6 +129,18 @@ public class BlackJackManager : MonoBehaviour
         }
     }
 
+    // set up the deck
+    private void SetUpDeck(List<Card> deck)
+    {
+        // for each card in the deck
+        int i = 0;
+        while (i < deck.Count)
+        {
+            SetCardValue(deck[i]);
+            i++;
+        }
+    }
+
     // deal a new hand to the player and dealer
     private IEnumerator DealNewHand()
     {
@@ -160,29 +166,42 @@ public class BlackJackManager : MonoBehaviour
         if (audSrc.clip != audClpCardSlide)
             audSrc.clip = audClpCardSlide;
         
-        // deal cards to both the dealer and player
-        DealCard(col_dealerHand, goDealerCardBorder, false);
-        audSrc.Play();
-        yield return new WaitForSeconds(0.5f);
-        DealCard(col_playerHand, goPlayerCardBorder, true);
-        audSrc.Play();
-        yield return new WaitForSeconds(0.5f);
-        DealCard(col_dealerHand, goDealerCardBorder, false);
-        audSrc.Play();
-        yield return new WaitForSeconds(0.5f);
-        DealCard(col_playerHand, goPlayerCardBorder, true);
-        audSrc.Play();
+        // for 4 loops
+        for (int i=0; i<4; i++)
+        {
+            // deal cards to both the dealer and player
+            if (i%2 == 0)
+            {
+                DealCard(col_dealerHand, goDealerCardBorder, false);
+                audSrc.Play();
 
+                // if this is the first deal
+                if (i == 0)
+                {
+                    // display the current score of the dealer
+                    CalculateDealerInitialHand();
+                }
+                
+                yield return new WaitForSeconds(0.5f);
+            } else
+            {
+                DealCard(col_playerHand, goPlayerCardBorder, true);
+                audSrc.Play();
+
+                // display the current score of the player
+                CalculateHand(col_playerHand, txtPlayerHandCount);
+
+                yield return new WaitForSeconds(0.5f);
+            }
+
+
+            // update the deck count
+            txtDeckCount.text = DeckManager.instance.Count().ToString();
+        }
+        
         // turn on our buttons
         btnHit.gameObject.SetActive(true);
         btnStand.gameObject.SetActive(true);
-
-        // update the deck count
-        txtDeckCount.text = DeckManager.instance.Count().ToString();
-
-        // display the current score of each hand
-        CalculateHand(col_playerHand, txtPlayerHandCount);
-        CalculateDealerInitialHand();
     }
 
     // deal a card
@@ -307,8 +326,8 @@ public class BlackJackManager : MonoBehaviour
         // hide the buttons and show replay button
         btnHit.gameObject.SetActive(false);
         btnStand.gameObject.SetActive(false);
-        btnReplay.gameObject.SetActive(true);
-        btnRestart.gameObject.SetActive(true);
+        btnMainMenu.gameObject.SetActive(true);
+        btnPlayAgain.gameObject.SetActive(true);
     }
 
     // add a card to the player hand
@@ -334,14 +353,12 @@ public class BlackJackManager : MonoBehaviour
         }
     }
 
-    // deal a new hand and start a new game
-    public void Replay()
+    // deal a new hand 
+    public void PlayAgain()
     {
-        // hide the replay button and show the appropriate buttons
-        btnHit.gameObject.SetActive(true);
-        btnStand.gameObject.SetActive(true);
-        btnReplay.gameObject.SetActive(false);
-        btnRestart.gameObject.SetActive(false);
+        // hide and show the appropriate buttons
+        btnMainMenu.gameObject.SetActive(false);
+        btnPlayAgain.gameObject.SetActive(false);
 
         // for each card in the player's hand
         foreach (Card card in col_playerHand)
@@ -407,10 +424,9 @@ public class BlackJackManager : MonoBehaviour
         }
     }
 
-    // restart the scene
-    public void RestartGame()
+    // go to main menu
+    public void MainMenu()
     {
-        // reload the current scene
-        Scene scene = SceneManager.GetActiveScene(); SceneManager.LoadScene(scene.name);
+        SceneManager.LoadScene("MainMenu");
     }
 }
