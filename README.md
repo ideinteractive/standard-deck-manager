@@ -1,7 +1,11 @@
-# Standard Playing Card - Deck Manager
+# Standard Deck Manager
 Description To Come
 
 _Copyright (c) 2017 tvledesign LLC. All rights reserved._
+
+## License
+
+Standard Deck Manager is covered by Unity's Asset Store Terms of Service and EULA which can be found via (https://unity3d.com/legal/as_terms)[https://unity3d.com/legal/as_terms].
 
 ## Importing the Package
 
