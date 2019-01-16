@@ -234,11 +234,16 @@ public class BlackJackManager : MonoBehaviour
                 SpawnCardToSlot(slot, DeckManager.instance.deck[0].card, m_vecDealerCardOffset);
                 m_vecDealerCardOffset += vecCardSpawnOffset;
             }
-            else
+            else if (hand.Count == 2)
             {
                 // spawn a backface card
                 SpawnBackFaceCardToSlot(slot, DeckManager.instance.cardBackFace, m_vecDealerCardOffset);
                 DeckManager.instance.cardBackFace.GetComponent<SpriteRenderer>().sortingOrder = hand.Count;
+                m_vecDealerCardOffset += vecCardSpawnOffset;
+            } else
+            {
+                SpawnCardToSlot(slot, DeckManager.instance.deck[0].card, m_vecDealerCardOffset);
+                m_vecDealerCardOffset += vecCardSpawnOffset;
             }
         }
 
@@ -308,30 +313,73 @@ public class BlackJackManager : MonoBehaviour
         m_vecPlayerCardOffset = Vector3.zero;
     }
 
-    // stand and reveal the hands to determine who wins
-    public void Stand()
+    // stand function for button click
+    public void StandButton()
     {
+        // stand and reveal the hands to determine who wins
+        StartCoroutine(Stand());
+    }
+
+    // stand and reveal the hands to determine who wins
+    private IEnumerator Stand()
+    {
+        // hide the buttons
+        btnHit.gameObject.SetActive(false);
+        btnStand.gameObject.SetActive(false);
+
+        // assign the correct sfx
+        if (audSrc.clip != audClpCardSlide)
+            audSrc.clip = audClpCardSlide;
+
         // spawn the dealer's second card onto the back face position
         col_dealerHand[1].card.transform.position = DeckManager.instance.cardBackFace.transform.position;
         col_dealerHand[1].card.GetComponent<SpriteRenderer>().sortingOrder = 2;
         col_dealerHand[1].card.SetActive(true);
         DeckManager.instance.cardBackFace.SetActive(false);
 
+        // play the sfx
+        audSrc.Play();
+
         // calculate the dealer's hand
         CalculateHand(col_dealerHand, txtDealerHandCount);
+
+        yield return new WaitForSeconds(0.5f);
+
+        // if the player's hand is less than or equal to 21
+        if (int.Parse(txtPlayerHandCount.text) <= 21)
+        {
+            // if the dealer's hand is less than 17
+            while (int.Parse(txtDealerHandCount.text) < 17)
+            {
+                // add a new card to the dealer's hand 
+                DealCard(col_dealerHand, goDealerCardBorder, false);
+
+                // calculate the dealer's hand 
+                CalculateHand(col_dealerHand, txtDealerHandCount);
+
+                // play the sfx
+                audSrc.Play();
+                yield return new WaitForSeconds(0.5f);
+            }
+        }
 
         // reveal the score and who won
         SelectWinner();
 
-        // hide the buttons and show replay button
-        btnHit.gameObject.SetActive(false);
-        btnStand.gameObject.SetActive(false);
+        // show option buttons
         btnMainMenu.gameObject.SetActive(true);
         btnPlayAgain.gameObject.SetActive(true);
     }
 
+    // hit button
+    public void HitButton()
+    {
+        // add a card to the player hand
+        StartCoroutine(Hit());
+    }
+
     // add a card to the player hand
-    public void Hit()
+    public IEnumerator Hit()
     {
         // assign the correct sfx
         if (audSrc.clip != audClpCardSlide)
@@ -348,13 +396,18 @@ public class BlackJackManager : MonoBehaviour
         // check if the player's hand is greater than 21
         if (int.Parse(txtPlayerHandCount.text) > 21)
         {
+            // hide the buttons
+            btnHit.gameObject.SetActive(false);
+            btnStand.gameObject.SetActive(false);
+
             // calculate the score so that the game is over
-            Stand();
+            yield return new WaitForSeconds(0.5f);
+            StartCoroutine(Stand());
         }
     }
 
     // deal a new hand 
-    public void PlayAgain()
+    public void PlayAgainButton()
     {
         // hide and show the appropriate buttons
         btnMainMenu.gameObject.SetActive(false);
@@ -398,7 +451,13 @@ public class BlackJackManager : MonoBehaviour
             if (int.Parse(txtPlayerHandCount.text) > int.Parse(txtDealerHandCount.text))
             {
                 // show that the player won and increment the score
-                txtWinMessage.text = "You have won!";
+                if (int.Parse(txtPlayerHandCount.text) < 21)
+                {
+                    txtWinMessage.text = "You have won!";
+                } else
+                {
+                    txtWinMessage.text = "Blackjack!";
+                }
                 m_intPlayerScore++;
                 txtPlayerScore.text = "You: " + m_intPlayerScore;
             }
@@ -409,23 +468,33 @@ public class BlackJackManager : MonoBehaviour
             }
             else
             {
-                // show that the dealer won and increment the score
-                txtWinMessage.text = "The Dealer has won!";
-                m_intDealerScore++;
-                txtDealerScore.text = "Dealer: " + m_intDealerScore;
+                // if the dealer's hand is greater than 21
+                if (int.Parse(txtDealerHandCount.text) > 21)
+                {
+                    txtWinMessage.text = "The Dealer has bust! You have won!";
+                    m_intPlayerScore++;
+                    txtPlayerScore.text = "You: " + m_intPlayerScore;
+                }
+                else
+                {
+                    // show that the dealer won and increment the score
+                    txtWinMessage.text = "The Dealer has won!";
+                    m_intDealerScore++;
+                    txtDealerScore.text = "Dealer: " + m_intDealerScore;
+                }
             }
         }
         else
         {
             // show that the dealer won and increment the score
-            txtWinMessage.text = "The Dealer has won!";
+            txtWinMessage.text = "Bust! The Dealer has won!";
             m_intDealerScore++;
             txtDealerScore.text = "Dealer: " + m_intDealerScore;
         }
     }
 
     // go to main menu
-    public void MainMenu()
+    public void MainMenuButton()
     {
         SceneManager.LoadScene("MainMenu");
     }
