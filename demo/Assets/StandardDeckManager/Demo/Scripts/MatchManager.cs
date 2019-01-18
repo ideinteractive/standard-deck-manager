@@ -79,7 +79,7 @@ public class MatchManager : MonoBehaviour
 	// once per frame
 	void Update ()
     {
-		// if the cards are all delt 
+		// if the cards are all dealt 
         if(m_gameStarted)
         {
             // allow the player to start flipping the cards
@@ -115,6 +115,31 @@ public class MatchManager : MonoBehaviour
             // deal 4 cards straight from the top of the deck
             if (i < 4)
             {
+                // if any any card after the first card is dealt
+                if (i != 0)
+                {
+                    // for each card in the in use pile
+                    int c = 0;
+                    Debug.Log("CARDS - " + DeckManager.instance.inUsePile.Count);
+                    while (c<DeckManager.instance.inUsePile.Count)
+                    {
+                        Debug.Log(c);
+                        // check to see if the card about to be dealt
+                        // is the same rank as one of the cards in the pile
+                       while (DeckManager.instance.deck[0].rank == DeckManager.instance.inUsePile[c].rank)
+                        {
+                            Debug.Log("SHUFFLE");
+                            // if it is shuffle the deck of cards and restart the loop
+                            DeckManager.instance.Shuffle();
+                            
+                            //c = 0;
+                            //continue;
+                        }
+                        c++;
+                        Debug.Log("INCREASE");
+                    }
+                }
+
                 // move the current card in the deck manager to the in use pile
                 DeckManager.instance.MoveToInUse(DeckManager.instance.deck[0], DeckManager.instance.deck);
             } else
@@ -163,6 +188,15 @@ public class MatchManager : MonoBehaviour
                 // check if the collider is tagged "Card"
                 if (hit.collider.tag == "Card")
                 {
+                    // get the index of the current card
+                    int index = slots.IndexOf(hit.collider.gameObject);
+
+                    // check if the card being hit is the same card
+                    if (m_cardOne == DeckManager.instance.inUsePile[index] || m_cardTwo == DeckManager.instance.inUsePile[index])
+                    {
+                        return;
+                    }
+
                     // assign the correct sfx
                     if (audSrc.clip != audClpCardSlide)
                         audSrc.clip = audClpCardSlide;
@@ -171,7 +205,7 @@ public class MatchManager : MonoBehaviour
                     audSrc.Play();
 
                     // turn the card over in the correct slot
-                    int index = slots.IndexOf(hit.collider.gameObject);
+                    
                     DeckManager.instance.inUsePile[index].card.transform.position = slots[index].transform.position;
                     DeckManager.instance.inUsePile[index].card.GetComponent<SpriteRenderer>().sortingOrder = 1;
                     DeckManager.instance.inUsePile[index].card.SetActive(true);
