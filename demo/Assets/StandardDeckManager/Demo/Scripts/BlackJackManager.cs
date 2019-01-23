@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// BlackJackManager
@@ -10,40 +11,62 @@ using System.Collections;
 
 public class BlackJackManager : MonoBehaviour
 {
+    #region Variables
     // public variables
     [Header("Game Objects")]
-    public GameObject goDealerCardBorder;       // where the dealer card spawns
-    public GameObject goPlayerCardBorder;       // where the player card spawns
+    public GameObject goDealerCardBorder;               // where the dealer card spawns
+    public GameObject goPlayerCardBorder;               // where the player card spawns
 
     [Header("UI Objects")]
-    public Text txtDeckCount;                   // text object to track deck count
-    public Text txtPlayerHandCount;             // text object to track player's hand
-    public Text txtDealerHandCount;             // text object to track dealer's hand
-    public Text txtPlayerScore;                 // text object to track player's score
-    public Text txtDealerScore;                 // text object to track dealer's score
-    public Text txtWinMessage;                  // text object to inform who won
-    public Button btnHit;                       // hit button
-    public Button btnStand;                     // stand button
-    public Button btnPlayAgain;                 // replay button
-    public Button btnMainMenu;                  // main menu button
+    public Text txtDeckCount;                           // text object to track deck count
+    public Text txtPlayerHandCount;                     // text object to track player's hand
+    public Text txtDealerHandCount;                     // text object to track dealer's hand
+    public Text txtPlayerScore;                         // text object to track player's score
+    public Text txtDealerScore;                         // text object to track dealer's score
+    public Text txtWinMessage;                          // text object to inform who won
+    public Button btnHit;                               // hit button
+    public Button btnStand;                             // stand button
+    public Button btnPlayAgain;                         // replay button
+    public Button btnMainMenu;                          // main menu button
 
     [Header("Other Settings")]
-    public Vector3 vecCardSpawnOffset;          // how much offset when placing the cards next to each other
+    public int intMinDeckShuffleAmount      = 4;        // the minimum amount of cards the deck should have before its shuffled
+    public float fltWaitTimeAfterShuffle    = 0.7f;     // the wait time after the deck is shuffled
+    public float fltWaitTimeBeforeDeal      = 0.5f;     // the wait time between when a dealer hits  
+    public float fltWaitTimeBeforeResults   = 0.5f;     // the wait time before the winner is determined
+    public float fltWaitTimeAfterHitButton  = 0.6f;     // the wait time for the button to appear again after hitting hit
+    public Vector3 vecCardSpawnOffset;                  // how much offset when placing the cards next to each other
 
     [Header("Dealer and Player Hand")]
-    public List<Card> col_dealerHand;           // the dealer's hand
-    public List<Card> col_playerHand;           // the player's hand
+    public List<Card> col_dealerHand;                   // the dealer's hand
+    public List<Card> col_playerHand;                   // the player's hand
 
     [Header("Sound Effects")]
-    public AudioSource audSrc;                  // the audio source to play sounds from
-    public AudioClip audClpCardSlide;           // audio clip for dealing a card
-    public AudioClip audClpCardShuffle;         // audio clip for shuffling the deck
+    public AudioSource audSrc;                          // the audio source to play sounds from
+    public AudioClip audClpCardSlide;                   // audio clip for dealing a card
+    public AudioClip audClpCardShuffle;                 // audio clip for shuffling the deck
+    public AudioClip audClpButtonHover;                 // audio clip for our button hover
+    public AudioClip audClpWin;                         // audio clip for win state
+    public AudioClip audClpLose;                        // audio clip for lose state
+    public AudioClip audClpBlackjack;                   // audio clip for blackjack state
+    public AudioClip audClpDraw;                        // audio clip for draw state
+
+    [Header("Volume Levels")]
+    public float fltCardSlideVolume         = 0.5f;     // the volume for card slide  
+    public float fltCardShuffleVolume       = 0.5f;     // the volume for card shuffling   
+    public float fltButtonHoverVolume       = 0.5f;     // the volume for button hover
+    public float fltWinVolume               = 0.5f;     // the volume for our win sound
+    public float fltLoseVolume              = 0.5f;     // the volume for our lose sound
+    public float fltBlackjackVolume         = 0.5f;     // the volume for our blackjack soud
+    public float fltDrawVolume              = 0.5f;     // the volume for our draw sound
 
     // private evariables
-    private Vector3 m_vecDealerCardOffset;      // the offset of where the card object is displayed for the dealer
-    private Vector3 m_vecPlayerCardOffset;      // the offset of where the card object is displayed for the player
-    private int m_intPlayerScore;               // the player's score
-    private int m_intDealerScore;               // the dealer's score
+    private Vector3 m_vecDealerCardOffset;              // the offset of where the card object is displayed for the dealer
+    private Vector3 m_vecPlayerCardOffset;              // the offset of where the card object is displayed for the player
+    private int m_intPlayerScore;                       // the player's score
+    private int m_intDealerScore;                       // the dealer's score
+    private bool m_blnActionInProgress;                 // check if the player performed an action already
+    #endregion
 
     // on initialization
     void Start()
@@ -65,35 +88,21 @@ public class BlackJackManager : MonoBehaviour
         StartCoroutine(InitializeGame());
     }
 
-    // initialize the game
-    private IEnumerator InitializeGame()
+    #region Game Functionality
+    // set up the deck
+    private void SetUpDeck(List<Card> deck)
     {
-        yield return new WaitForSeconds(0.2f);
-
-        // set up our card values below
         // for each card in the deck
-        SetUpDeck(DeckManager.instance.deck);
-        SetUpDeck(DeckManager.instance.discardPile);
-        SetUpDeck(DeckManager.instance.inUsePile);
-
-        // if the audio clip is not the shuffle sfx
-        if (audSrc.clip != audClpCardShuffle)
-            audSrc.clip = audClpCardShuffle;
-        audSrc.Play();
-
-        // shuffle the deck of cards
-        DeckManager.instance.Shuffle();
-
-        yield return new WaitForSeconds(1.2f);
-
-        // reset the spawn offset
-        ResetSpawnOffset();
-
-        // deal a new hand 
-        StartCoroutine(DealNewHand());
+        int i = 0;
+        while (i < deck.Count)
+        {
+            // set up its value
+            SetCardValue(deck[i]);
+            i++;
+        }
     }
 
-    // set the card values
+    // sets the value for a specific card
     private void SetCardValue(Card card)
     {
         // create a switch statement for each 
@@ -145,21 +154,38 @@ public class BlackJackManager : MonoBehaviour
         }
     }
 
-    // set up the deck
-    private void SetUpDeck(List<Card> deck)
+    // initializes the game and handles the setup
+    private IEnumerator InitializeGame()
     {
-        // for each card in the deck
-        int i = 0;
-        while (i < deck.Count)
-        {
-            SetCardValue(deck[i]);
-            i++;
-        }
+        yield return new WaitForSeconds(0.2f);
+
+        // set up each deck's card value
+        SetUpDeck(DeckManager.instance.deck);
+        SetUpDeck(DeckManager.instance.discardPile);
+        SetUpDeck(DeckManager.instance.inUsePile);
+
+        // play our shuffle sfx
+        AssignAudioClip(audClpCardShuffle);
+        audSrc.Play();
+
+        // shuffle the deck of cards
+        DeckManager.instance.Shuffle();
+
+        yield return new WaitForSeconds(fltWaitTimeAfterShuffle);
+
+        // reset the spawn offset
+        ResetSpawnOffset();
+
+        // deal a new hand 
+        StartCoroutine(DealNewHand());
     }
 
     // deal a new hand to the player and dealer
     private IEnumerator DealNewHand()
     {
+        // reset our variables
+        m_blnActionInProgress = false;
+
         // if there are cards in the in use pile
         while (DeckManager.instance.inUsePile.Count > 0)
         {
@@ -167,26 +193,17 @@ public class BlackJackManager : MonoBehaviour
             DeckManager.instance.DiscardCard(DeckManager.instance.inUsePile[0], DeckManager.instance.inUsePile);
         }
 
-        // if there is less than 4 cards in the deck
-        if (DeckManager.instance.Count() < 4)
+        // check if the discard pile should 
+        // be shuffled back into the main deck
+        if (CheckForShuffle())
         {
-            // shuffle the discard pile into the deck before continuing 
-            DeckManager.instance.ShuffleDecks(DeckManager.instance.deck, DeckManager.instance.discardPile);
-
-            // if the audio clip is not the shuffle sfx
-            if (audSrc.clip != audClpCardShuffle)
-                audSrc.clip = audClpCardShuffle;
-            audSrc.Play();
+            yield return new WaitForSeconds(fltWaitTimeAfterShuffle);
         }
 
         // create a new list for the dealer and player
         col_dealerHand = new List<Card>();
         col_playerHand = new List<Card>();
 
-        // assign the correct sfx
-        if (audSrc.clip != audClpCardSlide)
-            audSrc.clip = audClpCardSlide;
-        
         // for 4 loops
         for (int i=0; i<4; i++)
         {
@@ -194,7 +211,6 @@ public class BlackJackManager : MonoBehaviour
             if (i%2 == 0)
             {
                 StartCoroutine(DealCard(col_dealerHand, goDealerCardBorder, false));
-                audSrc.Play();
 
                 // if this is the first deal
                 if (i == 0)
@@ -202,20 +218,20 @@ public class BlackJackManager : MonoBehaviour
                     // display the current score of the dealer
                     CalculateDealerInitialHand();
                 }
-                
-                yield return new WaitForSeconds(0.5f);
-            } else
+
+                yield return new WaitForSeconds(fltWaitTimeBeforeDeal);
+            }
+            else
             {
                 StartCoroutine(DealCard(col_playerHand, goPlayerCardBorder, true));
-                audSrc.Play();
 
                 // display the current score of the player
                 CalculateHand(col_playerHand, txtPlayerHandCount);
 
-                yield return new WaitForSeconds(0.5f);
-            }         
+                yield return new WaitForSeconds(fltWaitTimeBeforeDeal);
+            }
         }
-        
+
         // turn on our buttons
         btnHit.gameObject.SetActive(true);
         btnStand.gameObject.SetActive(true);
@@ -224,18 +240,11 @@ public class BlackJackManager : MonoBehaviour
     // deal a card
     private IEnumerator DealCard(List<Card> hand, GameObject slot, bool isPlayer)
     {
-        // if there is less than 4 cards in the deck
-        if (DeckManager.instance.Count() < 4)
+        // check if the discard pile should 
+        // be shuffled back into the main deck
+        if(CheckForShuffle())
         {
-            // shuffle the discard pile into the deck before continuing 
-            DeckManager.instance.ShuffleDecks(DeckManager.instance.deck, DeckManager.instance.discardPile);
-
-            // if the audio clip is not the shuffle sfx
-            if (audSrc.clip != audClpCardShuffle)
-                audSrc.clip = audClpCardShuffle;
-            audSrc.Play();
-
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(fltWaitTimeAfterShuffle);
         }
 
         // add the card to the hand and set the sorting order
@@ -271,11 +280,19 @@ public class BlackJackManager : MonoBehaviour
             }
         }
 
+        // assign the card sliding sfx
+        AssignAudioClip(audClpCardSlide);
+        audSrc.Play();
+
         // move the current card in the deck manager to the in use pile
         DeckManager.instance.MoveToInUse(DeckManager.instance.deck[0], DeckManager.instance.deck);
 
         // update the deck count
         txtDeckCount.text = DeckManager.instance.Count().ToString();
+
+        // set action in progress to false
+        // to allow the player to continue
+        m_blnActionInProgress = false;
     }
 
     // spawn back face card onto slot
@@ -333,20 +350,6 @@ public class BlackJackManager : MonoBehaviour
         txtDealerHandCount.text = col_dealerHand[0].value.ToString();
     }
 
-    // reset the spawn offset
-    private void ResetSpawnOffset()
-    {
-        m_vecDealerCardOffset = Vector3.zero;
-        m_vecPlayerCardOffset = Vector3.zero;
-    }
-
-    // stand function for button click
-    public void StandButton()
-    {
-        // stand and reveal the hands to determine who wins
-        StartCoroutine(Stand());
-    }
-
     // stand and reveal the hands to determine who wins
     private IEnumerator Stand()
     {
@@ -354,9 +357,8 @@ public class BlackJackManager : MonoBehaviour
         btnHit.gameObject.SetActive(false);
         btnStand.gameObject.SetActive(false);
 
-        // assign the correct sfx
-        if (audSrc.clip != audClpCardSlide)
-            audSrc.clip = audClpCardSlide;
+        // assign the card sliding sfx
+        AssignAudioClip(audClpCardSlide);
 
         // spawn the dealer's second card onto the back face position
         col_dealerHand[1].card.transform.position = DeckManager.instance.cardBackFace.transform.position;
@@ -370,7 +372,7 @@ public class BlackJackManager : MonoBehaviour
         // calculate the dealer's hand
         CalculateHand(col_dealerHand, txtDealerHandCount);
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(fltWaitTimeBeforeResults);
 
         // if the player's hand is less than or equal to 21
         if (int.Parse(txtPlayerHandCount.text) <= 21)
@@ -386,7 +388,7 @@ public class BlackJackManager : MonoBehaviour
 
                 // play the sfx
                 audSrc.Play();
-                yield return new WaitForSeconds(0.5f);
+                yield return new WaitForSeconds(fltWaitTimeBeforeDeal);
             }
         }
 
@@ -398,22 +400,9 @@ public class BlackJackManager : MonoBehaviour
         btnPlayAgain.gameObject.SetActive(true);
     }
 
-    // hit button
-    public void HitButton()
-    {
-        // add a card to the player hand
-        StartCoroutine(Hit());
-    }
-
     // add a card to the player hand
     public IEnumerator Hit()
     {
-        // assign the correct sfx
-        if (audSrc.clip != audClpCardSlide)
-            audSrc.clip = audClpCardSlide;
-
-        audSrc.Play();
-
         // add a new card to the player hand 
         StartCoroutine(DealCard(col_playerHand, goPlayerCardBorder, true));
 
@@ -428,9 +417,106 @@ public class BlackJackManager : MonoBehaviour
             btnStand.gameObject.SetActive(false);
 
             // calculate the score so that the game is over
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(fltWaitTimeBeforeResults);
             StartCoroutine(Stand());
         }
+
+        yield return new WaitForSeconds(fltWaitTimeAfterHitButton);
+    }
+
+    // reveal the score and who won
+    private void SelectWinner()
+    {
+        // if the player score is 21 or less
+        if (int.Parse(txtPlayerHandCount.text) <= 21)
+        {
+            // if the player score is higher than the dealer's
+            if (int.Parse(txtPlayerHandCount.text) > int.Parse(txtDealerHandCount.text))
+            {
+                // show that the player won and increment the score
+                if (int.Parse(txtPlayerHandCount.text) < 21)
+                {
+                    txtWinMessage.text = "You have won!";
+                    AssignAudioClip(audClpWin);
+                }
+                else
+                {
+                    txtWinMessage.text = "Blackjack!";
+                    AssignAudioClip(audClpBlackjack);
+                }
+                m_intPlayerScore++;
+                txtPlayerScore.text = "You: " + m_intPlayerScore;
+            }
+            else if (int.Parse(txtPlayerHandCount.text) == int.Parse(txtDealerHandCount.text))
+            {
+                // show the it is a draw
+                txtWinMessage.text = "Draw!";
+                AssignAudioClip(audClpDraw);
+            }
+            else
+            {
+                // if the dealer's hand is greater than 21
+                if (int.Parse(txtDealerHandCount.text) > 21)
+                {
+                    txtWinMessage.text = "The dealer busts. You have won!";
+                    m_intPlayerScore++;
+                    txtPlayerScore.text = "You: " + m_intPlayerScore;
+                    AssignAudioClip(audClpWin);
+                }
+                else
+                {
+                    // show that the dealer won and increment the score
+                    txtWinMessage.text = "The Dealer has won!";
+                    m_intDealerScore++;
+                    txtDealerScore.text = "Dealer: " + m_intDealerScore;
+                    AssignAudioClip(audClpLose);
+                }
+            }
+        }
+        else
+        {
+            // show that the dealer won and increment the score
+            txtWinMessage.text = "Bust! The Dealer has won.";
+            m_intDealerScore++;
+            txtDealerScore.text = "Dealer: " + m_intDealerScore;
+            AssignAudioClip(audClpWin);
+        }
+
+        audSrc.Play();
+    }
+    #endregion
+
+    #region UI Button Actions
+    // stand function for button click
+    public void StandButton()
+    {
+        // if an action is already in progress
+        if (m_blnActionInProgress)
+            // ignore everything else
+            return;
+
+        // prevent the player from doing anything
+        // else until this action is completed
+        m_blnActionInProgress = true;
+
+        // stand and reveal the hands to determine who wins
+        StartCoroutine(Stand());
+    }
+
+    // hit button
+    public void HitButton()
+    {
+        // if an action is already in progress
+        if (m_blnActionInProgress)
+            // ignore everything else
+            return;
+
+        // prevent the player from doing anything
+        // else until this action is completed
+        m_blnActionInProgress = true;
+
+        // add a card to the player hand
+        StartCoroutine(Hit());
     }
 
     // deal a new hand 
@@ -468,61 +554,64 @@ public class BlackJackManager : MonoBehaviour
         StartCoroutine(DealNewHand());
     }
 
-    // reveal the score and who won
-    private void SelectWinner()
-    {
-        // if the player score is 21 or less
-        if (int.Parse(txtPlayerHandCount.text) <= 21)
-        {
-            // if the player score is higher than the dealer's
-            if (int.Parse(txtPlayerHandCount.text) > int.Parse(txtDealerHandCount.text))
-            {
-                // show that the player won and increment the score
-                if (int.Parse(txtPlayerHandCount.text) < 21)
-                {
-                    txtWinMessage.text = "You have won!";
-                } else
-                {
-                    txtWinMessage.text = "Blackjack!";
-                }
-                m_intPlayerScore++;
-                txtPlayerScore.text = "You: " + m_intPlayerScore;
-            }
-            else if (int.Parse(txtPlayerHandCount.text) == int.Parse(txtDealerHandCount.text))
-            {
-                // show the it is a draw
-                txtWinMessage.text = "Draw!";
-            }
-            else
-            {
-                // if the dealer's hand is greater than 21
-                if (int.Parse(txtDealerHandCount.text) > 21)
-                {
-                    txtWinMessage.text = "The dealer busts. You have won!";
-                    m_intPlayerScore++;
-                    txtPlayerScore.text = "You: " + m_intPlayerScore;
-                }
-                else
-                {
-                    // show that the dealer won and increment the score
-                    txtWinMessage.text = "The Dealer has won!";
-                    m_intDealerScore++;
-                    txtDealerScore.text = "Dealer: " + m_intDealerScore;
-                }
-            }
-        }
-        else
-        {
-            // show that the dealer won and increment the score
-            txtWinMessage.text = "Bust! The Dealer has won.";
-            m_intDealerScore++;
-            txtDealerScore.text = "Dealer: " + m_intDealerScore;
-        }
-    }
-
     // go to main menu
     public void MainMenuButton()
     {
-        GameManager.instance.GoToMainMenu();
+        SceneManager.LoadScene("MainMenu");
     }
+
+    // play the button hover sfx
+    public void PlayButtonHover()
+    {
+        // assign button hover sfx
+        AssignAudioClip(audClpButtonHover);
+        audSrc.Play();
+    }
+    #endregion
+
+    #region Helper Functions
+    // assign an audio clip
+    private void AssignAudioClip(AudioClip audClp)
+    {
+        // if the audio clip is not the clip we want
+        if (audSrc.clip != audClp)
+            // assign it
+            audSrc.clip = audClp;
+
+        // adjust the volume based on the clip
+        if (audClp == audClpCardShuffle)
+            audSrc.volume =  fltCardShuffleVolume;
+        else if (audClp == audClpCardSlide)
+            audSrc.volume = fltCardSlideVolume;
+        else if (audClp == audClpButtonHover)
+            audSrc.volume = fltButtonHoverVolume;
+    }
+
+    // reset the spawn offset
+    private void ResetSpawnOffset()
+    {
+        m_vecDealerCardOffset = Vector3.zero;
+        m_vecPlayerCardOffset = Vector3.zero;
+    }
+
+    // check if the discard pile should 
+    // be shuffled back into the main deck
+    private bool CheckForShuffle()
+    {
+        // if there is less than the min amount of cards in the deck
+        if (DeckManager.instance.Count() <= intMinDeckShuffleAmount)
+        {
+            // shuffle the discard pile into the deck
+            DeckManager.instance.ShuffleDecks(DeckManager.instance.deck, DeckManager.instance.discardPile);
+
+            // play the shuffle sfx
+            AssignAudioClip(audClpCardShuffle);
+            audSrc.Play();
+
+            return true;
+        }
+
+        return false;
+    }
+    #endregion
 }
