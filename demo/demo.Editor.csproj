@@ -133,9 +133,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\StandardDeckManager\Editor\DeckEditor.cs" />
-    <Compile Include="Assets\StandardDeckManager\Editor\DeckOptionsEditor.cs" />
+    <Compile Include="Assets\StandardDeckManager\Editor\DeckManagerEditor.cs" />
     <Compile Include="Assets\StandardDeckManager\Editor\EditorClasses.cs" />
+    <Compile Include="Assets\StandardDeckManager\Editor\SDMTools.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\StandardDeckManager\Demo\Fonts\Francois One\OFL.txt" />

@@ -15,6 +15,7 @@ public class DeckManager : MonoBehaviour
     public List<Card> deck = new List<Card>();            // contains a list of cards
     public List<Card> discardPile = new List<Card>();     // contains a list of discarded cards
     public List<Card> inUsePile = new List<Card>();       // contains a list of cards in use
+
     public GameObject cardBackFace;                         // the back face of a card
 
     // boolean to keep track of custom editor panel
@@ -30,7 +31,7 @@ public class DeckManager : MonoBehaviour
     {
         // set this object
         instance = this;
-
+        
         // spawn a new empty gameobject to contain our pooled objects
         m_goPool = new GameObject();
         m_goPool.name = "Pool";
@@ -132,10 +133,17 @@ public class DeckManager : MonoBehaviour
     // discard a card to the discard pile
     public void DiscardCard(Card card, List<Card> _deck)
     {
+        Debug.Log(card.value);
         // add the card to the discard pille
         // and remove it from the source deck
-        discardPile.Add(card);
-        _deck.Remove(card);
+        Card t = new Card();
+        t.suit = card.suit;
+        t.color = card.color;
+        t.value = card.value;
+        t.rank = card.rank;
+        t.card = card.card;
+        discardPile.Add(t);
+        //_deck.Remove(card);
     }
 
     // add a card to the in use pile
@@ -216,7 +224,7 @@ public class DeckManager : MonoBehaviour
         deckToShuffle.AddRange(mainDeck);
 
         // clear the main deck
-        mainDeck = new List<Card>();
+        mainDeck = deckToShuffle;
 
         // set the main deck to the deck to shuffle
         mainDeck = deckToShuffle;
@@ -256,7 +264,7 @@ public class DeckManager : MonoBehaviour
     public void RemoveAllAndCreateNew()
     {
         // create a new deck 
-        deck.Clear();
+        deck = new List<Card>();
 
         // for each suit 
         for (int i = 0; i <= (int)Card.Suit.Hearts; i++)
@@ -299,10 +307,10 @@ public class DeckManager : MonoBehaviour
         }
 
         // create a new discard pile
-        discardPile.Clear();
+        discardPile = new List<Card>();
 
         // create a new in use pile
-        inUsePile.Clear();
+        inUsePile = new List<Card>();
 
         // assign the back face card
         cardBackFace = Resources.Load("Prefabs/Back Face") as GameObject;
@@ -315,9 +323,9 @@ public class DeckManager : MonoBehaviour
     public void RemoveAll()
     {
         // remove all cards 
-        deck.Clear();
-        discardPile.Clear();
-        inUsePile.Clear();
+        deck = new List<Card>();
+        discardPile = new List<Card>();
+        inUsePile = new List<Card>();
 
         // assign the back face card
         cardBackFace = Resources.Load("Prefabs/Back Face") as GameObject;

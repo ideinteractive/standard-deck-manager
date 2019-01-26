@@ -11,20 +11,20 @@ public class MenuManager : MonoBehaviour
     public void GoToBlackjack()
     {
         // load the scene
-        GameManager.instance.GoToBlackjack();
+        //GameManager.instance.GoToBlackjack();
     }
 
     // go to war demo
     public void GoToWar()
     {
         // load the scene
-        GameManager.instance.GoToWar();
+        //GameManager.instance.GoToWar();
     }
 
     // go to match demo
     public void GoToMatch()
     {
         // load the scene
-        GameManager.instance.GoToMatch();
+        //GameManager.instance.GoToMatch();
     }
 }

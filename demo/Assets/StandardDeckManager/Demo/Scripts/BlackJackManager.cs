@@ -87,7 +87,7 @@ public class BlackJackManager : MonoBehaviour
         // initialize the game
         StartCoroutine(InitializeGame());
     }
-
+    
     #region Game Functionality
     // set up the deck
     private void SetUpDeck(List<Card> deck)
@@ -568,7 +568,7 @@ public class BlackJackManager : MonoBehaviour
         audSrc.Play();
     }
     #endregion
-
+    
     #region Helper Functions
     // assign an audio clip
     private void AssignAudioClip(AudioClip audClp)
