@@ -120,13 +120,13 @@ public class DeckManagerEditor : Editor
         if (_deck == deckManager.deck)
         {
             // move the card to the discard pile
-            if (GUI.Button(new Rect(rect.width - 95, rect.y, 60, 15), "Discard"))
+            if (GUI.Button(new Rect(rect.width - 40, rect.y, 20, 15), "D"))
             {
                 Undo.RecordObjects(targets, "Card moved to discard pile.");
                 deckManager.MoveToDiscard(card, deckManager.deck);
             }
             // move the card to the in use pile
-            if (GUI.Button(new Rect(rect.width - 30, rect.y, 60, 15), "Use"))
+            if (GUI.Button(new Rect(rect.width - 15, rect.y, 20, 15), "U"))
             {
                 Undo.RecordObjects(targets, "Card moved to in use pile.");
                 deckManager.MoveToInUse(card, deckManager.deck);
@@ -137,13 +137,13 @@ public class DeckManagerEditor : Editor
         if (_deck == deckManager.discardPile)
         {
             // move the card to the deck
-            if (GUI.Button(new Rect(rect.width - 95, rect.y, 60, 15), "Deck"))
+            if (GUI.Button(new Rect(rect.width - 40, rect.y, 20, 15), "A"))
             {
                 Undo.RecordObjects(targets, "Card moved to deck.");
                 deckManager.MoveToDeck(card, deckManager.discardPile);
             }
             // move the card to the in use pile
-            if (GUI.Button(new Rect(rect.width - 30, rect.y, 60, 15), "Use"))
+            if (GUI.Button(new Rect(rect.width - 15, rect.y, 20, 15), "U"))
             {
                 Undo.RecordObjects(targets, "Card moved to in use pile.");
                 deckManager.MoveToInUse(card, deckManager.discardPile);
@@ -154,17 +154,44 @@ public class DeckManagerEditor : Editor
         if (_deck == deckManager.inUsePile)
         {
             // move the card to the deck
-            if (GUI.Button(new Rect(rect.width - 95, rect.y, 60, 15), "Deck"))
+            if (GUI.Button(new Rect(rect.width - 40, rect.y, 20, 15), "A"))
             {
                 Undo.RecordObjects(targets, "Card moved to deck.");
                 deckManager.MoveToDeck(card, deckManager.inUsePile);
             }
             // move the card to the discard pile
-            if (GUI.Button(new Rect(rect.width - 30, rect.y, 60, 15), "Discard"))
+            if (GUI.Button(new Rect(rect.width - 15, rect.y, 20, 15), "D"))
             {
                 Undo.RecordObjects(targets, "Card moved to discard pile.");
                 deckManager.MoveToDiscard(card, deckManager.inUsePile);
             }
+        }
+
+        // edit the card with the card editor
+        if (GUI.Button(new Rect(rect.width + 10, rect.y, 20, 15), "E"))
+        {
+            // get existing open window or if none, make a new one
+            CardEditor window = (CardEditor)EditorWindow.GetWindow(typeof(CardEditor), false, "Card Editor");
+            window.minSize = new Vector2(325, 140);
+            window.Show();
+
+            // pass our information to the card editor
+            CardEditor.Instance.intCardIndex = _deck.IndexOf(card);
+
+            if (_deck == deckManager.deck)
+                CardEditor.Instance.blnEditingCardFromDeck = true;
+            else
+                CardEditor.Instance.blnEditingCardFromDeck = false;
+
+            if (_deck == deckManager.discardPile)
+                CardEditor.Instance.blnEditingCardFromDiscard = true;
+            else
+                CardEditor.Instance.blnEditingCardFromDiscard = false;
+
+            if (_deck == deckManager.inUsePile)
+                CardEditor.Instance.blnEditingCardFromInUse = true;
+            else
+                CardEditor.Instance.blnEditingCardFromInUse = false;
         }
     }
 
