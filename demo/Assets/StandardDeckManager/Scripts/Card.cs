@@ -8,17 +8,6 @@
 [System.Serializable]
 public class Card
 {
-    // define our card name
-    [SerializeField]
-    public string strName;
-
-#if UNITY_EDITOR
-    // boolean to keep track of custom editor panel
-    [SerializeField]
-    public bool blnExpandCardPnl;
-# endif
-
-    // define the card's suit
     public enum Suit
     {
         Clubs,
@@ -26,19 +15,13 @@ public class Card
         Spades,
         Hearts
     }
-    [SerializeField]
-    public Suit suit;
 
-    // define the card's color
     public enum Color
     {
         Black,
         Red
     }
-    [SerializeField]
-    public Color color;
-
-    // define the card's rank
+    
     public enum Rank
     {
         Ace,
@@ -55,14 +38,12 @@ public class Card
         Queen,
         King
     }
-    [SerializeField]
-    public Rank rank;
 
-    // define the card's value
+    public string strName;          // define our card name
+    public Suit suit;               // define the card's suit
     [SerializeField]
-    public int value;
-
-    // the card gameobject
-    [SerializeField]
-    public GameObject card;
+    public Color color;             // define the card's color
+    public Rank rank;               // define the card's rank
+    public int value;               // define the card's value
+    public GameObject card;         // the card gameobject
 }

@@ -121,39 +121,7 @@ public class DeckManager : MonoBehaviour
         }
     }
 
-    // move card to the choosen deck
-    public void MoveCardToDeck(Card card, List<Card> _deck, List<Card> targetDeck)
-    {
-        // add the card to the deck
-        // and remove it from the source deck
-        targetDeck.Add(card);
-        _deck.Remove(card);
-    }
 
-    // discard a card to the discard pile
-    public void DiscardCard(Card card, List<Card> _deck)
-    {
-        Debug.Log(card.value);
-        // add the card to the discard pille
-        // and remove it from the source deck
-        Card t = new Card();
-        t.suit = card.suit;
-        t.color = card.color;
-        t.value = card.value;
-        t.rank = card.rank;
-        t.card = card.card;
-        discardPile.Add(t);
-        //_deck.Remove(card);
-    }
-
-    // add a card to the in use pile
-    public void MoveToInUse(Card card, List<Card> deck)
-    {
-        // add the card to the in use pile
-        // and remove it from the source deck
-        inUsePile.Add(card);
-        deck.Remove(card);
-    }
 
     // add a new card to the deck
     public void AddCard(Card card, List<Card> deck)
@@ -169,16 +137,7 @@ public class DeckManager : MonoBehaviour
         deck.Remove(card);
     }
 
-    // remove cards from in use pile to discard pile
-    public void DiscardInUse()
-    {
-        // for each card in the in use pile
-        foreach (Card card in inUsePile)
-        {
-            discardPile.Add(card);
-            inUsePile.Remove(card);
-        }
-    }
+    
 
     // shuffle the deck
     public void Shuffle()
@@ -260,6 +219,60 @@ public class DeckManager : MonoBehaviour
         }
     }
 
+    
+
+    // return the deck count
+    public int Count()
+    {
+        return deck.Count;
+    }
+
+    // return the deck count of a given deck
+    public int Count(List<Card> deck)
+    {
+        return deck.Count;
+    }
+    // remove cards from in use pile to discard pile
+    public void DiscardInUse()
+    {
+        // for each card in the in use pile
+        foreach (Card card in inUsePile)
+        {
+            discardPile.Add(card);
+            inUsePile.Remove(card);
+        }
+    }
+
+
+
+
+
+    // move a card to another deck
+    private void MoveCardToADeck(Card card, List<Card> fromDeck, List<Card> toDeck)
+    {
+        // move a card from the from deck to the to deck
+        toDeck.Add(card);
+        fromDeck.Remove(card);
+    }
+
+    // move a card to the discard pile
+    public void MoveToDiscard(Card card, List<Card> fromDeck)
+    {
+        MoveCardToADeck(card, fromDeck, discardPile);
+    }
+
+    // move a card to the deck
+    public void MoveToDeck(Card card, List<Card> fromDeck)
+    {
+        MoveCardToADeck(card, fromDeck, deck);
+    }
+
+    // move a card to the in use pile
+    public void MoveToInUse(Card card, List<Card> fromDeck)
+    {
+        MoveCardToADeck(card, fromDeck, inUsePile);
+    }
+
     // remove all playing cards and generate a new deck
     public void RemoveAllAndCreateNew()
     {
@@ -334,15 +347,7 @@ public class DeckManager : MonoBehaviour
         Debug.Log("All Card Removed");
     }
 
-    // return the deck count
-    public int Count()
-    {
-        return deck.Count;
-    }
 
-    // return the deck count of a given deck
-    public int Count(List<Card> deck)
-    {
-        return deck.Count;
-    }
-} 
+
+
+}

@@ -67,7 +67,7 @@ public class BlackJackManager : MonoBehaviour
     private int m_intDealerScore;                       // the dealer's score
     private bool m_blnActionInProgress;                 // check if the player performed an action already
     #endregion
-
+    /*
     // on initialization
     void Start()
     {
@@ -614,4 +614,5 @@ public class BlackJackManager : MonoBehaviour
         return false;
     }
     #endregion
+    */
 }

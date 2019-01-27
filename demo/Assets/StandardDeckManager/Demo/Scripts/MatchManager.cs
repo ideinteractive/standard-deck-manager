@@ -11,6 +11,7 @@ using UnityEngine.UI;
 
 public class MatchManager : MonoBehaviour
 {
+
     // public variables
 
     [Header("Game Objects")]
@@ -33,7 +34,7 @@ public class MatchManager : MonoBehaviour
     private Card m_cardTwo;                                     // holds our second selected card
     private int m_totalScore;                                   // keeps track of the overall score
     private int m_score;                                        // keeps track of the current round's score
-
+/*
     // on initialization
     void Start ()
     {
@@ -356,5 +357,5 @@ public class MatchManager : MonoBehaviour
     public void MainMenu()
     {
         SceneManager.LoadScene("MainMenu");
-    }
+    }*/
 }

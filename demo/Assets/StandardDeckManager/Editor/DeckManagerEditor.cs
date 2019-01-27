@@ -2,11 +2,10 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
-using UnityEditor.SceneManagement;
 
 /// <summary>
-/// DeckEditor
-/// Description: Custom editor for the DeckManager.
+/// DeckManagerEditor
+/// Description: Custom editor to display all of the cards inside the Deck Manager.
 /// </summary>
 
 [CustomEditor(typeof(DeckManager))]
@@ -18,92 +17,194 @@ public class DeckManagerEditor : Editor
     // reference to the DeckManager
     public DeckManager deckManager;
 
-    // on enable
+    // reference to our reorderable lists
+    private ReorderableList deck;
+    private ReorderableList discardPile;
+    private ReorderableList inUsePile;
+
+    // when this is enabled and active
     private void OnEnable()
     {
-        // set this instance
-        Instance = this;
+        Instance = this;    // set up this instance
+        deckManager = (DeckManager)target;  // set up the reference to the current inspected object
 
-        // set the reference to the current inspected object
-        deckManager = (DeckManager)target;
+        // create our reorderable list
+        deck = new ReorderableList(serializedObject, serializedObject.FindProperty("deck"));
+        discardPile = new ReorderableList(serializedObject, serializedObject.FindProperty("discardPile"));
+        inUsePile = new ReorderableList(serializedObject, serializedObject.FindProperty("inUsePile"));
+
+        // draw out our column headers
+        // and reorderable lists
+        deck.drawHeaderCallback = rect =>
+        {
+            EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, rect.height), "Cards", EditorStyles.boldLabel);
+        };
+        deck.drawElementCallback += DrawDeckElement;
+        deck.onSelectCallback += SelectCard;
+
+        discardPile.drawHeaderCallback = rect =>
+        {
+            EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, rect.height), "Cards", EditorStyles.boldLabel);
+        };
+        discardPile.drawElementCallback += DrawDiscardPileElement;
+        discardPile.onSelectCallback += SelectCard;
+
+        inUsePile.drawHeaderCallback = rect =>
+        {
+            EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, rect.height), "Cards", EditorStyles.boldLabel);
+        };
+        inUsePile.drawElementCallback += DrawInUsePileElement;
+        inUsePile.onSelectCallback += SelectCard;
     }
 
-    // if this script is destoryed or removed
+    // if this script is destroyed or removed
     public void OnDestroy()
     {
+        // if we are using the editor
         if (Application.isEditor)
         {
             // if there is no deck manager found
             if (deckManager == null)
             {
-                // get existing open window and close it
-                SDMTools window = (SDMTools)EditorWindow.GetWindow(typeof(SDMTools), false, "SDM Tools");
-                window.Close();
+                // get existing open windows and close it
+                DeckOptionsEditor doeWindow = (DeckOptionsEditor)EditorWindow.GetWindow(typeof(DeckOptionsEditor), false, "Deck Options");
+                doeWindow.Close();
+                CardEditor ceWindow = (CardEditor)EditorWindow.GetWindow(typeof(CardEditor), false, "Card Editor");
+                ceWindow.Close();
+            }
+
+            // remove a reference to this editor
+            Instance = null;
+
+            // clear all windows of references
+            CardEditor.Instance.blnEditingCardFromDeck = false;
+            CardEditor.Instance.blnEditingCardFromDiscard = false;
+            CardEditor.Instance.blnEditingCardFromInUse = false;
+        }
+    }
+
+    // callback for when we select a card in the deck
+    private void SelectCard(ReorderableList _deck)
+    {
+        if (0 <= _deck.index && _deck.index < _deck.count)
+        {
+            if (CardEditor.IsOpen)
+            {
+                // pass our information to the card editor
+                CardEditor.Instance.intCardIndex = _deck.index;
+
+                if (_deck == deck)
+                    CardEditor.Instance.blnEditingCardFromDeck = true;
+                else
+                    CardEditor.Instance.blnEditingCardFromDeck = false;
+
+                if (_deck == discardPile)
+                    CardEditor.Instance.blnEditingCardFromDiscard = true;
+                else
+                    CardEditor.Instance.blnEditingCardFromDiscard = false;
+
+                if (_deck == inUsePile)
+                    CardEditor.Instance.blnEditingCardFromInUse = true;
+                else
+                    CardEditor.Instance.blnEditingCardFromInUse = false;
             }
         }
     }
 
-    // outputs the default buttons every deck has
-    public void DefaultButtons(List<Card> deck, int i)
+    // draw our our elements
+    private void DrawElements(Rect rect, Card card, List<Card> _deck)
     {
-        // move the card up on the list
-        if (GUILayout.Button("U", GUILayout.MinWidth(20.0f), GUILayout.MaxWidth(20.0f)))
+        EditorGUI.LabelField(new Rect(rect.x, rect.y + 2, rect.width, rect.height), card.color + " " + card.rank + " of " + card.suit);
+
+        // if it is the main deck
+        if (_deck == deckManager.deck)
         {
-            Undo.RecordObject(target, "Card moved up.");
-            deckManager.MoveCardUp(deck[i], deck);
+            // move the card to the discard pile
+            if (GUI.Button(new Rect(rect.width - 95, rect.y, 60, 15), "Discard"))
+            {
+                Undo.RecordObjects(targets, "Card moved to discard pile.");
+                deckManager.MoveToDiscard(card, deckManager.deck);
+            }
+            // move the card to the in use pile
+            if (GUI.Button(new Rect(rect.width - 30, rect.y, 60, 15), "Use"))
+            {
+                Undo.RecordObjects(targets, "Card moved to in use pile.");
+                deckManager.MoveToInUse(card, deckManager.deck);
+            }
         }
 
-
-        // move the card down on the list
-        if (GUILayout.Button("D", GUILayout.MinWidth(20.0f), GUILayout.MaxWidth(20.0f)))
+        // if it is the discard pile
+        if (_deck == deckManager.discardPile)
         {
-            Undo.RecordObject(target, "Card moved down.");
-            deckManager.MoveCardDown(deck[i], deck);
+            // move the card to the deck
+            if (GUI.Button(new Rect(rect.width - 95, rect.y, 60, 15), "Deck"))
+            {
+                Undo.RecordObjects(targets, "Card moved to deck.");
+                deckManager.MoveToDeck(card, deckManager.discardPile);
+            }
+            // move the card to the in use pile
+            if (GUI.Button(new Rect(rect.width - 30, rect.y, 60, 15), "Use"))
+            {
+                Undo.RecordObjects(targets, "Card moved to in use pile.");
+                deckManager.MoveToInUse(card, deckManager.discardPile);
+            }
         }
 
-
-        // move the card to the top of the list
-        if (GUILayout.Button("T", GUILayout.MinWidth(20.0f), GUILayout.MaxWidth(20.0f)))
+        // if it is the in use pile
+        if (_deck == deckManager.inUsePile)
         {
-            Undo.RecordObject(target, "Card moved to top of deck.");
-            deckManager.MoveCardToTop(deck[i], deck);
-        }
-
-
-        // move the card to the bottom of the list
-        if (GUILayout.Button("B", GUILayout.MinWidth(20.0f), GUILayout.MaxWidth(20.0f)))
-        {
-            Undo.RecordObject(target, "Card moved to bottom of deck.");
-            deckManager.MoveCardToBottom(deck[i], deck);
-        }
-
-
-        // remove the card from the list
-        if (GUILayout.Button("R", GUILayout.MinWidth(20.0f), GUILayout.MaxWidth(20.0f)))
-        {
-            Undo.RecordObject(target, "Card removed.");
-            deckManager.RemoveCard(deck[i], deck);
+            // move the card to the deck
+            if (GUI.Button(new Rect(rect.width - 95, rect.y, 60, 15), "Deck"))
+            {
+                Undo.RecordObjects(targets, "Card moved to deck.");
+                deckManager.MoveToDeck(card, deckManager.inUsePile);
+            }
+            // move the card to the discard pile
+            if (GUI.Button(new Rect(rect.width - 30, rect.y, 60, 15), "Discard"))
+            {
+                Undo.RecordObjects(targets, "Card moved to discard pile.");
+                deckManager.MoveToDiscard(card, deckManager.inUsePile);
+            }
         }
     }
 
-    // when the window gets updated
-    private void OnInspectorUpdate()
+    // draw our our elements for the deck
+    private void DrawDeckElement(Rect rect, int index, bool active, bool focused)
     {
-        // repaint the editor window
-        Repaint();
+        Card card = deckManager.deck[index];
+
+        // draw our our elements
+        DrawElements(rect, card, deckManager.deck);
     }
 
-    // overwrite inspector interface
+    // draw our our elements for the discard pile
+    private void DrawDiscardPileElement(Rect rect, int index, bool active, bool focused)
+    {
+        Card card = deckManager.discardPile[index];
+
+        // draw our our elements
+        DrawElements(rect, card, deckManager.discardPile);
+    }
+
+    // draw our our elements for the in use pile
+    private void DrawInUsePileElement(Rect rect, int index, bool active, bool focused)
+    {
+        Card card = deckManager.inUsePile[index];
+
+        // draw our our elements
+        DrawElements(rect, card, deckManager.inUsePile);
+    }
+
+    // override our inspector interface
     public override void OnInspectorGUI()
     {
+        // update serialized object representation
+        serializedObject.Update();
+
         // if the instance is empty
         if (Instance == null)
-        {
             // set this instance
             Instance = this;
-        }
-
-        Undo.RecordObjects(targets, "DeckManager");
 
         /// GUI STYLES
 
@@ -116,287 +217,88 @@ public class DeckManagerEditor : Editor
 
         /// EDITOR
 
+        EditorGUI.BeginChangeCheck();
+        EditorGUILayout.Space();
+        EditorGUILayout.BeginHorizontal(styleRowHeader);
+        EditorGUILayout.LabelField("Deck Manager Tools", EditorStyles.boldLabel);
+        EditorGUILayout.EndHorizontal();
         EditorGUILayout.Space();
 
         // get existing open window or if none, make a new one
-        if (GUILayout.Button("Open Deck Manager Tools"))
+        if (GUILayout.Button("Deck Options"))
         {
-            SDMTools window = (SDMTools)EditorWindow.GetWindow(typeof(SDMTools), false, "SDM Tools");
+            DeckOptionsEditor window = (DeckOptionsEditor)EditorWindow.GetWindow(typeof(DeckOptionsEditor), false, "Deck Options");
             window.Show();
         }
 
-        // remove everything
-        if (GUILayout.Button("Remove All Card"))
+        // optn the card editor window
+        if (GUILayout.Button("Card Editor"))
         {
-            deckManager.RemoveAll();
+            // get existing open window or if none, make a new one
+            CardEditor window = (CardEditor)EditorWindow.GetWindow(typeof(CardEditor), false, "Card Editor");
+            window.minSize = new Vector2(325, 140);
+            window.Show();
         }
 
         // remove everything and create a new standard deck
-        if (GUILayout.Button("Generate New Deck"))
+        if (GUILayout.Button("Generate a New Deck"))
         {
             Undo.RecordObjects(targets, "New deck generated.");
             deckManager.RemoveAllAndCreateNew();
         }
 
-        EditorGUILayout.Space();
+        // remove everything
+        if (GUILayout.Button("Remove All Cards"))
+        {
+            Undo.RecordObjects(targets, "All card removed.");
+            deckManager.RemoveAll();
+        }
 
+        EditorGUILayout.Space();
         EditorGUILayout.BeginHorizontal(styleRowHeader);
-        EditorGUILayout.LabelField("Deck / Discard Pile / In Use Pile", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("In Use Pile / Deck / Discard Pile Cards", EditorStyles.boldLabel);
         EditorGUILayout.EndHorizontal();
-
         EditorGUILayout.Space();
 
-        EditorGUILayout.BeginHorizontal();
-        deckManager.blnExpandDeckPnl = EditorGUILayout.Foldout(deckManager.blnExpandDeckPnl, "Deck [" + deckManager.deck.Count.ToString() + "]");
-        EditorGUILayout.EndHorizontal();
-
-        // if the deck's panel is expanded
+        deckManager.blnExpandDeckPnl = EditorGUILayout.Foldout(deckManager.blnExpandDeckPnl, "Deck [" + deckManager.deck.Count + "]");
         if (deckManager.blnExpandDeckPnl)
-        {
-            // try and render the card info
             try
             {
-                // for each card inside the deck starting from the lowest to highest (order)
-                for (int i = 0; i < deckManager.deck.Count; i++)
-                {
-                    Undo.RecordObjects(targets, "DeckManager");
-                    EditorGUILayout.BeginHorizontal(stylePaddingLeft);
-
-                    // expand or collapse the card's panel depending on the boolean status
-                    // and name the panel based on the card
-                    deckManager.deck[i].blnExpandCardPnl = EditorGUILayout.Foldout(deckManager.deck[i].blnExpandCardPnl, deckManager.deck[i].strName);
-
-                    // render our default buttons
-                    DefaultButtons(deckManager.deck, i);
-
-                    // move the card to the discard pile
-                    if (GUILayout.Button("-", GUILayout.MinWidth(20.0f), GUILayout.MaxWidth(20.0f)))
-                    {
-                        Undo.RecordObject(target, "Card moved to discard pile.");
-                        deckManager.DiscardCard(deckManager.deck[i], deckManager.deck);
-                    }
-
-
-                    // move the card to the in use pile
-                    if (GUILayout.Button("IU", GUILayout.MinWidth(25.0f), GUILayout.MaxWidth(25.0f)))
-                    {
-                        Undo.RecordObject(target, "Card moved to in use pile.");
-                        deckManager.MoveToInUse(deckManager.deck[i], deckManager.deck);
-                    }
-
-
-                    EditorGUILayout.EndHorizontal();
-
-                    // if the card's panel is expanded
-                    if (deckManager.deck[i].blnExpandCardPnl)
-                    {
-                        EditorGUILayout.Space();
-                        EditorGUILayout.BeginVertical(stylePaddingLeft);
-
-                        // automatically assign the card name if it doesn't exist
-                        deckManager.deck[i].strName = deckManager.deck[i].color.ToString() + " " + deckManager.deck[i].rank.ToString() + " of " + deckManager.deck[i].suit.ToString();
-
-                        // show the card's color
-                        deckManager.deck[i].color = (Card.Color)EditorGUILayout.EnumPopup("Color", deckManager.deck[i].color);
-
-                        // show the card's rank
-                        deckManager.deck[i].rank = (Card.Rank)EditorGUILayout.EnumPopup("Rank", deckManager.deck[i].rank);
-
-                        // show the card's suit
-                        deckManager.deck[i].suit = (Card.Suit)EditorGUILayout.EnumPopup("Suit", deckManager.deck[i].suit);
-
-                        // show the card's value
-                        deckManager.deck[i].value = EditorGUILayout.IntField("Value", deckManager.deck[i].value);
-
-                        // show the card's object
-                        deckManager.deck[i].card = (GameObject)EditorGUILayout.ObjectField("Card", deckManager.deck[i].card, typeof(GameObject), true);
-
-                        EditorGUILayout.EndVertical();
-                        EditorGUILayout.Space();
-                    }
-                }
+                deck.DoLayoutList();
             }
             catch
             {
                 return;
             }
-        }
 
-        EditorGUILayout.Space();
-
-        // discard pile
-
-        EditorGUILayout.BeginHorizontal();
-        deckManager.blnExpandDiscardPnl = EditorGUILayout.Foldout(deckManager.blnExpandDiscardPnl, "Discard Pile [" + deckManager.discardPile.Count.ToString() + "]");
-        EditorGUILayout.EndHorizontal();
-
-        // if the discard panel is expanded
+        deckManager.blnExpandDiscardPnl = EditorGUILayout.Foldout(deckManager.blnExpandDiscardPnl, "Discard Pile [" + deckManager.discardPile.Count + "]");
         if (deckManager.blnExpandDiscardPnl)
-        {
-            // try and render the card info
             try
             {
-                // for each card inside the discard pile starting from the lowest to highest (order)
-                for (int i = 0; i < deckManager.discardPile.Count; i++)
-                {
-                    EditorGUILayout.BeginHorizontal(stylePaddingLeft);
-
-                    // expand or collapse the card's panel depending on the boolean status
-                    // and name the panel based on the card
-                    deckManager.discardPile[i].blnExpandCardPnl = EditorGUILayout.Foldout(deckManager.discardPile[i].blnExpandCardPnl, deckManager.discardPile[i].strName);
-
-                    // render our default buttons
-                    DefaultButtons(deckManager.discardPile, i);
-
-                    // move the card to the deck
-                    if (GUILayout.Button("+", GUILayout.MinWidth(20.0f), GUILayout.MaxWidth(20.0f)))
-                    {
-                        Undo.RecordObject(target, "Card moved to deck.");
-                        deckManager.MoveCardToDeck(deckManager.discardPile[i], deckManager.discardPile, deckManager.deck);
-                    }
-
-
-                    // move the card to the in use pile
-                    if (GUILayout.Button("IU", GUILayout.MinWidth(25.0f), GUILayout.MaxWidth(25.0f)))
-                    {
-                        Undo.RecordObject(target, "Card moved to in use pile.");
-                        deckManager.MoveToInUse(deckManager.discardPile[i], deckManager.discardPile);
-                    }
-
-
-                    EditorGUILayout.EndHorizontal();
-
-                    // if the card's panel is expanded
-                    if (deckManager.discardPile[i].blnExpandCardPnl)
-                    {
-                        EditorGUILayout.Space();
-                        EditorGUILayout.BeginVertical(stylePaddingLeft);
-
-                        // automatically assign the card name if it doesn't exist
-                        deckManager.discardPile[i].strName = deckManager.discardPile[i].color.ToString() + " " + deckManager.discardPile[i].rank.ToString() + " of " + deckManager.discardPile[i].suit.ToString();
-
-                        // show the card's color
-                        deckManager.discardPile[i].color = (Card.Color)EditorGUILayout.EnumPopup("Color", deckManager.discardPile[i].color);
-
-                        // show the card's rank
-                        deckManager.discardPile[i].rank = (Card.Rank)EditorGUILayout.EnumPopup("Rank", deckManager.discardPile[i].rank);
-
-                        // show the card's suit
-                        deckManager.discardPile[i].suit = (Card.Suit)EditorGUILayout.EnumPopup("Suit", deckManager.discardPile[i].suit);
-
-                        // show the card's value
-                        deckManager.discardPile[i].value = EditorGUILayout.IntField("Value", deckManager.discardPile[i].value);
-
-                        // show the card's object
-                        deckManager.discardPile[i].card = (GameObject)EditorGUILayout.ObjectField("Card", deckManager.discardPile[i].card, typeof(GameObject), true);
-
-                        EditorGUILayout.EndVertical();
-                        EditorGUILayout.Space();
-                    }
-                }
+                discardPile.DoLayoutList();
             }
             catch
             {
                 return;
             }
-        }
 
-        EditorGUILayout.Space();
-
-        // in use pile
-
-        EditorGUILayout.BeginHorizontal();
-        deckManager.blnExpandInUsePnl = EditorGUILayout.Foldout(deckManager.blnExpandInUsePnl, "In Use Pile [" + deckManager.inUsePile.Count.ToString() + "]");
-        EditorGUILayout.EndHorizontal();
-
-        // if the in use panel is expanded
+        deckManager.blnExpandInUsePnl = EditorGUILayout.Foldout(deckManager.blnExpandInUsePnl, "In Use Pile [" + deckManager.inUsePile.Count + "]");
         if (deckManager.blnExpandInUsePnl)
-        {
-            // try and render the card info
             try
             {
-                // for each card inside the in use pile starting from the lowest to highest (order)
-                for (int i = 0; i < deckManager.inUsePile.Count; i++)
-                {
-                    EditorGUILayout.BeginHorizontal(stylePaddingLeft);
-
-                    // expand or collapse the card's panel depending on the boolean status
-                    // and name the panel based on the card
-                    deckManager.inUsePile[i].blnExpandCardPnl = EditorGUILayout.Foldout(deckManager.inUsePile[i].blnExpandCardPnl, deckManager.inUsePile[i].strName);
-
-                    // render our default buttons
-                    DefaultButtons(deckManager.inUsePile, i);
-
-                    // move the card to the deck
-                    if (GUILayout.Button("+", GUILayout.MinWidth(20.0f), GUILayout.MaxWidth(20.0f)))
-                    {
-                        Undo.RecordObject(target, "Card moved to deck.");
-                        deckManager.MoveCardToDeck(deckManager.inUsePile[i], deckManager.inUsePile, deckManager.deck);
-                    }
-
-                    // move the card to the discard pile
-                    if (GUILayout.Button("-", GUILayout.MinWidth(20.0f), GUILayout.MaxWidth(20.0f)))
-                    {
-                        Undo.RecordObject(target, "Card moved to discard pile.");
-                        deckManager.DiscardCard(deckManager.inUsePile[i], deckManager.inUsePile);
-                    }
-
-
-                    EditorGUILayout.EndHorizontal();
-
-                    // if the card's panel is expanded
-                    if (deckManager.inUsePile[i].blnExpandCardPnl)
-                    {
-                        EditorGUILayout.Space();
-                        EditorGUILayout.BeginVertical(stylePaddingLeft);
-
-                        // automatically assign the card name if it doesn't exist
-                        deckManager.inUsePile[i].strName = deckManager.inUsePile[i].color.ToString() + " " + deckManager.inUsePile[i].rank.ToString() + " of " + deckManager.inUsePile[i].suit.ToString();
-
-                        // show the card's color
-                        deckManager.inUsePile[i].color = (Card.Color)EditorGUILayout.EnumPopup("Color", deckManager.inUsePile[i].color);
-
-                        // show the card's rank
-                        deckManager.inUsePile[i].rank = (Card.Rank)EditorGUILayout.EnumPopup("Rank", deckManager.inUsePile[i].rank);
-
-                        // show the card's suit
-                        deckManager.inUsePile[i].suit = (Card.Suit)EditorGUILayout.EnumPopup("Suit", deckManager.inUsePile[i].suit);
-
-                        // show the card's value
-                        deckManager.inUsePile[i].value = EditorGUILayout.IntField("Value", deckManager.inUsePile[i].value);
-
-                        // show the card's object
-                        deckManager.inUsePile[i].card = (GameObject)EditorGUILayout.ObjectField("Card", deckManager.inUsePile[i].card, typeof(GameObject), true);
-
-                        EditorGUILayout.EndVertical();
-                        EditorGUILayout.Space();
-                    }
-                }
+                inUsePile.DoLayoutList();
             }
             catch
             {
                 return;
             }
-        }
 
         EditorGUILayout.Space();
 
-        EditorGUILayout.BeginHorizontal(styleRowHeader);
-        EditorGUILayout.LabelField("Other Settings", EditorStyles.boldLabel);
-        EditorGUILayout.EndHorizontal();
+        if (EditorGUI.EndChangeCheck())
+            EditorUtility.SetDirty(target);
 
-        EditorGUILayout.Space();
-
-        // show the card's back face object
-        deckManager.cardBackFace = (GameObject)EditorGUILayout.ObjectField("Card Back Face", deckManager.cardBackFace, typeof(GameObject), true);
-
-        EditorGUILayout.Space();
-
-        // mark the scene as dirty if there are any changes
-        if (GUI.changed)
-        {
-            Debug.Log("CHANGED");
-            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
-        }
+        // apply property modifications
+        serializedObject.ApplyModifiedProperties();
     }
 }

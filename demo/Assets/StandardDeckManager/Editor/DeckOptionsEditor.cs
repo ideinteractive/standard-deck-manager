@@ -6,8 +6,8 @@ using UnityEngine;
 /// Description: Editor tools to allow for easy debugging of the standard deck manager.
 /// </summary>
 
-public class SDMTools : EditorWindow
-{
+public class DeckOptionsEditor : EditorWindow
+{/*
     // reference this editor
     public static SDMTools Instance { get; private set; }
 
@@ -172,7 +172,7 @@ public class SDMTools : EditorWindow
         // inform the user there is no object available
         EditorGUILayout.HelpBox("Please keep in mind random cards have a value of 0. Values will have to be assigned manually.", MessageType.Info);
         EditorGUILayout.Space();
-
+        Undo.RecordObjects(deckManagerEditor.targets, "Added card to deck.");
         // add a random card to the deck
         if (GUILayout.Button("Add to Deck"))
         {
@@ -388,5 +388,5 @@ public class SDMTools : EditorWindow
         EditorGUILayout.Space();
         EditorGUILayout.Space();
         EditorGUILayout.EndScrollView();
-    }
+    }*/
 }
