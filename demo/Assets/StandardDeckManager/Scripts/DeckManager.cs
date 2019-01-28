@@ -17,15 +17,15 @@ public class DeckManager : MonoBehaviour
     public List<Card> inUsePile         = new List<Card>();         // contains a list of cards in use
     public GameObject cardBackFace;                                 // the back face of a card
 
+    [HideInInspector]
+    public GameObject goPool;                                       // object to nest our pooled objects
+
 #if UNITY_EDITOR
     // boolean to keep track of custom editor panel
     public bool blnExpandDeckPnl;
     public bool blnExpandDiscardPnl;
     public bool blnExpandInUsePnl;
 #endif
-
-    // private variables
-    private GameObject m_goPool;    // object to nest our pooled objects
 
     // on awake
     private void Awake()
@@ -34,26 +34,21 @@ public class DeckManager : MonoBehaviour
         Instance = this;
 
         // spawn a new empty gameobject to contain our pooled objects
-        m_goPool = new GameObject
+        goPool = new GameObject
         {
             name = "Pool"
         };
-        m_goPool.transform.parent = this.transform;
+        goPool.transform.parent = this.transform;
 
-        // for each object inside the deck 
-        foreach (Card card in deck)
-        {
-            GameObject goCard = Instantiate(card.card, this.transform.position, this.transform.rotation);
-            goCard.SetActive(false);
-            goCard.transform.parent = m_goPool.transform;
-            card.card = goCard;
-            goCard.name = card.color + " " + card.rank + " of " + card.suit;
-        }
+        // spawn our cards
+        SpawnCardPool(deck);
+        SpawnCardPool(discardPile);
+        SpawnCardPool(inUsePile);
 
         // spawn the back face card
         GameObject goBackFaceCard = Instantiate(cardBackFace, this.transform.position, this.transform.rotation);
         goBackFaceCard.SetActive(false);
-        goBackFaceCard.transform.parent = m_goPool.transform;
+        goBackFaceCard.transform.parent = goPool.transform;
         cardBackFace = goBackFaceCard;
         cardBackFace.name = "Back Face Card";
     }
@@ -69,6 +64,24 @@ public class DeckManager : MonoBehaviour
             int randomIndex = Random.Range(i, list.Count);
             list[i] = list[randomIndex];
             list[randomIndex] = temp;
+        }
+    }
+
+    // spawn all the cards inside a deck
+    private void SpawnCardPool(List<Card> deck)
+    {
+        // if there are cards in the deck
+        if (deck.Count > 0)
+        {
+            // for each object inside the deck 
+            foreach (Card card in deck)
+            {
+                GameObject goCard = Instantiate(card.card, this.transform.position, this.transform.rotation);
+                goCard.SetActive(false);
+                goCard.transform.parent = goPool.transform;
+                card.card = goCard;
+                goCard.name = card.color + " " + card.rank + " of " + card.suit;
+            }
         }
     }
 
@@ -203,7 +216,7 @@ public class DeckManager : MonoBehaviour
             // instantiate the object
             GameObject goCard = Instantiate(card.card, this.transform.position, this.transform.rotation);
             goCard.SetActive(false);
-            goCard.transform.parent = m_goPool.transform;
+            goCard.transform.parent = goPool.transform;
             goCard.name = card.color + " " + card.rank + " of " + card.suit;
 
             // assign the new card to the card object

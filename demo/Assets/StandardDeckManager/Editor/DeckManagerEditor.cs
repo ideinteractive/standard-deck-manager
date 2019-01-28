@@ -436,6 +436,17 @@ public class DeckManagerEditor : Editor
         Undo.RecordObjects(targets, "Added card to deck.");
         deckManager.deck.Add((Card)card);
         serializedObject.ApplyModifiedProperties();
+
+        // if the application is playing
+        if(Application.isPlaying)
+        {
+            // instantiate the object
+            Card tempCard = (Card)card;
+            GameObject goCard = Instantiate(tempCard.card, deckManager.transform.position, deckManager.transform.rotation);
+            goCard.SetActive(false);
+            goCard.transform.parent = deckManager.goPool.transform;
+            goCard.name = tempCard.color + " " + tempCard.rank + " of " + tempCard.suit;
+        }
     }
 
     // add in a new card to discard pile
