@@ -42,6 +42,7 @@ public class DeckManagerEditor : Editor
         reorderableDeck.drawElementCallback += DrawDeckElement;
         reorderableDeck.onSelectCallback += SelectCard;
         reorderableDeck.onAddDropdownCallback = DrawGenericMenu;
+        reorderableDeck.onRemoveCallback = RemoveCard;
 
         reorderableDiscardPile.drawHeaderCallback = rect =>
         {
@@ -50,6 +51,7 @@ public class DeckManagerEditor : Editor
         reorderableDiscardPile.drawElementCallback += DrawDiscardPileElement;
         reorderableDiscardPile.onSelectCallback += SelectCard;
         reorderableDiscardPile.onAddDropdownCallback = DrawGenericMenu;
+        reorderableDiscardPile.onRemoveCallback = RemoveCard;
 
         reorderableInUsePile.drawHeaderCallback = rect =>
         {
@@ -58,6 +60,7 @@ public class DeckManagerEditor : Editor
         reorderableInUsePile.drawElementCallback += DrawInUsePileElement;
         reorderableInUsePile.onSelectCallback += SelectCard;
         reorderableInUsePile.onAddDropdownCallback = DrawGenericMenu;
+        reorderableInUsePile.onRemoveCallback = RemoveCard;
     }
 
     // if this script is destroyed or removed
@@ -123,6 +126,46 @@ public class DeckManagerEditor : Editor
                     CardEditor.Instance.blnEditingCardFromInUse = false;
             }
         }
+    }
+
+    // callback for when we remove a card from the deck
+    private void RemoveCard(ReorderableList deck)
+    {
+        if (0 <= deck.index && deck.index < deck.count)
+        {
+            // determine which deck we are removing the card from
+            if (deck == reorderableDeck)
+            {
+                Undo.RecordObjects(targets, "Card removed from deck.");
+                DestroyAndRemoveCard(deckManager.deck, deck.index);
+                serializedObject.ApplyModifiedProperties();
+
+            }
+            else if (deck == reorderableDiscardPile)
+            {
+                Undo.RecordObjects(targets, "Card removed from discard pile.");
+                DestroyAndRemoveCard(deckManager.discardPile, deck.index);
+                serializedObject.ApplyModifiedProperties();
+            }
+            else if (deck == reorderableInUsePile)
+            {
+                Undo.RecordObjects(targets, "Card removed from in use pile.");
+                DestroyAndRemoveCard(deckManager.inUsePile, deck.index);
+                serializedObject.ApplyModifiedProperties();
+            }
+        }
+    }
+
+    // destroy and remove our card object
+    private void DestroyAndRemoveCard(List<Card> deck, int index)
+    {
+        // if the application is playing
+        if (Application.isPlaying)
+            // delete the instantiated object
+            Destroy(deck[index].card);
+
+        // remove the card from the deck
+        deck.Remove(deck[index]);
     }
 
     // draw our our elements
@@ -430,23 +473,29 @@ public class DeckManagerEditor : Editor
             menu.AddItem(content, on, AddNewCardToInUsePile, card);
     }
 
-    // add in a new card to deck
-    private void AddNewCardToDeck(object card)
+    // spawn the card from the deck
+    private void SpawnCard(Card card)
     {
-        Undo.RecordObjects(targets, "Added card to deck.");
-        deckManager.deck.Add((Card)card);
-        serializedObject.ApplyModifiedProperties();
-
         // if the application is playing
-        if(Application.isPlaying)
+        if (Application.isPlaying)
         {
             // instantiate the object
             Card tempCard = (Card)card;
             GameObject goCard = Instantiate(tempCard.card, deckManager.transform.position, deckManager.transform.rotation);
             goCard.SetActive(false);
             goCard.transform.parent = deckManager.goPool.transform;
+            card.card = goCard;
             goCard.name = tempCard.color + " " + tempCard.rank + " of " + tempCard.suit;
         }
+    }
+
+    // add in a new card to deck
+    private void AddNewCardToDeck(object card)
+    {
+        Undo.RecordObjects(targets, "Added card to deck.");
+        deckManager.deck.Add((Card)card);
+        serializedObject.ApplyModifiedProperties();
+        SpawnCard((Card)card);
     }
 
     // add in a new card to discard pile
@@ -455,6 +504,7 @@ public class DeckManagerEditor : Editor
         Undo.RecordObjects(targets, "Added card to discard pile.");
         deckManager.discardPile.Add((Card)card);
         serializedObject.ApplyModifiedProperties();
+        SpawnCard((Card)card);
     }
 
     // add in a new card to in use pile
@@ -463,5 +513,6 @@ public class DeckManagerEditor : Editor
         Undo.RecordObjects(targets, "Added card to in use pile.");
         deckManager.inUsePile.Add((Card)card);
         serializedObject.ApplyModifiedProperties();
+        SpawnCard((Card)card);
     }
 }
