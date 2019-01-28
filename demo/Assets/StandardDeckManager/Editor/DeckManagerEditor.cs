@@ -151,12 +151,24 @@ public class DeckManagerEditor : Editor
             {
                 Undo.RecordObjects(targets, "Card moved to discard pile.");
                 deckManager.MoveCardToDiscard(card, deckManager.deck);
+
+                if (EditorGUI.EndChangeCheck())
+                    EditorUtility.SetDirty(target);
+
+                // apply property modifications
+                serializedObject.ApplyModifiedProperties();
             }
             // move the card to the in use pile
             if (GUI.Button(new Rect(rect.width - 15, rect.y, 20, 15), "U"))
             {
                 Undo.RecordObjects(targets, "Card moved to in use pile.");
                 deckManager.MoveCardToInUse(card, deckManager.deck);
+
+                if (EditorGUI.EndChangeCheck())
+                    EditorUtility.SetDirty(target);
+
+                // apply property modifications
+                serializedObject.ApplyModifiedProperties();
             }
         }
 
@@ -168,12 +180,24 @@ public class DeckManagerEditor : Editor
             {
                 Undo.RecordObjects(targets, "Card moved to deck.");
                 deckManager.MoveCardToDeck(card, deckManager.discardPile);
+
+                if (EditorGUI.EndChangeCheck())
+                    EditorUtility.SetDirty(target);
+
+                // apply property modifications
+                serializedObject.ApplyModifiedProperties();
             }
             // move the card to the in use pile
             if (GUI.Button(new Rect(rect.width - 15, rect.y, 20, 15), "U"))
             {
                 Undo.RecordObjects(targets, "Card moved to in use pile.");
                 deckManager.MoveCardToInUse(card, deckManager.discardPile);
+
+                if (EditorGUI.EndChangeCheck())
+                    EditorUtility.SetDirty(target);
+
+                // apply property modifications
+                serializedObject.ApplyModifiedProperties();
             }
         }
 
@@ -185,12 +209,24 @@ public class DeckManagerEditor : Editor
             {
                 Undo.RecordObjects(targets, "Card moved to deck.");
                 deckManager.MoveCardToDeck(card, deckManager.inUsePile);
+
+                if (EditorGUI.EndChangeCheck())
+                    EditorUtility.SetDirty(target);
+
+                // apply property modifications
+                serializedObject.ApplyModifiedProperties();
             }
             // move the card to the discard pile
             if (GUI.Button(new Rect(rect.width - 15, rect.y, 20, 15), "D"))
             {
                 Undo.RecordObjects(targets, "Card moved to discard pile.");
                 deckManager.MoveCardToDiscard(card, deckManager.inUsePile);
+
+                if (EditorGUI.EndChangeCheck())
+                    EditorUtility.SetDirty(target);
+
+                // apply property modifications
+                serializedObject.ApplyModifiedProperties();
             }
         }
 
