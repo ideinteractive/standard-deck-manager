@@ -24,20 +24,24 @@ public class MemoryMatchManager : MonoBehaviour
     public Button btnPlayAgain;                                 // play again button
 
     [Header("Other Settings")]
-    public float fltWaitTimeAfterShuffle = 0.7f;        // the wait time after the deck is shuffled
-    public float fltWaitTimeBeforeDeal = 0.5f;          // the wait time between when a dealer hits  
-    public float fltWaitTimeBeforeResults = 0.5f;       // the wait time before the winner is determined
+    public float fltWaitTimeAfterShuffle = 0.7f;                // the wait time after the deck is shuffled
+    public float fltWaitTimeBeforeDeal = 0.5f;                  // the wait time between when a dealer hits  
+    public float fltWaitTimeBeforeResults = 0.5f;               // the wait time before the winner is determined
 
     [Header("Sound Effects")]
     public AudioSource audSrc;                                  // the audio source to play sounds from
     public AudioClip audClpCardSlide;                           // audio clip for dealing a card
     public AudioClip audClpCardShuffle;                         // audio clip for shuffling the deck
     public AudioClip audClpWin;                                 // audio clip for win state
+    public AudioClip audClpMatch;                               // audio clip for match state
+    public AudioClip audClpNoMatch;                             // audio clip for no match state
 
     [Header("Volume Levels")]
-    public float fltCardSlideVolume = 0.5f;             // the volume for card slide  
-    public float fltCardShuffleVolume = 0.5f;           // the volume for card shuffling   
-    public float fltWinVolume = 0.5f;                   // the volume for our win sound
+    public float fltCardSlideVolume = 0.5f;                     // the volume for card slide  
+    public float fltCardShuffleVolume = 0.5f;                   // the volume for card shuffling   
+    public float fltWinVolume = 0.5f;                           // the volume for our win sound
+    public float fltMatchVolume = 0.5f;                         // the volume for our match sound
+    public float fltNoMatchVolume = 0.5f;                       // the volume for our no match sound
 
     // private variables
     private bool m_gameStarted = false;                         // check if the game has started
@@ -70,8 +74,15 @@ public class MemoryMatchManager : MonoBehaviour
             go.SetActive(false);
         }
 
+        // reverse the list
+        slots.Reverse();
+
         // shuffle the deck of cards
         DeckManager.Instance.ShuffleDeck();
+
+        // play the shuffle sfx
+        AssignAudioClip(audClpCardShuffle);
+        audSrc.Play();
 
         // reset our variables and references
         m_totalScore = 0;
@@ -83,10 +94,8 @@ public class MemoryMatchManager : MonoBehaviour
     {
         // if the cards are all dealt 
         if (m_gameStarted)
-        {
             // allow the player to start flipping the cards
-            //FlipCard();
-        }
+            FlipCard();
     }
 
     #region Game Functionality
@@ -163,18 +172,10 @@ public class MemoryMatchManager : MonoBehaviour
             // put them in the discard pile
             DeckManager.Instance.MoveAllCardToDiscard(DeckManager.Instance.inUsePile);
 
-        // if there is less than the min amount of cards in the deck
-        if (DeckManager.Instance.CountDeck() <= 0)
-        {
-            // shuffle the discard pile into the deck
-            DeckManager.Instance.ShuffleDecksTogether(DeckManager.Instance.deck, DeckManager.Instance.discardPile);
-
-            // play the shuffle sfx
-            AssignAudioClip(audClpCardShuffle);
-            audSrc.Play();
-
+        // check if the discard pile should 
+        // be shuffled back into the main deck
+        if (CheckForShuffle())
             yield return new WaitForSeconds(fltWaitTimeAfterShuffle);
-        }
 
         // create a new temporary list of cards and select only distinct ranks
         IEnumerable<Card> ienumerableCardList = DeckManager.Instance.deck.GroupBy(x => x.rank).Select(g => g.First()).Distinct().ToList();
@@ -184,9 +185,36 @@ public class MemoryMatchManager : MonoBehaviour
         int i = 0;
         while (i < slots.Count)
         {
+
             // for the first 4 cards
             if (i < 4)
             {
+                // if there is less than 9 cards in the deck
+                while (DeckManager.Instance.CountDeck() == 0)
+                {
+                    if (CheckForShuffle())
+                    {
+                        // pull a new set of unqiue cards
+                        ienumerableCardList = DeckManager.Instance.deck.GroupBy(x => x.rank).Select(g => g.First()).Distinct().ToList();
+                        tempListOfCards = ienumerableCardList.ToList();
+
+                        // for each card in our in use pile
+                        int tc = 0;
+                        while (tc < DeckManager.Instance.CountInUsePile())
+                        {
+                            // check the list for duplicate ranks matching our in use pile and remove them
+                            tempListOfCards.RemoveAll(x => x.rank == DeckManager.Instance.inUsePile[tc].rank);
+                            tc++;
+                        }
+
+                        yield return new WaitForSeconds(fltWaitTimeAfterShuffle);
+                    }
+
+                    // play the shuffle sfx
+                    AssignAudioClip(audClpCardShuffle);
+                    audSrc.Play();
+                }
+
                 // select a card from the top of the temp list of cards
                 Card card = DeckManager.Instance.deck.Single(s => s == tempListOfCards[i]);
 
@@ -195,6 +223,11 @@ public class MemoryMatchManager : MonoBehaviour
             }
             else
             {
+                // check if the discard pile should 
+                // be shuffled back into the main deck
+                if (CheckForShuffle())
+                    yield return new WaitForSeconds(fltWaitTimeAfterShuffle);
+
                 // find a pair for each of the first four cards dealt
                 Card card = DeckManager.Instance.deck.First(s => s.rank == DeckManager.Instance.inUsePile[i - 4].rank);
 
@@ -277,7 +310,7 @@ public class MemoryMatchManager : MonoBehaviour
     private IEnumerator CheckForMatch()
     {
         // wait for the player to see the card before we proceed
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(fltWaitTimeBeforeResults);
 
         // if the cards match
         if (m_cardOne.rank == m_cardTwo.rank)
@@ -285,11 +318,20 @@ public class MemoryMatchManager : MonoBehaviour
             // hide the card slots they are on
             slots[DeckManager.Instance.inUsePile.IndexOf(m_cardOne)].SetActive(false);
             slots[DeckManager.Instance.inUsePile.IndexOf(m_cardTwo)].SetActive(false);
-
+            
             // increase the score by 1
             m_score++;
             m_totalScore++;
             txtPlayerScore.text = "Pairs Matched: " + m_totalScore.ToString();
+
+            // play the match sfx
+            AssignAudioClip(audClpMatch);
+            audSrc.Play();
+        } else
+        {
+            // play the no match sfx
+            AssignAudioClip(audClpNoMatch);
+            audSrc.Play();
         }
 
         // reset the card one and two and hide our turned over cards
@@ -301,6 +343,8 @@ public class MemoryMatchManager : MonoBehaviour
         // if the current round's score equals to half the value of our slot
         if (m_score == slots.Count / 2)
         {
+            yield return new WaitForSeconds(fltWaitTimeBeforeResults);
+
             // the game is now over
             // show our win screen
             ShowWinScreen();
@@ -310,6 +354,10 @@ public class MemoryMatchManager : MonoBehaviour
     // show our win screen
     private void ShowWinScreen()
     {
+        // play the win sfx
+        AssignAudioClip(audClpWin);
+        audSrc.Play();
+
         // inform the player they won
         txtWinMessage.text = "You've matched all the pairs. Nice job!";
         AssignAudioClip(audClpWin);
@@ -366,6 +414,30 @@ public class MemoryMatchManager : MonoBehaviour
             audSrc.volume = fltCardShuffleVolume;
         else if (audClp == audClpCardSlide)
             audSrc.volume = fltCardSlideVolume;
+        else if (audClp == audClpMatch)
+            audSrc.volume = fltMatchVolume;
+        else if (audClp == audClpNoMatch)
+            audSrc.volume = fltNoMatchVolume;
+    }
+
+    // check if the discard pile should 
+    // be shuffled back into the main deck
+    private bool CheckForShuffle()
+    {
+        // if there is less than 9 cards in the deck
+        if (DeckManager.Instance.CountDeck() == 0)
+        {
+            // shuffle the discard pile into the deck
+            DeckManager.Instance.ShuffleDecksTogether(DeckManager.Instance.deck, DeckManager.Instance.discardPile);
+
+            // play the shuffle sfx
+            AssignAudioClip(audClpCardShuffle);
+            audSrc.Play();
+
+            return true;
+        }
+
+        return false;
     }
     #endregion
 }

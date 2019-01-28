@@ -607,8 +607,7 @@ public class BlackjackManager : MonoBehaviour
         m_vecPlayerCardOffset = Vector3.zero;
     }
 
-    // check if the discard pile should 
-    // be shuffled back into the main deck
+    // if there are no cards in the deck
     private bool CheckForShuffle()
     {
         // if there is less than the min amount of cards in the deck
