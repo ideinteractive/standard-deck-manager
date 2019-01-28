@@ -80,9 +80,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\StandardDeckManager\Demo\Scripts\BlackjackManager.cs" />
-    <Compile Include="Assets\StandardDeckManager\Demo\Scripts\MatchManager.cs" />
+    <Compile Include="Assets\StandardDeckManager\Demo\Scripts\GameControls.cs" />
+    <Compile Include="Assets\StandardDeckManager\Demo\Scripts\MemoryMatchManager.cs" />
     <Compile Include="Assets\StandardDeckManager\Demo\Scripts\MenuManager.cs" />
-    <Compile Include="Assets\StandardDeckManager\Demo\Scripts\WarManager.cs" />
     <Compile Include="Assets\StandardDeckManager\Scripts\DeckManager.cs" />
   </ItemGroup>
   <ItemGroup>

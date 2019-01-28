@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// MenuManager
@@ -11,20 +13,20 @@ public class MenuManager : MonoBehaviour
     public void GoToBlackjack()
     {
         // load the scene
-        //GameManager.instance.GoToBlackjack();
+        SceneManager.LoadScene("BlackjackDemo");
     }
 
     // go to war demo
     public void GoToWar()
     {
         // load the scene
-        //GameManager.instance.GoToWar();
+        SceneManager.LoadScene("MemoryMatchDemo");
     }
 
     // go to match demo
     public void GoToMatch()
     {
         // load the scene
-        //GameManager.instance.GoToMatch();
+        SceneManager.LoadScene("WarDemo");
     }
 }

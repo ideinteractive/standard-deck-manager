@@ -30,7 +30,6 @@ public class BlackjackManager : MonoBehaviour
     public Button btnMainMenu;                          // main menu button
 
     [Header("Other Settings")]
-    public int intMinDeckShuffleAmount = 4;             // the minimum amount of cards the deck should have before its shuffled
     public float fltWaitTimeAfterShuffle = 0.7f;        // the wait time after the deck is shuffled
     public float fltWaitTimeBeforeDeal = 0.5f;          // the wait time between when a dealer hits  
     public float fltWaitTimeBeforeResults = 0.5f;       // the wait time before the winner is determined
@@ -85,25 +84,6 @@ public class BlackjackManager : MonoBehaviour
 
         // initialize the game
         StartCoroutine(InitializeGame());
-    }
-
-    // once per frame
-    private void Update()
-    {
-        // if the M key is pressed
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            // mute the audio source or unmute it
-            if (AudioListener.volume < 1)
-                AudioListener.volume = 1;
-            else
-                AudioListener.volume = 0;
-        }
-
-        // if the R key is pressed
-        if (Input.GetKeyDown(KeyCode.R))
-            // restart the scene
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     #region Game Functionality
@@ -206,17 +186,13 @@ public class BlackjackManager : MonoBehaviour
 
         // if there are cards in the in use pile
         if (DeckManager.Instance.CountInUsePile() > 0)
-        {
             // put them in the discard pile
             DeckManager.Instance.MoveAllCardToDiscard(DeckManager.Instance.inUsePile);
-        }
 
         // check if the discard pile should 
         // be shuffled back into the main deck
         if (CheckForShuffle())
-        {
             yield return new WaitForSeconds(fltWaitTimeAfterShuffle);
-        }
       
         // create a new list for the dealer and player
         col_dealerHand = new List<Card>();
@@ -636,7 +612,7 @@ public class BlackjackManager : MonoBehaviour
     private bool CheckForShuffle()
     {
         // if there is less than the min amount of cards in the deck
-        if (DeckManager.Instance.CountDeck() <= intMinDeckShuffleAmount)
+        if (DeckManager.Instance.CountDeck() <= 0)
         {
             // shuffle the discard pile into the deck
             DeckManager.Instance.ShuffleDecksTogether(DeckManager.Instance.deck, DeckManager.Instance.discardPile);
