@@ -50,10 +50,6 @@ public class CardEditor : EditorWindow
 
         // set the reference to the current inspected object
         deckManagerEditor = DeckManagerEditor.Instance;
-
-        Debug.Log(blnEditingCardFromDeck);
-        Debug.Log(blnEditingCardFromDiscard);
-        Debug.Log(blnEditingCardFromInUse);
     }
 
     // repaint the inspector if it gets updated

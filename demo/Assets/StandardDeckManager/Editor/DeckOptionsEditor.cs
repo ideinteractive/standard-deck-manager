@@ -26,6 +26,7 @@ public class DeckOptionsEditor : EditorWindow
     }
 
     // on initialization
+    [MenuItem("Standard Deck Manager/Deck Options")]
     private static void Init()
     {
         // get existing open window or if none, make a new one

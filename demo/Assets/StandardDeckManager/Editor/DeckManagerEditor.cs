@@ -354,11 +354,13 @@ public class DeckManagerEditor : Editor
         EditorGUILayout.EndHorizontal();
         EditorGUILayout.Space();
 
-        // remove everything and create a new standard deck
-        if (GUILayout.Button("Generate a New Deck"))
+        // optn the card editor window
+        if (GUILayout.Button("Card Editor"))
         {
-            Undo.RecordObjects(targets, "New deck generated.");
-            deckManager.RemoveAllAndCreateNew();
+            // get existing open window or if none, make a new one
+            CardEditor window = (CardEditor)EditorWindow.GetWindow(typeof(CardEditor), false, "Card Editor");
+            window.minSize = new Vector2(325, 140);
+            window.Show();
         }
 
         // get existing open window or if none, make a new one
@@ -368,13 +370,11 @@ public class DeckManagerEditor : Editor
             window.Show();
         }
 
-        // optn the card editor window
-        if (GUILayout.Button("Card Editor"))
+        // remove everything and create a new standard deck
+        if (GUILayout.Button("Generate a New Deck"))
         {
-            // get existing open window or if none, make a new one
-            CardEditor window = (CardEditor)EditorWindow.GetWindow(typeof(CardEditor), false, "Card Editor");
-            window.minSize = new Vector2(325, 140);
-            window.Show();
+            Undo.RecordObjects(targets, "New deck generated.");
+            deckManager.RemoveAllAndCreateNew();
         }
 
         // remove everything
