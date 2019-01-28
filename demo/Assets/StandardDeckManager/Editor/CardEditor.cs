@@ -50,19 +50,10 @@ public class CardEditor : EditorWindow
 
         // set the reference to the current inspected object
         deckManagerEditor = DeckManagerEditor.Instance;
-    }
 
-    // if this window is closed
-    private void OnDestroy()
-    {
-        // if we are using the editor
-        if (Application.isEditor)
-        {
-            // inform the editor we are no longer editing the card
-            blnEditingCardFromDeck = false;
-            blnEditingCardFromDiscard = false;
-            blnEditingCardFromInUse = false;
-        }
+        Debug.Log(blnEditingCardFromDeck);
+        Debug.Log(blnEditingCardFromDiscard);
+        Debug.Log(blnEditingCardFromInUse);
     }
 
     // repaint the inspector if it gets updated
