@@ -84,6 +84,25 @@ public class BlackjackManager : MonoBehaviour
         StartCoroutine(InitializeGame());
     }
 
+    // once per frame
+    private void Update()
+    {
+        // if the M key is pressed
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            // mute the audio source or unmute it
+            if (AudioListener.volume < 1)
+                AudioListener.volume = 1;
+            else
+                AudioListener.volume = 0;
+        }
+
+        // if the R key is pressed
+        if (Input.GetKeyDown(KeyCode.R))
+            // restart the scene
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
     #region Game Functionality
     // set up the deck
     private void SetUpDeck(List<Card> deck)
