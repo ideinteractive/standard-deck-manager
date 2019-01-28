@@ -5,11 +5,11 @@ using System.Collections;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// BlackJackManager
-/// Description: Manages and handles all functionality of the black jack demo
+/// BlackjackManager
+/// Description: Manages and handles all functionality of the blackjack demo
 /// </summary>
 
-public class BlackJackManager : MonoBehaviour
+public class BlackjackManager : MonoBehaviour
 {
     #region Variables
     // public variables
@@ -30,55 +30,51 @@ public class BlackJackManager : MonoBehaviour
     public Button btnMainMenu;                          // main menu button
 
     [Header("Other Settings")]
-    public int intMinDeckShuffleAmount      = 4;        // the minimum amount of cards the deck should have before its shuffled
-    public float fltWaitTimeAfterShuffle    = 0.7f;     // the wait time after the deck is shuffled
-    public float fltWaitTimeBeforeDeal      = 0.5f;     // the wait time between when a dealer hits  
-    public float fltWaitTimeBeforeResults   = 0.5f;     // the wait time before the winner is determined
-    public float fltWaitTimeAfterHitButton  = 0.6f;     // the wait time for the button to appear again after hitting hit
+    public int intMinDeckShuffleAmount = 4;             // the minimum amount of cards the deck should have before its shuffled
+    public float fltWaitTimeAfterShuffle = 0.7f;        // the wait time after the deck is shuffled
+    public float fltWaitTimeBeforeDeal = 0.5f;          // the wait time between when a dealer hits  
+    public float fltWaitTimeBeforeResults = 0.5f;       // the wait time before the winner is determined
+    public float fltWaitTimeAfterHitButton = 0.6f;      // the wait time for the button to appear again after hitting hit
     public Vector3 vecCardSpawnOffset;                  // how much offset when placing the cards next to each other
-
-    [Header("Dealer and Player Hand")]
-    public List<Card> col_dealerHand;                   // the dealer's hand
-    public List<Card> col_playerHand;                   // the player's hand
 
     [Header("Sound Effects")]
     public AudioSource audSrc;                          // the audio source to play sounds from
     public AudioClip audClpCardSlide;                   // audio clip for dealing a card
     public AudioClip audClpCardShuffle;                 // audio clip for shuffling the deck
-    public AudioClip audClpButtonHover;                 // audio clip for our button hover
     public AudioClip audClpWin;                         // audio clip for win state
     public AudioClip audClpLose;                        // audio clip for lose state
     public AudioClip audClpBlackjack;                   // audio clip for blackjack state
     public AudioClip audClpDraw;                        // audio clip for draw state
 
     [Header("Volume Levels")]
-    public float fltCardSlideVolume         = 0.5f;     // the volume for card slide  
-    public float fltCardShuffleVolume       = 0.5f;     // the volume for card shuffling   
-    public float fltButtonHoverVolume       = 0.5f;     // the volume for button hover
-    public float fltWinVolume               = 0.5f;     // the volume for our win sound
-    public float fltLoseVolume              = 0.5f;     // the volume for our lose sound
-    public float fltBlackjackVolume         = 0.5f;     // the volume for our blackjack soud
-    public float fltDrawVolume              = 0.5f;     // the volume for our draw sound
+    public float fltCardSlideVolume = 0.5f;             // the volume for card slide  
+    public float fltCardShuffleVolume = 0.5f;           // the volume for card shuffling   
+    public float fltWinVolume = 0.5f;                   // the volume for our win sound
+    public float fltLoseVolume = 0.5f;                  // the volume for our lose sound
+    public float fltBlackjackVolume = 0.5f;             // the volume for our blackjack soud
+    public float fltDrawVolume = 0.5f;                  // the volume for our draw sound
 
     // private evariables
+    private List<Card> col_dealerHand;                  // the dealer's hand
+    private List<Card> col_playerHand;                  // the player's hand
     private Vector3 m_vecDealerCardOffset;              // the offset of where the card object is displayed for the dealer
     private Vector3 m_vecPlayerCardOffset;              // the offset of where the card object is displayed for the player
     private int m_intPlayerScore;                       // the player's score
     private int m_intDealerScore;                       // the dealer's score
     private bool m_blnActionInProgress;                 // check if the player performed an action already
     #endregion
-    /*
+
     // on initialization
-    void Start()
+    private void Start()
     {
         // if the audio source is null
-        if(audSrc == null)
+        if (audSrc == null)
         {
             // set it from this component
             audSrc = this.GetComponent<AudioSource>();
         }
 
-        // reset our buttons
+        // reset our button states
         btnHit.gameObject.SetActive(false);
         btnStand.gameObject.SetActive(false);
         btnPlayAgain.gameObject.SetActive(false);
@@ -87,7 +83,7 @@ public class BlackJackManager : MonoBehaviour
         // initialize the game
         StartCoroutine(InitializeGame());
     }
-    
+
     #region Game Functionality
     // set up the deck
     private void SetUpDeck(List<Card> deck)
@@ -102,7 +98,7 @@ public class BlackJackManager : MonoBehaviour
         }
     }
 
-    // sets the value for a specific card
+    // sets the value for specific cards
     private void SetCardValue(Card card)
     {
         // create a switch statement for each 
@@ -160,16 +156,16 @@ public class BlackJackManager : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
 
         // set up each deck's card value
-        SetUpDeck(DeckManager.instance.deck);
-        SetUpDeck(DeckManager.instance.discardPile);
-        SetUpDeck(DeckManager.instance.inUsePile);
+        SetUpDeck(DeckManager.Instance.deck);
+        SetUpDeck(DeckManager.Instance.discardPile);
+        SetUpDeck(DeckManager.Instance.inUsePile);
 
         // play our shuffle sfx
         AssignAudioClip(audClpCardShuffle);
         audSrc.Play();
 
         // shuffle the deck of cards
-        DeckManager.instance.Shuffle();
+        DeckManager.Instance.ShuffleDeck();
 
         yield return new WaitForSeconds(fltWaitTimeAfterShuffle);
 
@@ -187,10 +183,10 @@ public class BlackJackManager : MonoBehaviour
         m_blnActionInProgress = false;
 
         // if there are cards in the in use pile
-        while (DeckManager.instance.inUsePile.Count > 0)
+        if (DeckManager.Instance.CountInUsePile() > 0)
         {
             // put them in the discard pile
-            DeckManager.instance.DiscardCard(DeckManager.instance.inUsePile[0], DeckManager.instance.inUsePile);
+            DeckManager.Instance.MoveAllCardToDiscard(DeckManager.Instance.inUsePile);
         }
 
         // check if the discard pile should 
@@ -199,16 +195,16 @@ public class BlackJackManager : MonoBehaviour
         {
             yield return new WaitForSeconds(fltWaitTimeAfterShuffle);
         }
-
+      
         // create a new list for the dealer and player
         col_dealerHand = new List<Card>();
         col_playerHand = new List<Card>();
-
+       
         // for 4 loops
-        for (int i=0; i<4; i++)
+        for (int i = 0; i < 4; i++)
         {
             // deal cards to both the dealer and player
-            if (i%2 == 0)
+            if (i % 2 == 0)
             {
                 StartCoroutine(DealCard(col_dealerHand, goDealerCardBorder, false));
 
@@ -242,20 +238,20 @@ public class BlackJackManager : MonoBehaviour
     {
         // check if the discard pile should 
         // be shuffled back into the main deck
-        if(CheckForShuffle())
+        if (CheckForShuffle())
         {
             yield return new WaitForSeconds(fltWaitTimeAfterShuffle);
         }
 
         // add the card to the hand and set the sorting order
-        hand.Add(DeckManager.instance.deck[0]);
-        DeckManager.instance.deck[0].card.GetComponent<SpriteRenderer>().sortingOrder = hand.Count;
+        hand.Add(DeckManager.Instance.deck[0]);
+        DeckManager.Instance.deck[0].card.GetComponent<SpriteRenderer>().sortingOrder = hand.Count;
 
         // if we are dealing the player's card
         if (isPlayer)
         {
             // spawn the card and increment the offset
-            SpawnCardToSlot(slot, DeckManager.instance.deck[0].card, m_vecPlayerCardOffset);
+            SpawnCardToSlot(slot, DeckManager.Instance.deck[0].card, m_vecPlayerCardOffset);
             m_vecPlayerCardOffset += vecCardSpawnOffset;
         }
         else
@@ -264,18 +260,19 @@ public class BlackJackManager : MonoBehaviour
             if (hand.Count == 1)
             {
                 // spawn the card and increment the offset
-                SpawnCardToSlot(slot, DeckManager.instance.deck[0].card, m_vecDealerCardOffset);
+                SpawnCardToSlot(slot, DeckManager.Instance.deck[0].card, m_vecDealerCardOffset);
                 m_vecDealerCardOffset += vecCardSpawnOffset;
             }
             else if (hand.Count == 2)
             {
                 // spawn a backface card
-                SpawnBackFaceCardToSlot(slot, DeckManager.instance.cardBackFace, m_vecDealerCardOffset);
-                DeckManager.instance.cardBackFace.GetComponent<SpriteRenderer>().sortingOrder = hand.Count;
+                SpawnBackFaceCardToSlot(slot, DeckManager.Instance.cardBackFace, m_vecDealerCardOffset);
+                DeckManager.Instance.cardBackFace.GetComponent<SpriteRenderer>().sortingOrder = hand.Count;
                 m_vecDealerCardOffset += vecCardSpawnOffset;
-            } else
+            }
+            else
             {
-                SpawnCardToSlot(slot, DeckManager.instance.deck[0].card, m_vecDealerCardOffset);
+                SpawnCardToSlot(slot, DeckManager.Instance.deck[0].card, m_vecDealerCardOffset);
                 m_vecDealerCardOffset += vecCardSpawnOffset;
             }
         }
@@ -285,10 +282,10 @@ public class BlackJackManager : MonoBehaviour
         audSrc.Play();
 
         // move the current card in the deck manager to the in use pile
-        DeckManager.instance.MoveToInUse(DeckManager.instance.deck[0], DeckManager.instance.deck);
+        DeckManager.Instance.MoveCardToInUse(DeckManager.Instance.deck[0], DeckManager.Instance.deck);
 
         // update the deck count
-        txtDeckCount.text = DeckManager.instance.Count().ToString();
+        txtDeckCount.text = DeckManager.Instance.CountDeck().ToString();
 
         // set action in progress to false
         // to allow the player to continue
@@ -340,7 +337,7 @@ public class BlackJackManager : MonoBehaviour
         }
 
         // output our score onto the ui object
-        textOutput.text = t_intScore.ToString();  
+        textOutput.text = t_intScore.ToString();
     }
 
     // display only the face up value of the dealer's hand
@@ -361,10 +358,10 @@ public class BlackJackManager : MonoBehaviour
         AssignAudioClip(audClpCardSlide);
 
         // spawn the dealer's second card onto the back face position
-        col_dealerHand[1].card.transform.position = DeckManager.instance.cardBackFace.transform.position;
+        col_dealerHand[1].card.transform.position = DeckManager.Instance.cardBackFace.transform.position;
         col_dealerHand[1].card.GetComponent<SpriteRenderer>().sortingOrder = 2;
         col_dealerHand[1].card.SetActive(true);
-        DeckManager.instance.cardBackFace.SetActive(false);
+        DeckManager.Instance.cardBackFace.SetActive(false);
 
         // play the sfx
         audSrc.Play();
@@ -479,7 +476,7 @@ public class BlackJackManager : MonoBehaviour
             txtWinMessage.text = "Bust! The Dealer has won.";
             m_intDealerScore++;
             txtDealerScore.text = "Dealer: " + m_intDealerScore;
-            AssignAudioClip(audClpWin);
+            AssignAudioClip(audClpLose);
         }
 
         audSrc.Play();
@@ -559,16 +556,8 @@ public class BlackJackManager : MonoBehaviour
     {
         SceneManager.LoadScene("MainMenu");
     }
-
-    // play the button hover sfx
-    public void PlayButtonHover()
-    {
-        // assign button hover sfx
-        AssignAudioClip(audClpButtonHover);
-        audSrc.Play();
-    }
     #endregion
-    
+
     #region Helper Functions
     // assign an audio clip
     private void AssignAudioClip(AudioClip audClp)
@@ -580,11 +569,9 @@ public class BlackJackManager : MonoBehaviour
 
         // adjust the volume based on the clip
         if (audClp == audClpCardShuffle)
-            audSrc.volume =  fltCardShuffleVolume;
+            audSrc.volume = fltCardShuffleVolume;
         else if (audClp == audClpCardSlide)
             audSrc.volume = fltCardSlideVolume;
-        else if (audClp == audClpButtonHover)
-            audSrc.volume = fltButtonHoverVolume;
     }
 
     // reset the spawn offset
@@ -599,10 +586,10 @@ public class BlackJackManager : MonoBehaviour
     private bool CheckForShuffle()
     {
         // if there is less than the min amount of cards in the deck
-        if (DeckManager.instance.Count() <= intMinDeckShuffleAmount)
+        if (DeckManager.Instance.CountDeck() <= intMinDeckShuffleAmount)
         {
             // shuffle the discard pile into the deck
-            DeckManager.instance.ShuffleDecks(DeckManager.instance.deck, DeckManager.instance.discardPile);
+            DeckManager.Instance.ShuffleDecksTogether(DeckManager.Instance.deck, DeckManager.Instance.discardPile);
 
             // play the shuffle sfx
             AssignAudioClip(audClpCardShuffle);
@@ -614,5 +601,4 @@ public class BlackJackManager : MonoBehaviour
         return false;
     }
     #endregion
-    */
 }

@@ -150,13 +150,13 @@ public class DeckManagerEditor : Editor
             if (GUI.Button(new Rect(rect.width - 40, rect.y, 20, 15), "D"))
             {
                 Undo.RecordObjects(targets, "Card moved to discard pile.");
-                deckManager.MoveToDiscard(card, deckManager.deck);
+                deckManager.MoveCardToDiscard(card, deckManager.deck);
             }
             // move the card to the in use pile
             if (GUI.Button(new Rect(rect.width - 15, rect.y, 20, 15), "U"))
             {
                 Undo.RecordObjects(targets, "Card moved to in use pile.");
-                deckManager.MoveToInUse(card, deckManager.deck);
+                deckManager.MoveCardToInUse(card, deckManager.deck);
             }
         }
 
@@ -167,13 +167,13 @@ public class DeckManagerEditor : Editor
             if (GUI.Button(new Rect(rect.width - 40, rect.y, 20, 15), "A"))
             {
                 Undo.RecordObjects(targets, "Card moved to deck.");
-                deckManager.MoveToDeck(card, deckManager.discardPile);
+                deckManager.MoveCardToDeck(card, deckManager.discardPile);
             }
             // move the card to the in use pile
             if (GUI.Button(new Rect(rect.width - 15, rect.y, 20, 15), "U"))
             {
                 Undo.RecordObjects(targets, "Card moved to in use pile.");
-                deckManager.MoveToInUse(card, deckManager.discardPile);
+                deckManager.MoveCardToInUse(card, deckManager.discardPile);
             }
         }
 
@@ -184,13 +184,13 @@ public class DeckManagerEditor : Editor
             if (GUI.Button(new Rect(rect.width - 40, rect.y, 20, 15), "A"))
             {
                 Undo.RecordObjects(targets, "Card moved to deck.");
-                deckManager.MoveToDeck(card, deckManager.inUsePile);
+                deckManager.MoveCardToDeck(card, deckManager.inUsePile);
             }
             // move the card to the discard pile
             if (GUI.Button(new Rect(rect.width - 15, rect.y, 20, 15), "D"))
             {
                 Undo.RecordObjects(targets, "Card moved to discard pile.");
-                deckManager.MoveToDiscard(card, deckManager.inUsePile);
+                deckManager.MoveCardToDiscard(card, deckManager.inUsePile);
             }
         }
 

@@ -158,19 +158,19 @@ public class DeckManager : MonoBehaviour
     }
 
     // move a card to the discard pile
-    public void MoveToDiscard(Card card, List<Card> fromDeck)
+    public void MoveCardToDiscard(Card card, List<Card> fromDeck)
     {
         MoveCardToADeck(card, fromDeck, discardPile);
     }
 
     // move a card to the deck
-    public void MoveToDeck(Card card, List<Card> fromDeck)
+    public void MoveCardToDeck(Card card, List<Card> fromDeck)
     {
         MoveCardToADeck(card, fromDeck, deck);
     }
 
     // move a card to the in use pile
-    public void MoveToInUse(Card card, List<Card> fromDeck)
+    public void MoveCardToInUse(Card card, List<Card> fromDeck)
     {
         MoveCardToADeck(card, fromDeck, inUsePile);
     }
@@ -308,9 +308,27 @@ public class DeckManager : MonoBehaviour
     }
 
     // return the count of a deck
-    public int Count(List<Card> deck)
+    private int Count(List<Card> deck)
     {
         return deck.Count;
+    }
+
+    // return count of deck
+    public int CountDeck()
+    {
+        return Count(deck);
+    }
+
+    // return count of discard pile
+    public int CountDiscardPile()
+    {
+        return Count(discardPile);
+    }
+
+    // return count of in use pile
+    public int CountInUsePile()
+    {
+        return Count(inUsePile);
     }
 
     // remove all playing cards and generate a new deck
