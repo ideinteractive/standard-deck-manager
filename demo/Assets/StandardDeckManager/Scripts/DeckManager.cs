@@ -3,38 +3,41 @@ using System.Collections.Generic;
 
 /// <summary>
 /// DeckManager
-/// Description: Manages and handles a standard deck of 52 playing cards.
+/// Description: Manages and handles all the functionality of our decks.
 /// </summary>
 
 public class DeckManager : MonoBehaviour
 {
     // global variables
-    public static DeckManager instance;     // set this object as a global object
+    public static DeckManager Instance;     // set this object as a global object
 
     // public variables
-    public List<Card> deck = new List<Card>();            // contains a list of cards
-    public List<Card> discardPile = new List<Card>();     // contains a list of discarded cards
-    public List<Card> inUsePile = new List<Card>();       // contains a list of cards in use
+    public List<Card> deck              = new List<Card>();         // contains a list of cards
+    public List<Card> discardPile       = new List<Card>();         // contains a list of discarded cards
+    public List<Card> inUsePile         = new List<Card>();         // contains a list of cards in use
+    public GameObject cardBackFace;                                 // the back face of a card
 
-    public GameObject cardBackFace;                         // the back face of a card
-
+#if UNITY_EDITOR
     // boolean to keep track of custom editor panel
     public bool blnExpandDeckPnl;
     public bool blnExpandDiscardPnl;
     public bool blnExpandInUsePnl;
+#endif
 
     // private variables
-    private GameObject m_goPool;   // object to nest our pooled objects
+    private GameObject m_goPool;    // object to nest our pooled objects
 
     // on awake
     private void Awake()
     {
-        // set this object
-        instance = this;
-        
+        // set this object's reference
+        Instance = this;
+
         // spawn a new empty gameobject to contain our pooled objects
-        m_goPool = new GameObject();
-        m_goPool.name = "Pool";
+        m_goPool = new GameObject
+        {
+            name = "Pool"
+        };
         m_goPool.transform.parent = this.transform;
 
         // for each object inside the deck 
@@ -44,6 +47,7 @@ public class DeckManager : MonoBehaviour
             goCard.SetActive(false);
             goCard.transform.parent = m_goPool.transform;
             card.card = goCard;
+            goCard.name = card.color + " " + card.rank + " of " + card.suit;
         }
 
         // spawn the back face card
@@ -51,96 +55,25 @@ public class DeckManager : MonoBehaviour
         goBackFaceCard.SetActive(false);
         goBackFaceCard.transform.parent = m_goPool.transform;
         cardBackFace = goBackFaceCard;
+        cardBackFace.name = "Back Face Card";
     }
 
-    // move a card up the deck
-    public void MoveCardUp(Card card, List<Card> deck)
+    // randomize a list that has been passed through
+    private static void RandomizeList(List<Card> list)
     {
-        // get the current index of the card
-        int index = deck.IndexOf(card);
-
-        // if that index is not zeo
-        if(index != 0)
+        // for each card in the list
+        for (int i = 0; i < list.Count; i++)
         {
-            // remove the current card from the deck
-            deck.Remove(card);
-
-            // add the card into the position
-            deck.Insert(index - 1, card);
+            // randomize the order
+            Card temp = list[i];
+            int randomIndex = Random.Range(i, list.Count);
+            list[i] = list[randomIndex];
+            list[randomIndex] = temp;
         }
     }
-
-    // move a card down the deck
-    public void MoveCardDown(Card card, List<Card> deck)
-    {
-        // get the current index of the card
-        int index = deck.IndexOf(card);
-
-        // if that index is not the max count of the deck
-        if (index != (deck.Count - 1))
-        {
-            // remove the current card from the deck
-            deck.Remove(card);
-
-            // add the card into the position
-            deck.Insert(index + 1, card);
-        }
-    }
-
-    // move a card to the top of the deck
-    public void MoveCardToTop(Card card, List<Card> deck)
-    {
-        // get the current index of the card
-        int index = deck.IndexOf(card);
-
-        // if that index is not zero
-        if (index != 0)
-        {
-            // remove the current card from the deck
-            deck.Remove(card);
-
-            // add the card to the top of the deck
-            deck.Insert(0, card);
-        }
-    }
-
-    // move a card to the bottom of the deck
-    public void MoveCardToBottom(Card card, List<Card> deck)
-    {
-        // get the current index of the card
-        int index = deck.IndexOf(card);
-
-        // if that index is not the max count of the deck
-        if (index != (deck.Count - 1))
-        {
-            // remove the current card from the deck
-            deck.Remove(card);
-
-            // add the card to the bottom of the deck
-            deck.Insert(deck.Count, card);
-        }
-    }
-
-
-
-    // add a new card to the deck
-    public void AddCard(Card card, List<Card> deck)
-    {
-        // add the card to the deck
-        deck.Add(card);
-    }
-
-    // remove a card from the deck
-    public void RemoveCard(Card card, List<Card> deck)
-    {
-        // remove the card from the deck
-        deck.Remove(card);
-    }
-
-    
 
     // shuffle the deck
-    public void Shuffle()
+    public void ShuffleDeck()
     {
         // shuffle the deck
         RandomizeList(deck);
@@ -161,91 +94,47 @@ public class DeckManager : MonoBehaviour
     }
 
     // shuffle two different decks together
-    public void ShuffleDecks(List<Card> mainDeck, List<Card> deckToShuffle)
+    public void ShuffleDecksTogether(List<Card> currentDeck, List<Card> withDeck)
     {
-        // add the deck to shuffle to the main deck
-        mainDeck.AddRange(deckToShuffle);
+        // add the deck we are shuffling with into the current deck
+        currentDeck.AddRange(withDeck);
 
         // shuffle the deck
-        RandomizeList(mainDeck);
+        RandomizeList(currentDeck);
 
-        // clear the deck to shuffle pile
-        deckToShuffle.Clear();
+        // clear the deck we were shuffling with
+        withDeck.Clear();
     }
 
-    // shuffle a choosen deck and add it to the top of a deck
-    public void ShuffleToTop(List<Card> mainDeck, List<Card> deckToShuffle)
+    // shuffle a deck to the top of another deck
+    public void ShuffleToTopOfDeck(List<Card> currentDeck, List<Card> otherDeck)
     {
-        // shuffle the deck to shuffle
-        RandomizeList(deckToShuffle);
+        // shuffle the current deck
+        RandomizeList(currentDeck);
 
-        // add the main deck to the bottom of the deck to shuffle
-        deckToShuffle.AddRange(mainDeck);
+        // add the other deck to the bottom of the current deck
+        currentDeck.AddRange(otherDeck);
 
-        // clear the main deck
-        mainDeck = deckToShuffle;
+        // clear the other deck and set the other deck to the current one
+        otherDeck.Clear();
+        otherDeck = currentDeck;
 
-        // set the main deck to the deck to shuffle
-        mainDeck = deckToShuffle;
-
-        // clear the deck to shuffle
-        deckToShuffle.Clear();
+        // clear the current deck
+        currentDeck.Clear();
     }
 
-    // shuffle a choosen deck and add it to the bottom of a deck
-    public void ShuffleToBottom(List<Card> mainDeck, List<Card> deckToShuffle)
+    // shuffle a deck to the bottom of another deck
+    public void ShuffleToBottomOfDeck(List<Card> currentDeck, List<Card> otherDeck)
     {
-        // shuffle the deck to shuffle
-        RandomizeList(deckToShuffle);
+        // shuffle the current deck
+        RandomizeList(currentDeck);
 
-        // add it to the bottom of the main deck
-        mainDeck.AddRange(deckToShuffle);
+        // add the current deck to the bottom of the other deck
+        otherDeck.AddRange(currentDeck);
 
-        // clear the deck to shuffle
-        deckToShuffle.Clear();
+        // clear the current deck
+        currentDeck.Clear();
     }
-
-    // randomize a list that has been passed through
-    private static void RandomizeList(List<Card> list)
-    {
-        // for each card in the list
-        for (int i = 0; i < list.Count; i++)
-        {
-            // randomize the order
-            Card temp = list[i];
-            int randomIndex = Random.Range(i, list.Count);
-            list[i] = list[randomIndex];
-            list[randomIndex] = temp;
-        }
-    }
-
-    
-
-    // return the deck count
-    public int Count()
-    {
-        return deck.Count;
-    }
-
-    // return the deck count of a given deck
-    public int Count(List<Card> deck)
-    {
-        return deck.Count;
-    }
-    // remove cards from in use pile to discard pile
-    public void DiscardInUse()
-    {
-        // for each card in the in use pile
-        foreach (Card card in inUsePile)
-        {
-            discardPile.Add(card);
-            inUsePile.Remove(card);
-        }
-    }
-
-
-
-
 
     // move a card to another deck
     private void MoveCardToADeck(Card card, List<Card> fromDeck, List<Card> toDeck)
@@ -273,11 +162,149 @@ public class DeckManager : MonoBehaviour
         MoveCardToADeck(card, fromDeck, inUsePile);
     }
 
+    // move all cards to another deck
+    private void MoveAllCardsToADeck(List<Card> fromDeck, List<Card> toDeck)
+    {
+        // for each card in the from deck
+        foreach (Card card in fromDeck)
+        {
+            // add it to the to deck
+            toDeck.Add(card);
+        }
+
+        // remove all cards from the from deck
+        fromDeck.Clear();
+    }
+
+    // move all cards to  the discard pile
+    public void MoveAllCardToDiscard(List<Card> fromDeck)
+    {
+        MoveAllCardsToADeck(fromDeck, discardPile);
+    }
+
+    // move all cards to  the deck
+    public void MoveAllCardToDeck(Card card, List<Card> fromDeck)
+    {
+        MoveAllCardsToADeck(fromDeck, deck);
+    }
+
+    // move all cards to  the in use pile
+    public void MoveAllCardToInUse(Card card, List<Card> fromDeck)
+    {
+        MoveAllCardsToADeck(fromDeck, inUsePile);
+    }
+
+    // add a new card to the deck
+    public void AddCard(Card card, List<Card> deck)
+    {
+        // if the application is playing
+        if (Application.isPlaying)
+        {
+            // instantiate the object
+            GameObject goCard = Instantiate(card.card, this.transform.position, this.transform.rotation);
+            goCard.SetActive(false);
+            goCard.transform.parent = m_goPool.transform;
+            goCard.name = card.color + " " + card.rank + " of " + card.suit;
+
+            // assign the new card to the card object
+            card.card = goCard;
+        }
+
+        // add the card to the deck
+        deck.Add(card);
+    }
+
+    // remove a card from the deck
+    public void RemoveCard(Card card, List<Card> deck)
+    {
+        // if the application is playing
+        if (Application.isPlaying)
+            // delete the instantiated object
+            Destroy(card.card);
+
+        // remove the card from the deck
+        deck.Remove(card);
+    }
+
+    // move a card up its current slot in the deck
+    public void MoveCardUpOneSlot(Card card, List<Card> deck)
+    {
+        // get the current index of the card
+        int index = deck.IndexOf(card);
+
+        // if that index is not zeo
+        if (index != 0)
+        {
+            // remove the current card from the deck
+            deck.Remove(card);
+
+            // add the card into the position
+            deck.Insert(index - 1, card);
+        }
+    }
+
+    // move a card down its current slot in the deck
+    public void MoveCardDownOneSlot(Card card, List<Card> deck)
+    {
+        // get the current index of the card
+        int index = deck.IndexOf(card);
+
+        // if that index is not the max count of the deck
+        if (index != (deck.Count - 1))
+        {
+            // remove the current card from the deck
+            deck.Remove(card);
+
+            // add the card into the position
+            deck.Insert(index + 1, card);
+        }
+    }
+
+    // move a card to the top of the deck
+    public void MoveCardToTopDeck(Card card, List<Card> deck)
+    {
+        // get the current index of the card
+        int index = deck.IndexOf(card);
+
+        // if that index is not zero
+        if (index != 0)
+        {
+            // remove the current card from the deck
+            deck.Remove(card);
+
+            // add the card to the top of the deck
+            deck.Insert(0, card);
+        }
+    }
+
+    // move a card to the bottom of the deck
+    public void MoveCardToBottomDeck(Card card, List<Card> deck)
+    {
+        // get the current index of the card
+        int index = deck.IndexOf(card);
+
+        // if that index is not the max count of the deck
+        if (index != (deck.Count - 1))
+        {
+            // remove the current card from the deck
+            deck.Remove(card);
+
+            // add the card to the bottom of the deck
+            deck.Insert(deck.Count, card);
+        }
+    }
+
+    // return the count of a deck
+    public int Count(List<Card> deck)
+    {
+        return deck.Count;
+    }
+
     // remove all playing cards and generate a new deck
     public void RemoveAllAndCreateNew()
     {
         // create a new deck 
-        deck = new List<Card>();
+        deck.Clear();
 
         // for each suit 
         for (int i = 0; i <= (int)Card.Suit.Hearts; i++)
@@ -320,10 +347,10 @@ public class DeckManager : MonoBehaviour
         }
 
         // create a new discard pile
-        discardPile = new List<Card>();
+        discardPile.Clear();
 
         // create a new in use pile
-        inUsePile = new List<Card>();
+        inUsePile.Clear();
 
         // assign the back face card
         cardBackFace = Resources.Load("Prefabs/Back Face") as GameObject;
@@ -336,9 +363,9 @@ public class DeckManager : MonoBehaviour
     public void RemoveAll()
     {
         // remove all cards 
-        deck = new List<Card>();
-        discardPile = new List<Card>();
-        inUsePile = new List<Card>();
+        deck.Clear();
+        discardPile.Clear();
+        inUsePile.Clear();
 
         // assign the back face card
         cardBackFace = Resources.Load("Prefabs/Back Face") as GameObject;
@@ -346,8 +373,52 @@ public class DeckManager : MonoBehaviour
         // inform the user the deck has been updated
         Debug.Log("All Card Removed");
     }
+}
 
+/// <summary>
+/// Card
+/// Description: Properties for each individual card.
+/// </summary>
 
+[System.Serializable]
+public class Card
+{
+    public enum Suit
+    {
+        Clubs,
+        Diamonds,
+        Spades,
+        Hearts
+    }
 
+    public enum Color
+    {
+        Black,
+        Red
+    }
 
+    public enum Rank
+    {
+        Ace,
+        Two,
+        Three,
+        Four,
+        Five,
+        Six,
+        Seven,
+        Eight,
+        Nine,
+        Ten,
+        Jack,
+        Queen,
+        King
+    }
+
+    public string strName;          // define our card name
+    public Suit suit;               // define the card's suit
+    [SerializeField]
+    public Color color;             // define the card's color
+    public Rank rank;               // define the card's rank
+    public int value;               // define the card's value
+    public GameObject card;         // the card gameobject
 }

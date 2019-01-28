@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Collections.Generic;
+using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -52,7 +53,7 @@ public class CardEditor : EditorWindow
     }
 
     // if this window is closed
-    public void OnDestroy()
+    private void OnDestroy()
     {
         // if we are using the editor
         if (Application.isEditor)
@@ -65,13 +66,34 @@ public class CardEditor : EditorWindow
     }
 
     // repaint the inspector if it gets updated
-    void OnInspectorUpdate()
+    private void OnInspectorUpdate()
     {
         Repaint();
     }
 
+    // draw our fields onto the inspector
+    private void DrawFields(List<Card> deck)
+    {
+        // try to draw our fields and if we can't turn them off
+        try
+        {
+            // allows use to create a new card to add
+            deck[intCardIndex].color = (Card.Color)EditorGUILayout.EnumPopup("Color", deck[intCardIndex].color);
+            deck[intCardIndex].rank = (Card.Rank)EditorGUILayout.EnumPopup("Rank", deck[intCardIndex].rank);
+            deck[intCardIndex].suit = (Card.Suit)EditorGUILayout.EnumPopup("Suit", deck[intCardIndex].suit);
+            deck[intCardIndex].value = EditorGUILayout.IntField("Value", deck[intCardIndex].value);
+            deck[intCardIndex].card = (GameObject)EditorGUILayout.ObjectField("Card", deck[intCardIndex].card, typeof(GameObject), true);
+        } catch
+        {
+            blnEditingCardFromDeck = false;
+            blnEditingCardFromDiscard = false;
+            blnEditingCardFromInUse = false;
+            GUIUtility.ExitGUI();
+        }
+    }
+
     // draw the ui
-    void OnGUI()
+    private void OnGUI()
     {
         // header styles
         GUIStyle styleRowHeader = new GUIStyle();
@@ -79,6 +101,24 @@ public class CardEditor : EditorWindow
         styleRowHeader.normal.background = EditorStyle.SetBackground(1, 1, new Color(0.1f, 0.1f, 0.1f, 0.2f));
         GUIStyle stylePaddingLeft = new GUIStyle();
         stylePaddingLeft.padding = new RectOffset(10, 0, 3, 3);
+
+        EditorGUILayout.Space();
+        EditorGUILayout.BeginHorizontal(styleRowHeader);
+        EditorGUILayout.LabelField("Edit Selected Card", EditorStyles.boldLabel);
+        EditorGUILayout.EndHorizontal();
+
+        // inform our user no card is selected;
+        if (!blnEditingCardFromDeck && !blnEditingCardFromDiscard && !blnEditingCardFromInUse)
+        {
+            try
+            {
+                EditorGUILayout.HelpBox("There is no card currently selected. Please select a card from the Deck Manager to edit.", MessageType.Info);
+            }
+            catch
+            {
+                return;
+            }
+        }
 
         // if the deck manager editor is null 
         if (deckManagerEditor == null)
@@ -92,76 +132,28 @@ public class CardEditor : EditorWindow
             {
                 return;
             }
-        }
-
-        // render our header if we are editing a card
-        if (blnEditingCardFromDeck || blnEditingCardFromDiscard || blnEditingCardFromInUse)
+        } else
         {
             // update serialized object representation
             deckManagerEditor.serializedObject.Update();
-
-            EditorGUILayout.Space();
-            EditorGUILayout.BeginHorizontal(styleRowHeader);
-            EditorGUILayout.LabelField("Edit Selected Card", EditorStyles.boldLabel);
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.Space();
         }
+
+        EditorGUILayout.Space();
 
         // if we are editing the card
         if (blnEditingCardFromDeck)
-        {
-            // allows use to create a new card to add
-            deckManagerEditor.deckManager.deck[intCardIndex].color = (Card.Color)EditorGUILayout.EnumPopup("Color", deckManagerEditor.deckManager.deck[intCardIndex].color);
-            deckManagerEditor.deckManager.deck[intCardIndex].rank = (Card.Rank)EditorGUILayout.EnumPopup("Rank", deckManagerEditor.deckManager.deck[intCardIndex].rank);
-            deckManagerEditor.deckManager.deck[intCardIndex].suit = (Card.Suit)EditorGUILayout.EnumPopup("Suit", deckManagerEditor.deckManager.deck[intCardIndex].suit);
-            deckManagerEditor.deckManager.deck[intCardIndex].value = EditorGUILayout.IntField("Value", deckManagerEditor.deckManager.deck[intCardIndex].value);
-            deckManagerEditor.deckManager.deck[intCardIndex].card = (GameObject)EditorGUILayout.ObjectField("Card", deckManagerEditor.deckManager.deck[intCardIndex].card, typeof(GameObject), true);
-
-            if (GUI.changed)
-            {
-                EditorUtility.SetDirty(deckManagerEditor.target);
-                EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
-            }
-        }
+            DrawFields(deckManagerEditor.deckManager.deck);
         else if (blnEditingCardFromDiscard)
-        {
-            // allows use to create a new card to add
-            deckManagerEditor.deckManager.discardPile[intCardIndex].color = (Card.Color)EditorGUILayout.EnumPopup("Color", deckManagerEditor.deckManager.discardPile[intCardIndex].color);
-            deckManagerEditor.deckManager.discardPile[intCardIndex].rank = (Card.Rank)EditorGUILayout.EnumPopup("Rank", deckManagerEditor.deckManager.discardPile[intCardIndex].rank);
-            deckManagerEditor.deckManager.discardPile[intCardIndex].suit = (Card.Suit)EditorGUILayout.EnumPopup("Suit", deckManagerEditor.deckManager.discardPile[intCardIndex].suit);
-            deckManagerEditor.deckManager.discardPile[intCardIndex].value = EditorGUILayout.IntField("Value", deckManagerEditor.deckManager.discardPile[intCardIndex].value);
-            deckManagerEditor.deckManager.discardPile[intCardIndex].card = (GameObject)EditorGUILayout.ObjectField("Card", deckManagerEditor.deckManager.discardPile[intCardIndex].card, typeof(GameObject), true);
-
-            if (GUI.changed)
-            {
-                EditorUtility.SetDirty(deckManagerEditor.target);
-                EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
-            }
-        }
+            DrawFields(deckManagerEditor.deckManager.discardPile);
         else if (blnEditingCardFromInUse)
+            DrawFields(deckManagerEditor.deckManager.inUsePile);
+
+        if (GUI.changed)
         {
-            // update serialized object representation
-            deckManagerEditor.serializedObject.Update();
-
-            // allows use to create a new card to add
-            deckManagerEditor.deckManager.inUsePile[intCardIndex].color = (Card.Color)EditorGUILayout.EnumPopup("Color", deckManagerEditor.deckManager.inUsePile[intCardIndex].color);
-            deckManagerEditor.deckManager.inUsePile[intCardIndex].rank = (Card.Rank)EditorGUILayout.EnumPopup("Rank", deckManagerEditor.deckManager.inUsePile[intCardIndex].rank);
-            deckManagerEditor.deckManager.inUsePile[intCardIndex].suit = (Card.Suit)EditorGUILayout.EnumPopup("Suit", deckManagerEditor.deckManager.inUsePile[intCardIndex].suit);
-            deckManagerEditor.deckManager.inUsePile[intCardIndex].value = EditorGUILayout.IntField("Value", deckManagerEditor.deckManager.inUsePile[intCardIndex].value);
-            deckManagerEditor.deckManager.inUsePile[intCardIndex].card = (GameObject)EditorGUILayout.ObjectField("Card", deckManagerEditor.deckManager.inUsePile[intCardIndex].card, typeof(GameObject), true);
-
-            if (GUI.changed)
-            {
-                EditorUtility.SetDirty(deckManagerEditor.target);
-                EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
-            }
+            EditorUtility.SetDirty(deckManagerEditor.target);
+            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
         }
-        else
-        {
-            // if no card is currently selected display a warning
-            EditorGUILayout.HelpBox("There is no card currently selected. Please select a card from the Deck Manager to edit.", MessageType.Info);
-        }
-
+       
         EditorGUILayout.Space();
     }
 }

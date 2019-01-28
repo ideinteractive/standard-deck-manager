@@ -83,7 +83,6 @@
     <Compile Include="Assets\StandardDeckManager\Demo\Scripts\MatchManager.cs" />
     <Compile Include="Assets\StandardDeckManager\Demo\Scripts\MenuManager.cs" />
     <Compile Include="Assets\StandardDeckManager\Demo\Scripts\WarManager.cs" />
-    <Compile Include="Assets\StandardDeckManager\Scripts\Card.cs" />
     <Compile Include="Assets\StandardDeckManager\Scripts\DeckManager.cs" />
   </ItemGroup>
   <ItemGroup>

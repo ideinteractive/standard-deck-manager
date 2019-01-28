@@ -18,9 +18,9 @@ public class DeckManagerEditor : Editor
     public DeckManager deckManager;
 
     // reference to our reorderable lists
-    private ReorderableList deck;
-    private ReorderableList discardPile;
-    private ReorderableList inUsePile;
+    private ReorderableList reorderableDeck;
+    private ReorderableList reorderableDiscardPile;
+    private ReorderableList reorderableInUsePile;
 
     // when this is enabled and active
     private void OnEnable()
@@ -29,36 +29,39 @@ public class DeckManagerEditor : Editor
         deckManager = (DeckManager)target;  // set up the reference to the current inspected object
 
         // create our reorderable list
-        deck = new ReorderableList(serializedObject, serializedObject.FindProperty("deck"));
-        discardPile = new ReorderableList(serializedObject, serializedObject.FindProperty("discardPile"));
-        inUsePile = new ReorderableList(serializedObject, serializedObject.FindProperty("inUsePile"));
+        reorderableDeck = new ReorderableList(serializedObject, serializedObject.FindProperty("deck"));
+        reorderableDiscardPile = new ReorderableList(serializedObject, serializedObject.FindProperty("discardPile"));
+        reorderableInUsePile = new ReorderableList(serializedObject, serializedObject.FindProperty("inUsePile"));
 
         // draw out our column headers
         // and reorderable lists
-        deck.drawHeaderCallback = rect =>
+        reorderableDeck.drawHeaderCallback = rect =>
         {
             EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, rect.height), "Cards", EditorStyles.boldLabel);
         };
-        deck.drawElementCallback += DrawDeckElement;
-        deck.onSelectCallback += SelectCard;
+        reorderableDeck.drawElementCallback += DrawDeckElement;
+        reorderableDeck.onSelectCallback += SelectCard;
+        reorderableDeck.onAddDropdownCallback = DrawGenericMenu;
 
-        discardPile.drawHeaderCallback = rect =>
+        reorderableDiscardPile.drawHeaderCallback = rect =>
         {
             EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, rect.height), "Cards", EditorStyles.boldLabel);
         };
-        discardPile.drawElementCallback += DrawDiscardPileElement;
-        discardPile.onSelectCallback += SelectCard;
+        reorderableDiscardPile.drawElementCallback += DrawDiscardPileElement;
+        reorderableDiscardPile.onSelectCallback += SelectCard;
+        reorderableDiscardPile.onAddDropdownCallback = DrawGenericMenu;
 
-        inUsePile.drawHeaderCallback = rect =>
+        reorderableInUsePile.drawHeaderCallback = rect =>
         {
             EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, rect.height), "Cards", EditorStyles.boldLabel);
         };
-        inUsePile.drawElementCallback += DrawInUsePileElement;
-        inUsePile.onSelectCallback += SelectCard;
+        reorderableInUsePile.drawElementCallback += DrawInUsePileElement;
+        reorderableInUsePile.onSelectCallback += SelectCard;
+        reorderableInUsePile.onAddDropdownCallback = DrawGenericMenu;
     }
 
     // if this script is destroyed or removed
-    public void OnDestroy()
+    private void OnDestroy()
     {
         // if we are using the editor
         if (Application.isEditor)
@@ -76,34 +79,45 @@ public class DeckManagerEditor : Editor
             // remove a reference to this editor
             Instance = null;
 
-            // clear all windows of references
-            CardEditor.Instance.blnEditingCardFromDeck = false;
-            CardEditor.Instance.blnEditingCardFromDiscard = false;
-            CardEditor.Instance.blnEditingCardFromInUse = false;
+            // if our card editor window is open
+            if (CardEditor.IsOpen)
+            {
+                // clear all references
+                CardEditor.Instance.blnEditingCardFromDeck = false;
+                CardEditor.Instance.blnEditingCardFromDiscard = false;
+                CardEditor.Instance.blnEditingCardFromInUse = false;
+            }
+
+            // if our deck options window is open
+            if (DeckOptionsEditor.IsOpen)
+            {
+                // clear all references
+                DeckOptionsEditor.deckManagerEditor = null;
+            }
         }
     }
 
     // callback for when we select a card in the deck
-    private void SelectCard(ReorderableList _deck)
+    private void SelectCard(ReorderableList deck)
     {
-        if (0 <= _deck.index && _deck.index < _deck.count)
+        if (0 <= deck.index && deck.index < deck.count)
         {
             if (CardEditor.IsOpen)
             {
                 // pass our information to the card editor
-                CardEditor.Instance.intCardIndex = _deck.index;
+                CardEditor.Instance.intCardIndex = deck.index;
 
-                if (_deck == deck)
+                if (deck == reorderableDeck)
                     CardEditor.Instance.blnEditingCardFromDeck = true;
                 else
                     CardEditor.Instance.blnEditingCardFromDeck = false;
 
-                if (_deck == discardPile)
+                if (deck == reorderableDiscardPile)
                     CardEditor.Instance.blnEditingCardFromDiscard = true;
                 else
                     CardEditor.Instance.blnEditingCardFromDiscard = false;
 
-                if (_deck == inUsePile)
+                if (deck == reorderableInUsePile)
                     CardEditor.Instance.blnEditingCardFromInUse = true;
                 else
                     CardEditor.Instance.blnEditingCardFromInUse = false;
@@ -112,12 +126,12 @@ public class DeckManagerEditor : Editor
     }
 
     // draw our our elements
-    private void DrawElements(Rect rect, Card card, List<Card> _deck)
+    private void DrawElements(Rect rect, Card card, List<Card> deck)
     {
         EditorGUI.LabelField(new Rect(rect.x, rect.y + 2, rect.width, rect.height), card.color + " " + card.rank + " of " + card.suit);
 
         // if it is the main deck
-        if (_deck == deckManager.deck)
+        if (deck == deckManager.deck)
         {
             // move the card to the discard pile
             if (GUI.Button(new Rect(rect.width - 40, rect.y, 20, 15), "D"))
@@ -134,7 +148,7 @@ public class DeckManagerEditor : Editor
         }
 
         // if it is the discard pile
-        if (_deck == deckManager.discardPile)
+        if (deck == deckManager.discardPile)
         {
             // move the card to the deck
             if (GUI.Button(new Rect(rect.width - 40, rect.y, 20, 15), "A"))
@@ -151,7 +165,7 @@ public class DeckManagerEditor : Editor
         }
 
         // if it is the in use pile
-        if (_deck == deckManager.inUsePile)
+        if (deck == deckManager.inUsePile)
         {
             // move the card to the deck
             if (GUI.Button(new Rect(rect.width - 40, rect.y, 20, 15), "A"))
@@ -176,19 +190,19 @@ public class DeckManagerEditor : Editor
             window.Show();
 
             // pass our information to the card editor
-            CardEditor.Instance.intCardIndex = _deck.IndexOf(card);
+            CardEditor.Instance.intCardIndex = deck.IndexOf(card);
 
-            if (_deck == deckManager.deck)
+            if (deck == deckManager.deck)
                 CardEditor.Instance.blnEditingCardFromDeck = true;
             else
                 CardEditor.Instance.blnEditingCardFromDeck = false;
 
-            if (_deck == deckManager.discardPile)
+            if (deck == deckManager.discardPile)
                 CardEditor.Instance.blnEditingCardFromDiscard = true;
             else
                 CardEditor.Instance.blnEditingCardFromDiscard = false;
 
-            if (_deck == deckManager.inUsePile)
+            if (deck == deckManager.inUsePile)
                 CardEditor.Instance.blnEditingCardFromInUse = true;
             else
                 CardEditor.Instance.blnEditingCardFromInUse = false;
@@ -222,6 +236,82 @@ public class DeckManagerEditor : Editor
         DrawElements(rect, card, deckManager.inUsePile);
     }
 
+    // draw our generic menu for adding in new cards
+    private void DrawGenericMenu(Rect rect, ReorderableList deck)
+    {
+        var menu = new GenericMenu();
+        for (int c = 0; c < 2; c++)
+        {
+            // if c is an odd number
+            // return red
+            if (c % 2 == 1)
+            {
+                for (int s = 0; s < 2; s++)
+                {
+                    // if s is an odd number
+                    // return red
+                    if (s % 2 == 1)
+                        for (int r = 0; r < 13; r++)
+                        {
+                            Card card = new Card
+                            {
+                                color = Card.Color.Red,
+                                suit = Card.Suit.Hearts,
+                                rank = (Card.Rank)r
+                            };
+                            card.card = Resources.Load("Prefabs/" + card.color + " " + card.rank + " " + card.suit) as GameObject;
+                            AddItem(new GUIContent("Red/Hearts/" + (Card.Rank)r), false, card, deck, menu);
+                        }
+                    else
+                        for (int r = 0; r < 13; r++)
+                        {
+                            Card card = new Card
+                            {
+                                color = Card.Color.Red,
+                                suit = Card.Suit.Diamonds,
+                                rank = (Card.Rank)r
+                            };
+                            card.card = Resources.Load("Prefabs/" + card.color + " " + card.rank + " " + card.suit) as GameObject;
+                            AddItem(new GUIContent("Red/Diamonds/" + (Card.Rank)r), false, card, deck, menu);
+                        }
+                }
+            }
+            else
+            {
+                for (int s = 0; s < 2; s++)
+                {
+                    // if s is an odd number
+                    // return red
+                    if (s % 2 == 1)
+                        for (int r = 0; r < 13; r++)
+                        {
+                            Card card = new Card
+                            {
+                                color = Card.Color.Black,
+                                suit = Card.Suit.Spades,
+                                rank = (Card.Rank)r
+                            };
+                            card.card = Resources.Load("Prefabs/" + card.color + " " + card.rank + " " + card.suit) as GameObject;
+                            AddItem(new GUIContent("Black/Spades/" + (Card.Rank)r), false, card, deck, menu);
+                        }
+                    else
+                        for (int r = 0; r < 13; r++)
+                        {
+                            Card card = new Card
+                            {
+                                color = Card.Color.Black,
+                                suit = Card.Suit.Clubs,
+                                rank = (Card.Rank)r
+                            };
+                            card.card = Resources.Load("Prefabs/" + card.color + " " + card.rank + " " + card.suit) as GameObject;
+                            AddItem(new GUIContent("Black/Clubs/" + (Card.Rank)r), false, card, deck, menu);
+                        }
+                }
+            }
+        }
+        menu.ShowAsContext();
+    }
+    
     // override our inspector interface
     public override void OnInspectorGUI()
     {
@@ -251,6 +341,13 @@ public class DeckManagerEditor : Editor
         EditorGUILayout.EndHorizontal();
         EditorGUILayout.Space();
 
+        // remove everything and create a new standard deck
+        if (GUILayout.Button("Generate a New Deck"))
+        {
+            Undo.RecordObjects(targets, "New deck generated.");
+            deckManager.RemoveAllAndCreateNew();
+        }
+
         // get existing open window or if none, make a new one
         if (GUILayout.Button("Deck Options"))
         {
@@ -265,13 +362,6 @@ public class DeckManagerEditor : Editor
             CardEditor window = (CardEditor)EditorWindow.GetWindow(typeof(CardEditor), false, "Card Editor");
             window.minSize = new Vector2(325, 140);
             window.Show();
-        }
-
-        // remove everything and create a new standard deck
-        if (GUILayout.Button("Generate a New Deck"))
-        {
-            Undo.RecordObjects(targets, "New deck generated.");
-            deckManager.RemoveAllAndCreateNew();
         }
 
         // remove everything
@@ -291,7 +381,7 @@ public class DeckManagerEditor : Editor
         if (deckManager.blnExpandDeckPnl)
             try
             {
-                deck.DoLayoutList();
+                reorderableDeck.DoLayoutList();
             }
             catch
             {
@@ -302,7 +392,7 @@ public class DeckManagerEditor : Editor
         if (deckManager.blnExpandDiscardPnl)
             try
             {
-                discardPile.DoLayoutList();
+                reorderableDiscardPile.DoLayoutList();
             }
             catch
             {
@@ -313,7 +403,7 @@ public class DeckManagerEditor : Editor
         if (deckManager.blnExpandInUsePnl)
             try
             {
-                inUsePile.DoLayoutList();
+                reorderableInUsePile.DoLayoutList();
             }
             catch
             {
@@ -326,6 +416,41 @@ public class DeckManagerEditor : Editor
             EditorUtility.SetDirty(target);
 
         // apply property modifications
+        serializedObject.ApplyModifiedProperties();
+    }
+
+    // add an item to the appropriate list
+    private void AddItem(GUIContent content, bool on, Card card, ReorderableList deck, GenericMenu menu)
+    {
+        if (deck == reorderableDeck)
+            menu.AddItem(content, on, AddNewCardToDeck, card);
+        else if (deck == reorderableDiscardPile)
+            menu.AddItem(content, on, AddNewCardToDiscardPile, card);
+        else if (deck == reorderableInUsePile)
+            menu.AddItem(content, on, AddNewCardToInUsePile, card);
+    }
+
+    // add in a new card to deck
+    private void AddNewCardToDeck(object card)
+    {
+        Undo.RecordObjects(targets, "Added card to deck.");
+        deckManager.deck.Add((Card)card);
+        serializedObject.ApplyModifiedProperties();
+    }
+
+    // add in a new card to discard pile
+    private void AddNewCardToDiscardPile(object card)
+    {
+        Undo.RecordObjects(targets, "Added card to discard pile.");
+        deckManager.discardPile.Add((Card)card);
+        serializedObject.ApplyModifiedProperties();
+    }
+
+    // add in a new card to in use pile
+    private void AddNewCardToInUsePile(object card)
+    {
+        Undo.RecordObjects(targets, "Added card to in use pile.");
+        deckManager.inUsePile.Add((Card)card);
         serializedObject.ApplyModifiedProperties();
     }
 }
