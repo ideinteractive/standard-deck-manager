@@ -52,6 +52,15 @@ public class DeckOptionsEditor : EditorWindow
         Repaint();
     }
 
+    // mark the scene as dirty
+    private void MarkSceneDirty()
+    {
+        // if we are not in play mode
+        if(!Application.isPlaying)
+            // mark the scene as dirty
+            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+    }
+
     // draw the ui
     private void OnGUI()
     {
@@ -94,7 +103,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Deck shuffled.");
             deckManagerEditor.deckManager.ShuffleDeck();
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         // shuffle the discard pile
@@ -102,7 +111,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Discard pile shuffled.");
             deckManagerEditor.deckManager.ShuffleDiscardPile();
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         // shuffle the in use pile
@@ -110,7 +119,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "In use pile shuffled.");
             deckManagerEditor.deckManager.ShuffleInUsePile();
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         EditorGUILayout.Space();
@@ -125,7 +134,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Deck shuffled with discard pile.");
             deckManagerEditor.deckManager.ShuffleDecksTogether(deckManagerEditor.deckManager.deck, deckManagerEditor.deckManager.discardPile);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         // shuffle the deck with the in use pile
@@ -133,7 +142,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Deck shuffled with in use pile.");
             deckManagerEditor.deckManager.ShuffleDecksTogether(deckManagerEditor.deckManager.deck, deckManagerEditor.deckManager.inUsePile);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         EditorGUILayout.Space();
@@ -144,7 +153,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Discard pile shuffled with deck.");
             deckManagerEditor.deckManager.ShuffleDecksTogether(deckManagerEditor.deckManager.discardPile, deckManagerEditor.deckManager.deck);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         // shuffle the discard and in use pile
@@ -152,7 +161,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Discard pile shuffled with in use pile.");
             deckManagerEditor.deckManager.ShuffleDecksTogether(deckManagerEditor.deckManager.discardPile, deckManagerEditor.deckManager.inUsePile);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         EditorGUILayout.Space();
@@ -163,7 +172,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "In use pile shuffled with deck.");
             deckManagerEditor.deckManager.ShuffleDecksTogether(deckManagerEditor.deckManager.inUsePile, deckManagerEditor.deckManager.deck);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         // shuffle the in use pile and discard pile
@@ -171,7 +180,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "In use pile shuffled with discard pile.");
             deckManagerEditor.deckManager.ShuffleDecksTogether(deckManagerEditor.deckManager.inUsePile, deckManagerEditor.deckManager.discardPile);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         EditorGUILayout.Space();
@@ -186,7 +195,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Shuffled discard pile to top of deck.");
             deckManagerEditor.deckManager.ShuffleToTopOfDeck(deckManagerEditor.deckManager.discardPile, deckManagerEditor.deckManager.deck);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         // shuffle the in use pile and add it to the top of the deck
@@ -194,7 +203,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Shuffled in use pile to top of deck.");
             deckManagerEditor.deckManager.ShuffleToTopOfDeck(deckManagerEditor.deckManager.inUsePile, deckManagerEditor.deckManager.deck);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         EditorGUILayout.Space();
@@ -205,7 +214,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Shuffled deck to top of discard pile.");
             deckManagerEditor.deckManager.ShuffleToTopOfDeck(deckManagerEditor.deckManager.deck, deckManagerEditor.deckManager.discardPile);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         // shuffle the in use pile and add it to the top of the discard pile
@@ -213,7 +222,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Shuffled in use pile to top of discard pile.");
             deckManagerEditor.deckManager.ShuffleToTopOfDeck(deckManagerEditor.deckManager.inUsePile, deckManagerEditor.deckManager.discardPile);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         EditorGUILayout.Space();
@@ -224,7 +233,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Shuffled deck to top of in use pile.");
             deckManagerEditor.deckManager.ShuffleToTopOfDeck(deckManagerEditor.deckManager.deck, deckManagerEditor.deckManager.inUsePile);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         // shuffle the discard pile and add it to the top of the in use pile
@@ -232,7 +241,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Shuffled discard pile to top of in use pile.");
             deckManagerEditor.deckManager.ShuffleToTopOfDeck(deckManagerEditor.deckManager.discardPile, deckManagerEditor.deckManager.inUsePile);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         EditorGUILayout.Space();
@@ -247,7 +256,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Shuffled discard pile to bottom of deck.");
             deckManagerEditor.deckManager.ShuffleToBottomOfDeck(deckManagerEditor.deckManager.discardPile, deckManagerEditor.deckManager.deck);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         // shuffle the in use pile and add it to the bottom of the deck
@@ -255,7 +264,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Shuffled in use pile to bottom of deck.");
             deckManagerEditor.deckManager.ShuffleToBottomOfDeck(deckManagerEditor.deckManager.inUsePile, deckManagerEditor.deckManager.deck);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         EditorGUILayout.Space();
@@ -266,7 +275,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Shuffled deck to bottom of discard pile.");
             deckManagerEditor.deckManager.ShuffleToBottomOfDeck(deckManagerEditor.deckManager.deck, deckManagerEditor.deckManager.discardPile);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         // shuffle the in use pile and add it to the bottom of the discard pile
@@ -274,7 +283,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Shuffled in use pile to bottom of discard pile.");
             deckManagerEditor.deckManager.ShuffleToBottomOfDeck(deckManagerEditor.deckManager.inUsePile, deckManagerEditor.deckManager.discardPile);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         EditorGUILayout.Space();
@@ -285,7 +294,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Shuffled deck to bottom of in use pile.");
             deckManagerEditor.deckManager.ShuffleToBottomOfDeck(deckManagerEditor.deckManager.deck, deckManagerEditor.deckManager.inUsePile);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         // shuffle the discard pile and add it to the bottom of the in use pile
@@ -293,7 +302,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             Undo.RecordObjects(deckManagerEditor.targets, "Shuffled discard pile to bottom of in use pile.");
             deckManagerEditor.deckManager.ShuffleToBottomOfDeck(deckManagerEditor.deckManager.discardPile, deckManagerEditor.deckManager.inUsePile);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+            MarkSceneDirty();
         }
 
         EditorGUILayout.Space();

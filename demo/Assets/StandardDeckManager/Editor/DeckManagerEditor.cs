@@ -66,38 +66,8 @@ public class DeckManagerEditor : Editor
     // if this script is destroyed or removed
     private void OnDestroy()
     {
-        // if we are using the editor
-        if (Application.isEditor)
-        {
-            // if there is no deck manager found
-            if (deckManager == null)
-            {
-                // get existing open windows and close it
-                DeckOptionsEditor doeWindow = (DeckOptionsEditor)EditorWindow.GetWindow(typeof(DeckOptionsEditor), false, "Deck Options");
-                doeWindow.Close();
-                CardEditor ceWindow = (CardEditor)EditorWindow.GetWindow(typeof(CardEditor), false, "Card Editor");
-                ceWindow.Close();
-            }
-
-            // remove a reference to this editor
-            Instance = null;
-
-            // if our card editor window is open
-            if (CardEditor.IsOpen)
-            {
-                // clear all references
-                CardEditor.Instance.blnEditingCardFromDeck = false;
-                CardEditor.Instance.blnEditingCardFromDiscard = false;
-                CardEditor.Instance.blnEditingCardFromInUse = false;
-            }
-
-            // if our deck options window is open
-            if (DeckOptionsEditor.IsOpen)
-            {
-                // clear all references
-                DeckOptionsEditor.deckManagerEditor = null;
-            }
-        }
+        // remove a reference to this editor
+        Instance = null;
     }
 
     // callback for when we select a card in the deck

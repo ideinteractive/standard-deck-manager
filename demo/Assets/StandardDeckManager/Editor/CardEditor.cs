@@ -124,12 +124,16 @@ public class CardEditor : EditorWindow
         if (deckManagerEditor == null)
         {
             // try and find a reference to the deck manager editor
-            try
+            if (DeckManagerEditor.Instance)
             {
                 deckManagerEditor = DeckManagerEditor.Instance;
+
             }
-            catch
+            else
             {
+                blnEditingCardFromDeck = false;
+                blnEditingCardFromDiscard = false;
+                blnEditingCardFromInUse = false;
                 return;
             }
         } else
