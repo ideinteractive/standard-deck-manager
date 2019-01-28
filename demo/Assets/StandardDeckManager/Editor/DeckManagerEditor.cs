@@ -461,8 +461,14 @@ public class DeckManagerEditor : Editor
 
         EditorGUILayout.Space();
 
-        if (EditorGUI.EndChangeCheck())
-            EditorUtility.SetDirty(target);
+        try
+        {
+            if (EditorGUI.EndChangeCheck())
+                EditorUtility.SetDirty(target);
+        } catch
+        {
+            return;
+        }
 
         // apply property modifications
         serializedObject.ApplyModifiedProperties();

@@ -80,6 +80,9 @@ public class BlackjackManager : MonoBehaviour
         btnPlayAgain.gameObject.SetActive(false);
         btnMainMenu.gameObject.SetActive(false);
 
+        // update the deck count
+        txtDeckCount.text = DeckManager.Instance.CountDeck().ToString();
+
         // initialize the game
         StartCoroutine(InitializeGame());
     }
@@ -222,10 +225,19 @@ public class BlackjackManager : MonoBehaviour
         // for 4 loops
         for (int i = 0; i < 4; i++)
         {
+            // infom the manager an action is in progress
+            m_blnActionInProgress = true;
+
             // deal cards to both the dealer and player
             if (i % 2 == 0)
             {
                 StartCoroutine(DealCard(col_dealerHand, goDealerCardBorder, false));
+
+                // while an action is in progress wait until it is complete
+                while (m_blnActionInProgress)
+                {
+                    yield return null;
+                }
 
                 // if this is the first deal
                 if (i == 0)
@@ -239,6 +251,12 @@ public class BlackjackManager : MonoBehaviour
             else
             {
                 StartCoroutine(DealCard(col_playerHand, goPlayerCardBorder, true));
+
+                // while an action is in progress wait until it is complete
+                while (m_blnActionInProgress)
+                {
+                    yield return null;
+                }
 
                 // display the current score of the player
                 CalculateHand(col_playerHand, txtPlayerHandCount);
@@ -307,7 +325,7 @@ public class BlackjackManager : MonoBehaviour
         txtDeckCount.text = DeckManager.Instance.CountDeck().ToString();
 
         // set action in progress to false
-        // to allow the player to continue
+        // to allow the game to continue
         m_blnActionInProgress = false;
     }
 
@@ -396,8 +414,17 @@ public class BlackjackManager : MonoBehaviour
             // if the dealer's hand is less than 17
             while (int.Parse(txtDealerHandCount.text) < 17)
             {
+                // infom the manager an action is in progress
+                m_blnActionInProgress = true;
+
                 // add a new card to the dealer's hand 
                 StartCoroutine(DealCard(col_dealerHand, goDealerCardBorder, false));
+
+                // while an action is in progress wait until it is complete
+                while (m_blnActionInProgress)
+                {
+                    yield return null;
+                }
 
                 // calculate the dealer's hand 
                 CalculateHand(col_dealerHand, txtDealerHandCount);
@@ -421,6 +448,12 @@ public class BlackjackManager : MonoBehaviour
     {
         // add a new card to the player hand 
         StartCoroutine(DealCard(col_playerHand, goPlayerCardBorder, true));
+
+        // while an action is in progress wait until it is complete
+        while(m_blnActionInProgress)
+        {
+            yield return null;
+        }
 
         // calculate the player's hand 
         CalculateHand(col_playerHand, txtPlayerHandCount);
@@ -511,8 +544,7 @@ public class BlackjackManager : MonoBehaviour
             // ignore everything else
             return;
 
-        // prevent the player from doing anything
-        // else until this action is completed
+        // infom the manager an action is in progress
         m_blnActionInProgress = true;
 
         // stand and reveal the hands to determine who wins
@@ -527,8 +559,7 @@ public class BlackjackManager : MonoBehaviour
             // ignore everything else
             return;
 
-        // prevent the player from doing anything
-        // else until this action is completed
+        // infom the manager an action is in progress
         m_blnActionInProgress = true;
 
         // add a card to the player hand
