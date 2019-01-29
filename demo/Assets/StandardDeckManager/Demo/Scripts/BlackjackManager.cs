@@ -598,6 +598,14 @@ public class BlackjackManager : MonoBehaviour
             audSrc.volume = fltCardShuffleVolume;
         else if (audClp == audClpCardSlide)
             audSrc.volume = fltCardSlideVolume;
+        else if (audClp == audClpWin)
+            audSrc.volume = fltWinVolume;
+        else if (audClp == audClpLose)
+            audSrc.volume = fltLoseVolume;
+        else if (audClp == audClpDraw)
+            audSrc.volume = fltDrawVolume;
+        else if (audClp == audClpBlackjack)
+            audSrc.volume = fltBlackjackVolume;
     }
 
     // reset the spawn offset
