@@ -80,6 +80,9 @@ public class MemoryMatchManager : MonoBehaviour
         // shuffle the deck of cards
         DeckManager.Instance.ShuffleDeck();
 
+        // update the deck count
+        txtDeckCount.text = DeckManager.Instance.CountDeck().ToString();
+
         // play the shuffle sfx
         AssignAudioClip(audClpCardShuffle);
         audSrc.Play();

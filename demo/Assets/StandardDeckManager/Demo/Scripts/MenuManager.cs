@@ -20,13 +20,13 @@ public class MenuManager : MonoBehaviour
     public void GoToWar()
     {
         // load the scene
-        SceneManager.LoadScene("MemoryMatchDemo");
+        SceneManager.LoadScene("WarDemo");
     }
 
     // go to match demo
     public void GoToMatch()
     {
         // load the scene
-        SceneManager.LoadScene("WarDemo");
+        SceneManager.LoadScene("MemoryMatchDemo");
     }
 }

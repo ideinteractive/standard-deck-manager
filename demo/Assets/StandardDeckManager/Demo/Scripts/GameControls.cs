@@ -15,18 +15,18 @@ public class GameControls : MonoBehaviour
     void Awake()
     {
         // if we already have an instance
-        if (Instance != null)
-        {
-            // destroy this object
-            Destroy(Instance);
-        }
-        else
+        if (GameControls.Instance == null)
         {
             // set this instance
             Instance = this;
 
             // don't desroy this object
             DontDestroyOnLoad(this);
+        }
+        else if (GameControls.Instance != null)
+        {
+            // destroy this object
+            Destroy(Instance);
         }
     }
 
@@ -47,5 +47,14 @@ public class GameControls : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
             // restart the scene
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+        // if the B key is pressed
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            // if the scene is not the main menu
+            if (SceneManager.GetActiveScene().name != "MainMenu")
+                // load the main menu scene
+                SceneManager.LoadScene("MainMenu");
+        }
     }
 }
