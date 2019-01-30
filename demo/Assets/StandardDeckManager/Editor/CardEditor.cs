@@ -65,6 +65,7 @@ public class CardEditor : EditorWindow
         try
         {
             // allows use to create a new card to add
+            Undo.RecordObjects(deckManagerEditor.targets, "Edit card properties.");
             deck[intCardIndex].color = (Card.Color)EditorGUILayout.EnumPopup("Color", deck[intCardIndex].color);
             deck[intCardIndex].rank = (Card.Rank)EditorGUILayout.EnumPopup("Rank", deck[intCardIndex].rank);
             deck[intCardIndex].suit = (Card.Suit)EditorGUILayout.EnumPopup("Suit", deck[intCardIndex].suit);

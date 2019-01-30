@@ -9,25 +9,24 @@ using UnityEngine.SceneManagement;
 public class GameControls : MonoBehaviour
 {
     // static variables
-    public static GameControls Instance;
+    private static GameControls Instance;
 
     // on awake
     void Awake()
     {
-        // if we already have an instance
-        if (GameControls.Instance == null)
+        // if we don't have an instance
+        if(!Instance)
         {
             // set this instance
             Instance = this;
-
-            // don't desroy this object
-            DontDestroyOnLoad(this);
-        }
-        else if (GameControls.Instance != null)
+        } else
         {
-            // destroy this object
-            Destroy(Instance);
+            // else destroy it
+            Destroy(this.gameObject);
         }
+
+        // don't destroy this object on load
+        DontDestroyOnLoad(this);
     }
 
     // once per frame
