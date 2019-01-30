@@ -16,6 +16,7 @@ public class BlackjackManager : MonoBehaviour
     [Header("Game Objects")]
     public GameObject goDealerCardBorder;               // where the dealer card spawns
     public GameObject goPlayerCardBorder;               // where the player card spawns
+    public GameObject goCardBackFace;                   // the card back face object
 
     [Header("UI Objects")]
     public Text txtDeckCount;                           // text object to track deck count
@@ -72,6 +73,14 @@ public class BlackjackManager : MonoBehaviour
             // set it from this component
             audSrc = this.GetComponent<AudioSource>();
         }
+
+        // spawn our back face object
+        GameObject cardBackFace = Instantiate(goCardBackFace);
+        cardBackFace.SetActive(false);
+        cardBackFace.name = "Card Back Face";
+
+        // set the card back face to the spawned object
+        goCardBackFace = cardBackFace;
 
         // reset our button states
         btnHit.gameObject.SetActive(false);
@@ -279,8 +288,8 @@ public class BlackjackManager : MonoBehaviour
             else if (hand.Count == 2)
             {
                 // spawn a backface card
-                SpawnBackFaceCardToSlot(slot, DeckManager.Instance.cardBackFace, m_vecDealerCardOffset);
-                DeckManager.Instance.cardBackFace.GetComponent<SpriteRenderer>().sortingOrder = hand.Count;
+                SpawnBackFaceCardToSlot(slot, goCardBackFace, m_vecDealerCardOffset);
+                goCardBackFace.GetComponent<SpriteRenderer>().sortingOrder = hand.Count;
                 m_vecDealerCardOffset += vecCardSpawnOffset;
             }
             else
@@ -371,10 +380,10 @@ public class BlackjackManager : MonoBehaviour
         AssignAudioClip(audClpCardSlide);
 
         // spawn the dealer's second card onto the back face position
-        col_dealerHand[1].card.transform.position = DeckManager.Instance.cardBackFace.transform.position;
+        col_dealerHand[1].card.transform.position = goCardBackFace.transform.position;
         col_dealerHand[1].card.GetComponent<SpriteRenderer>().sortingOrder = 2;
         col_dealerHand[1].card.SetActive(true);
-        DeckManager.Instance.cardBackFace.SetActive(false);
+        goCardBackFace.SetActive(false);
 
         // play the sfx
         audSrc.Play();

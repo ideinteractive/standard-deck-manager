@@ -12,10 +12,9 @@ public class DeckManager : MonoBehaviour
     public static DeckManager Instance;     // set this object as a global object
 
     // public variables
-    public List<Card> deck              = new List<Card>();         // contains a list of cards
-    public List<Card> discardPile       = new List<Card>();         // contains a list of discarded cards
-    public List<Card> inUsePile         = new List<Card>();         // contains a list of cards in use
-    public GameObject cardBackFace;                                 // the back face of a card
+    public List<Card> deck = new List<Card>();         // contains a list of cards
+    public List<Card> discardPile = new List<Card>();         // contains a list of discarded cards
+    public List<Card> inUsePile = new List<Card>();         // contains a list of cards in use
 
     [HideInInspector]
     public GameObject goPool;                                       // object to nest our pooled objects
@@ -44,13 +43,6 @@ public class DeckManager : MonoBehaviour
         SpawnCardPool(deck);
         SpawnCardPool(discardPile);
         SpawnCardPool(inUsePile);
-
-        // spawn the back face card
-        GameObject goBackFaceCard = Instantiate(cardBackFace, this.transform.position, this.transform.rotation);
-        goBackFaceCard.SetActive(false);
-        goBackFaceCard.transform.parent = goPool.transform;
-        cardBackFace = goBackFaceCard;
-        cardBackFace.name = "Back Face Card";
     }
 
     // randomize a list that has been passed through
@@ -331,60 +323,88 @@ public class DeckManager : MonoBehaviour
         return Count(inUsePile);
     }
 
+    // delete all cards in a deck
+    private void DeleteCardsInDeck(List<Card> deck)
+    {
+        // if we are in play mode
+        if (Application.isPlaying)
+        {
+            // destroy the card objects
+            for (int i = 0; i < deck.Count; i++)
+            {
+                Destroy(deck[i].card);
+            }
+        }
+
+        deck.Clear();
+    }
+
     // remove all playing cards and generate a new deck
     public void RemoveAllAndCreateNew()
     {
         // create a new deck 
-        deck.Clear();
+        DeleteCardsInDeck(deck);
 
-        // for each suit 
-        for (int i = 0; i <= (int)Card.Suit.Hearts; i++)
+        // while the deck count is under 52
+        while (deck.Count < 52)
         {
-            // if i is an odd number
-            if (i % 2 == 1)
+            // for each suit 
+            for (int i = 0; i <= (int)Card.Suit.Hearts; i++)
             {
-                // for each card
-                for (int c = 0; c <= (int)Card.Rank.King; c++)
+                // if i is an odd number
+                if (i % 2 == 1)
                 {
-                    // create a new card and add it to the deck
-                    // add the card to the deck
-                    Card card = new Card();
-                    card.suit = (Card.Suit)i;
-                    card.color = (Card.Color)1;
-                    card.rank = (Card.Rank)c;
-                    card.value = c + 1;
-                    card.strName = card.color.ToString() + " " + card.rank.ToString() + " of " + card.suit.ToString();
-                    card.card = Resources.Load("Prefabs/" + card.color + " " + card.rank + " " + card.suit) as GameObject;
-                    deck.Add(card);
+                    // for each card
+                    for (int c = 0; c <= (int)Card.Rank.King; c++)
+                    {
+                        // create a new card and add it to the deck
+                        // add the card to the deck
+                        Card card = new Card
+                        {
+                            suit = (Card.Suit)i,
+                            color = (Card.Color)1,
+                            rank = (Card.Rank)c,
+                            value = c + 1
+                        };
+                        card.strName = card.color.ToString() + " " + card.rank.ToString() + " of " + card.suit.ToString();
+                        card.card = Resources.Load("Prefabs/" + card.color + " " + card.rank + " " + card.suit) as GameObject;
+                        deck.Add(card);
+                    }
                 }
-            }
-            else
-            {
-                // for each card
-                for (int c = 0; c <= (int)Card.Rank.King; c++)
+                else
                 {
-                    // create a new card and add it to the deck
-                    // add the card to the deck
-                    Card card = new Card();
-                    card.suit = (Card.Suit)i;
-                    card.color = (Card.Color)0;
-                    card.rank = (Card.Rank)c;
-                    card.value = c + 1;
-                    card.strName = card.color.ToString() + " " + card.rank.ToString() + " of " + card.suit.ToString();
-                    card.card = Resources.Load("Prefabs/" + card.color + " " + card.rank + " " + card.suit) as GameObject;
-                    deck.Add(card);
+                    // for each card
+                    for (int c = 0; c <= (int)Card.Rank.King; c++)
+                    {
+                        // create a new card and add it to the deck
+                        // add the card to the deck
+                        Card card = new Card
+                        {
+                            suit = (Card.Suit)i,
+                            color = (Card.Color)0,
+                            rank = (Card.Rank)c,
+                            value = c + 1
+                        };
+                        card.strName = card.color.ToString() + " " + card.rank.ToString() + " of " + card.suit.ToString();
+                        card.card = Resources.Load("Prefabs/" + card.color + " " + card.rank + " " + card.suit) as GameObject;
+                        deck.Add(card);
+                    }
                 }
             }
         }
 
+        // if we are in play mode
+        if (Application.isPlaying)
+        {
+            // spawn our cards
+            SpawnCardPool(deck);
+        }
+
         // create a new discard pile
-        discardPile.Clear();
+        DeleteCardsInDeck(discardPile);
 
         // create a new in use pile
-        inUsePile.Clear();
-
-        // assign the back face card
-        cardBackFace = Resources.Load("Prefabs/Back Face") as GameObject;
+        DeleteCardsInDeck(inUsePile);
 
         // inform the user the deck has been updated
         Debug.Log("Standard 52 Playing Card Deck - Imported");
@@ -394,12 +414,9 @@ public class DeckManager : MonoBehaviour
     public void RemoveAll()
     {
         // remove all cards 
-        deck.Clear();
-        discardPile.Clear();
-        inUsePile.Clear();
-
-        // assign the back face card
-        cardBackFace = Resources.Load("Prefabs/Back Face") as GameObject;
+        DeleteCardsInDeck(deck);
+        DeleteCardsInDeck(discardPile);
+        DeleteCardsInDeck(inUsePile);
 
         // inform the user the deck has been updated
         Debug.Log("All Card Removed");
