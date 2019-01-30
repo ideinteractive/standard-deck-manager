@@ -87,7 +87,7 @@ public class BlackjackManager : MonoBehaviour
         btnStand.gameObject.SetActive(false);
         btnPlayAgain.gameObject.SetActive(false);
         btnMainMenu.gameObject.SetActive(false);
-
+         
         // update the deck count
         txtDeckCount.text = DeckManager.Instance.CountDeck().ToString();
 
