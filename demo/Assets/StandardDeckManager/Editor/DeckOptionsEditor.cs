@@ -56,13 +56,8 @@ public class DeckOptionsEditor : EditorWindow
     // mark the scene as dirty
     private void MarkSceneDirty()
     {
-        // if we are not in play mode
-        if(!Application.isPlaying)
-            // mark the scene as dirty
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
-
-        // apply property modifications
-        deckManagerEditor.serializedObject.ApplyModifiedProperties();
+        EditorUtility.SetDirty(deckManagerEditor.target);
+        EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
     }
 
     // draw the ui
@@ -86,6 +81,10 @@ public class DeckOptionsEditor : EditorWindow
                 EditorGUILayout.Space();
                 return;
             }
+        } else
+        {
+            // update serialized object representation
+            deckManagerEditor.serializedObject.Update();
         }
 
         // header styles
