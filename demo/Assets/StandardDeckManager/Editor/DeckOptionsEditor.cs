@@ -77,11 +77,11 @@ public class DeckOptionsEditor : EditorWindow
         }
 
         // header styles
-        GUIStyle styleRowHeader = new GUIStyle();
-        styleRowHeader.padding = new RectOffset(0, 0, 3, 3);
+        GUIStyle styleRowHeader = new GUIStyle
+        {
+            padding = new RectOffset(0, 0, 3, 3)
+        };
         styleRowHeader.normal.background = EditorStyle.SetBackground(1, 1, new Color(0.1f, 0.1f, 0.1f, 0.2f));
-        GUIStyle stylePaddingLeft = new GUIStyle();
-        stylePaddingLeft.padding = new RectOffset(10, 0, 3, 3);
 
         m_vecScrollPos = EditorGUILayout.BeginScrollView(m_vecScrollPos);
 

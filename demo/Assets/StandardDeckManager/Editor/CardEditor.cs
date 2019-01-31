@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 /// <summary>
 /// CardEditor
@@ -90,10 +88,6 @@ public class CardEditor : EditorWindow
             padding = new RectOffset(0, 0, 3, 3)
         };
         styleRowHeader.normal.background = EditorStyle.SetBackground(1, 1, new Color(0.1f, 0.1f, 0.1f, 0.2f));
-        GUIStyle stylePaddingLeft = new GUIStyle
-        {
-            padding = new RectOffset(10, 0, 3, 3)
-        };
 
         EditorGUILayout.Space();
         EditorGUILayout.BeginHorizontal(styleRowHeader);
