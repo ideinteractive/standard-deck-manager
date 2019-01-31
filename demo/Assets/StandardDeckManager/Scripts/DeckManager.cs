@@ -98,6 +98,21 @@ public class DeckManager : MonoBehaviour
         RandomizeList(inUsePile);
     }
 
+    // shuffle all the decks together 
+    public void ShuffleAllDecksTogether()
+    {
+        ShuffleDecksTogether(deck, discardPile);
+        ShuffleDecksTogether(deck, inUsePile);
+    }
+
+    // shuffle all the decks
+    public void ShuffleAllDecks()
+    {
+        ShuffleDeck();
+        ShuffleDiscardPile();
+        ShuffleInUsePile();
+    }
+
     // shuffle two different decks together
     public void ShuffleDecksTogether(List<Card> currentDeck, List<Card> withDeck)
     {
@@ -321,6 +336,12 @@ public class DeckManager : MonoBehaviour
     public int CountInUsePile()
     {
         return Count(inUsePile);
+    }
+
+    // return coutn of all decks combined
+    public int CountAllDecks()
+    {
+        return Count(deck) + Count(discardPile) + Count(inUsePile);
     }
 
     // delete all cards in a deck

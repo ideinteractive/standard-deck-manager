@@ -55,8 +55,8 @@ public class BlackjackManager : MonoBehaviour
     public float fltDrawVolume = 0.5f;                  // the volume for our draw sound
 
     // private evariables
-    private List<Card> col_dealerHand;                  // the dealer's hand
-    private List<Card> col_playerHand;                  // the player's hand
+    private List<Card> m_col_dealerHand;                // the dealer's hand
+    private List<Card> m_col_playerHand;                // the player's hand
     private Vector3 m_vecDealerCardOffset;              // the offset of where the card object is displayed for the dealer
     private Vector3 m_vecPlayerCardOffset;              // the offset of where the card object is displayed for the player
     private int m_intPlayerScore;                       // the player's score
@@ -204,8 +204,8 @@ public class BlackjackManager : MonoBehaviour
             yield return new WaitForSeconds(fltWaitTimeAfterShuffle);
       
         // create a new list for the dealer and player
-        col_dealerHand = new List<Card>();
-        col_playerHand = new List<Card>();
+        m_col_dealerHand = new List<Card>();
+        m_col_playerHand = new List<Card>();
        
         // for 4 loops
         for (int i = 0; i < 4; i++)
@@ -216,7 +216,7 @@ public class BlackjackManager : MonoBehaviour
             // deal cards to both the dealer and player
             if (i % 2 == 0)
             {
-                StartCoroutine(DealCard(col_dealerHand, goDealerCardBorder, false));
+                StartCoroutine(DealCard(m_col_dealerHand, goDealerCardBorder, false));
 
                 // while an action is in progress wait until it is complete
                 while (m_blnActionInProgress)
@@ -235,7 +235,7 @@ public class BlackjackManager : MonoBehaviour
             }
             else
             {
-                StartCoroutine(DealCard(col_playerHand, goPlayerCardBorder, true));
+                StartCoroutine(DealCard(m_col_playerHand, goPlayerCardBorder, true));
 
                 // while an action is in progress wait until it is complete
                 while (m_blnActionInProgress)
@@ -244,7 +244,7 @@ public class BlackjackManager : MonoBehaviour
                 }
 
                 // display the current score of the player
-                CalculateHand(col_playerHand, txtPlayerHandCount);
+                CalculateHand(m_col_playerHand, txtPlayerHandCount);
 
                 yield return new WaitForSeconds(fltWaitTimeBeforeDeal);
             }
@@ -366,7 +366,7 @@ public class BlackjackManager : MonoBehaviour
     private void CalculateDealerInitialHand()
     {
         // output our score onto the ui object
-        txtDealerHandCount.text = col_dealerHand[0].value.ToString();
+        txtDealerHandCount.text = m_col_dealerHand[0].value.ToString();
     }
 
     // stand and reveal the hands to determine who wins
@@ -380,16 +380,16 @@ public class BlackjackManager : MonoBehaviour
         AssignAudioClip(audClpCardSlide);
 
         // spawn the dealer's second card onto the back face position
-        col_dealerHand[1].card.transform.position = goCardBackFace.transform.position;
-        col_dealerHand[1].card.GetComponent<SpriteRenderer>().sortingOrder = 2;
-        col_dealerHand[1].card.SetActive(true);
+        m_col_dealerHand[1].card.transform.position = goCardBackFace.transform.position;
+        m_col_dealerHand[1].card.GetComponent<SpriteRenderer>().sortingOrder = 2;
+        m_col_dealerHand[1].card.SetActive(true);
         goCardBackFace.SetActive(false);
 
         // play the sfx
         audSrc.Play();
 
         // calculate the dealer's hand
-        CalculateHand(col_dealerHand, txtDealerHandCount);
+        CalculateHand(m_col_dealerHand, txtDealerHandCount);
 
         yield return new WaitForSeconds(fltWaitTimeBeforeResults);
 
@@ -403,7 +403,7 @@ public class BlackjackManager : MonoBehaviour
                 m_blnActionInProgress = true;
 
                 // add a new card to the dealer's hand 
-                StartCoroutine(DealCard(col_dealerHand, goDealerCardBorder, false));
+                StartCoroutine(DealCard(m_col_dealerHand, goDealerCardBorder, false));
 
                 // while an action is in progress wait until it is complete
                 while (m_blnActionInProgress)
@@ -412,7 +412,7 @@ public class BlackjackManager : MonoBehaviour
                 }
 
                 // calculate the dealer's hand 
-                CalculateHand(col_dealerHand, txtDealerHandCount);
+                CalculateHand(m_col_dealerHand, txtDealerHandCount);
 
                 // play the sfx
                 audSrc.Play();
@@ -432,7 +432,7 @@ public class BlackjackManager : MonoBehaviour
     public IEnumerator Hit()
     {
         // add a new card to the player hand 
-        StartCoroutine(DealCard(col_playerHand, goPlayerCardBorder, true));
+        StartCoroutine(DealCard(m_col_playerHand, goPlayerCardBorder, true));
 
         // while an action is in progress wait until it is complete
         while(m_blnActionInProgress)
@@ -441,7 +441,7 @@ public class BlackjackManager : MonoBehaviour
         }
 
         // calculate the player's hand 
-        CalculateHand(col_playerHand, txtPlayerHandCount);
+        CalculateHand(m_col_playerHand, txtPlayerHandCount);
 
         // check if the player's hand is greater than 21
         if (int.Parse(txtPlayerHandCount.text) > 21)
@@ -559,14 +559,14 @@ public class BlackjackManager : MonoBehaviour
         btnPlayAgain.gameObject.SetActive(false);
 
         // for each card in the player's hand
-        foreach (Card card in col_playerHand)
+        foreach (Card card in m_col_playerHand)
         {
             // hide the card
             card.card.SetActive(false);
         }
 
         // for each card in the dealer's hand
-        foreach (Card card in col_dealerHand)
+        foreach (Card card in m_col_dealerHand)
         {
             // hide the card
             card.card.SetActive(false);

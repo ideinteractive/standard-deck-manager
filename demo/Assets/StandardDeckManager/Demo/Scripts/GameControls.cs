@@ -27,6 +27,7 @@ public class GameControls : MonoBehaviour
 
         // don't destroy this object on load
         DontDestroyOnLoad(this);
+
     }
 
     // once per frame

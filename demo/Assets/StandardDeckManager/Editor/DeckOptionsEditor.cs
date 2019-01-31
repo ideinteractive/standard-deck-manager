@@ -60,6 +60,9 @@ public class DeckOptionsEditor : EditorWindow
         if(!Application.isPlaying)
             // mark the scene as dirty
             EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+
+        // apply property modifications
+        deckManagerEditor.serializedObject.ApplyModifiedProperties();
     }
 
     // draw the ui
