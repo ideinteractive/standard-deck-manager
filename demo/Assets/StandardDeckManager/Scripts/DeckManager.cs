@@ -135,10 +135,14 @@ public class DeckManager : MonoBehaviour
         // add the other deck to the bottom of the current deck
         currentDeck.AddRange(otherDeck);
 
-        // clear the other deck and set the other deck to the current one
-        otherDeck.Clear();
-        otherDeck = currentDeck;
-
+        // set the other deck to the current one
+        if (otherDeck == deck)
+            deck = new List<Card>(currentDeck);
+        else if (otherDeck == discardPile)
+            discardPile = new List<Card>(currentDeck);
+        else if (otherDeck == inUsePile)
+            inUsePile = new List<Card>(currentDeck);
+        
         // clear the current deck
         currentDeck.Clear();
     }
