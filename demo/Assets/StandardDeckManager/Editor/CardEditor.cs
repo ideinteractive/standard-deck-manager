@@ -64,8 +64,9 @@ public class CardEditor : EditorWindow
         // try to draw our fields and if we can't turn them off
         try
         {
-            // allows use to create a new card to add
-            Undo.RecordObjects(deckManagerEditor.targets, "Edit card properties.");
+            // allow the user to edit the current selected card property
+            if(!Application.isPlaying)
+                Undo.RecordObjects(deckManagerEditor.targets, "Edit card properties.");
             deck[intCardIndex].color = (Card.Color)EditorGUILayout.EnumPopup("Color", deck[intCardIndex].color);
             deck[intCardIndex].rank = (Card.Rank)EditorGUILayout.EnumPopup("Rank", deck[intCardIndex].rank);
             deck[intCardIndex].suit = (Card.Suit)EditorGUILayout.EnumPopup("Suit", deck[intCardIndex].suit);
@@ -84,11 +85,15 @@ public class CardEditor : EditorWindow
     private void OnGUI()
     {
         // header styles
-        GUIStyle styleRowHeader = new GUIStyle();
-        styleRowHeader.padding = new RectOffset(0, 0, 3, 3);
+        GUIStyle styleRowHeader = new GUIStyle
+        {
+            padding = new RectOffset(0, 0, 3, 3)
+        };
         styleRowHeader.normal.background = EditorStyle.SetBackground(1, 1, new Color(0.1f, 0.1f, 0.1f, 0.2f));
-        GUIStyle stylePaddingLeft = new GUIStyle();
-        stylePaddingLeft.padding = new RectOffset(10, 0, 3, 3);
+        GUIStyle stylePaddingLeft = new GUIStyle
+        {
+            padding = new RectOffset(10, 0, 3, 3)
+        };
 
         EditorGUILayout.Space();
         EditorGUILayout.BeginHorizontal(styleRowHeader);
@@ -124,10 +129,6 @@ public class CardEditor : EditorWindow
                 blnEditingCardFromInUse = false;
                 return;
             }
-        } else
-        {
-            // update serialized object representation
-            deckManagerEditor.serializedObject.Update();
         }
 
         EditorGUILayout.Space();
@@ -140,12 +141,6 @@ public class CardEditor : EditorWindow
         else if (blnEditingCardFromInUse)
             DrawFields(deckManagerEditor.deckManager.inUsePile);
 
-        if (GUI.changed)
-        {
-            EditorUtility.SetDirty(deckManagerEditor.target);
-            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
-        }
-       
         EditorGUILayout.Space();
     }
 }
