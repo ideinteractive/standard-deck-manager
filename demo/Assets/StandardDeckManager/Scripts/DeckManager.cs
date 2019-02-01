@@ -487,6 +487,9 @@ public class Card
         King
     }
 
+#if UNITY_EDITOR
+    public bool blnAutoAssign;      // auto assign gameobject based on selection
+#endif
     public string strName;          // define our card name
     public Suit suit;               // define the card's suit
     [SerializeField]

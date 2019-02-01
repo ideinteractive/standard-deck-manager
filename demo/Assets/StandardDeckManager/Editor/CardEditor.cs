@@ -70,6 +70,11 @@ public class CardEditor : EditorWindow
             deck[intCardIndex].suit = (Card.Suit)EditorGUILayout.EnumPopup("Suit", deck[intCardIndex].suit);
             deck[intCardIndex].value = EditorGUILayout.IntField("Value", deck[intCardIndex].value);
             deck[intCardIndex].card = (GameObject)EditorGUILayout.ObjectField("Card", deck[intCardIndex].card, typeof(GameObject), true);
+            deck[intCardIndex].blnAutoAssign = EditorGUILayout.Toggle("Auto Assign", deck[intCardIndex].blnAutoAssign);
+            // if auto assign is true automatically assign an object based on selection
+            if(deck[intCardIndex].blnAutoAssign)
+                deck[intCardIndex].card = Resources.Load("Prefabs/" + deck[intCardIndex].color + " " + deck[intCardIndex].rank + " " + deck[intCardIndex].suit) as GameObject;
+
         } catch
         {
             blnEditingCardFromDeck = false;
