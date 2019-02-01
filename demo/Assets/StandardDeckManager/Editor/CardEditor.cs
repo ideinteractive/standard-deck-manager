@@ -67,7 +67,28 @@ public class CardEditor : EditorWindow
                 Undo.RecordObjects(deckManagerEditor.targets, "Edit card properties.");
             deck[intCardIndex].color = (Card.Color)EditorGUILayout.EnumPopup("Color", deck[intCardIndex].color);
             deck[intCardIndex].rank = (Card.Rank)EditorGUILayout.EnumPopup("Rank", deck[intCardIndex].rank);
-            deck[intCardIndex].suit = (Card.Suit)EditorGUILayout.EnumPopup("Suit", deck[intCardIndex].suit);
+
+            // if our color is red
+            if (deck[intCardIndex].color == Card.Color.Red)
+            {
+                deck[intCardIndex].redSuit = (Card.RedSuit)EditorGUILayout.EnumPopup("Suit", deck[intCardIndex].redSuit);
+
+                // assign our suit base on the selection
+                if(deck[intCardIndex].redSuit == Card.RedSuit.Diamonds)
+                    deck[intCardIndex].suit = Card.Suit.Diamonds;
+                else
+                    deck[intCardIndex].suit = Card.Suit.Hearts;
+            } else
+            {
+                deck[intCardIndex].blackSuit = (Card.BlackSuit)EditorGUILayout.EnumPopup("Suit", deck[intCardIndex].blackSuit);
+
+                // assign our suit base on the selection
+                if (deck[intCardIndex].blackSuit == Card.BlackSuit.Clubs)
+                    deck[intCardIndex].suit = Card.Suit.Clubs;
+                else
+                    deck[intCardIndex].suit = Card.Suit.Spades;
+            }
+
             deck[intCardIndex].value = EditorGUILayout.IntField("Value", deck[intCardIndex].value);
             deck[intCardIndex].card = (GameObject)EditorGUILayout.ObjectField("Card", deck[intCardIndex].card, typeof(GameObject), true);
             deck[intCardIndex].blnAutoAssign = EditorGUILayout.Toggle("Auto Assign", deck[intCardIndex].blnAutoAssign);

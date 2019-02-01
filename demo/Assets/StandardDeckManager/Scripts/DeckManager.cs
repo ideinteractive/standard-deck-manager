@@ -456,6 +456,25 @@ public class DeckManager : MonoBehaviour
 [System.Serializable]
 public class Card
 {
+#if UNITY_EDITOR
+    public bool blnAutoAssign;      // auto assign gameobject based on selection
+
+    public enum RedSuit
+    {
+        Diamonds,
+        Hearts
+    }
+    public RedSuit redSuit;         // helps us allow only suit selections for red
+
+    public enum BlackSuit
+    {
+        Clubs,
+        Spades
+    }
+    public BlackSuit blackSuit;     // helps us allow only suit selections for black
+
+#endif
+
     public enum Suit
     {
         Clubs,
@@ -487,9 +506,6 @@ public class Card
         King
     }
 
-#if UNITY_EDITOR
-    public bool blnAutoAssign;      // auto assign gameobject based on selection
-#endif
     public string strName;          // define our card name
     public Suit suit;               // define the card's suit
     [SerializeField]
