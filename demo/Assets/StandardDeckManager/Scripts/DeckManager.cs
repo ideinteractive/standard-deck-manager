@@ -207,13 +207,13 @@ public class DeckManager : MonoBehaviour
     }
 
     // move all cards to  the deck
-    public void MoveAllCardToDeck(Card card, List<Card> fromDeck)
+    public void MoveAllCardToDeck(List<Card> fromDeck)
     {
         MoveAllCardsToADeck(fromDeck, deck);
     }
 
     // move all cards to  the in use pile
-    public void MoveAllCardToInUse(Card card, List<Card> fromDeck)
+    public void MoveAllCardToInUse(List<Card> fromDeck)
     {
         MoveAllCardsToADeck(fromDeck, inUsePile);
     }

@@ -370,24 +370,7 @@ public class MemoryMatchManager : MonoBehaviour
         btnMainMenu.gameObject.SetActive(true);
         btnPlayAgain.gameObject.SetActive(true);
     }
-    #endregion
 
-    #region UI Button Actions
-    // go to main menu
-    public void MainMenuButton()
-    {
-        SceneManager.LoadScene("MainMenu");
-    }
-
-    // deal a new set of cards
-    public void PlayAgainButton()
-    {
-        // reset our variables and references
-        ResetGameVariables();
-    }
-    #endregion
-
-    #region Helper Functions
     // reset our variables and references
     private void ResetGameVariables()
     {
@@ -441,6 +424,21 @@ public class MemoryMatchManager : MonoBehaviour
         }
 
         return false;
+    }
+    #endregion
+
+    #region UI Button Actions
+    // go to main menu
+    public void MainMenuButton()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    // deal a new set of cards
+    public void PlayAgainButton()
+    {
+        // reset our variables and references
+        ResetGameVariables();
     }
     #endregion
 }

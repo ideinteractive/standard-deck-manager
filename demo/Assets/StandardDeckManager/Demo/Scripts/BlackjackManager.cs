@@ -518,6 +518,55 @@ public class BlackjackManager : MonoBehaviour
 
         audSrc.Play();
     }
+
+    // assign an audio clip
+    private void AssignAudioClip(AudioClip audClp)
+    {
+        // if the audio clip is not the clip we want
+        if (audSrc.clip != audClp)
+            // assign it
+            audSrc.clip = audClp;
+
+        // adjust the volume based on the clip
+        if (audClp == audClpCardShuffle)
+            audSrc.volume = fltCardShuffleVolume;
+        else if (audClp == audClpCardSlide)
+            audSrc.volume = fltCardSlideVolume;
+        else if (audClp == audClpWin)
+            audSrc.volume = fltWinVolume;
+        else if (audClp == audClpLose)
+            audSrc.volume = fltLoseVolume;
+        else if (audClp == audClpDraw)
+            audSrc.volume = fltDrawVolume;
+        else if (audClp == audClpBlackjack)
+            audSrc.volume = fltBlackjackVolume;
+    }
+
+    // reset the spawn offset
+    private void ResetSpawnOffset()
+    {
+        m_vecDealerCardOffset = Vector3.zero;
+        m_vecPlayerCardOffset = Vector3.zero;
+    }
+
+    // if there are no cards in the deck
+    private bool CheckForShuffle()
+    {
+        // if there is less than the min amount of cards in the deck
+        if (DeckManager.Instance.CountDeck() <= 0)
+        {
+            // shuffle the discard pile into the deck
+            DeckManager.Instance.ShuffleDecksTogether(DeckManager.Instance.deck, DeckManager.Instance.discardPile);
+
+            // play the shuffle sfx
+            AssignAudioClip(audClpCardShuffle);
+            audSrc.Play();
+
+            return true;
+        }
+
+        return false;
+    }
     #endregion
 
     #region UI Button Actions
@@ -590,57 +639,6 @@ public class BlackjackManager : MonoBehaviour
     public void MainMenuButton()
     {
         SceneManager.LoadScene("MainMenu");
-    }
-    #endregion
-
-    #region Helper Functions
-    // assign an audio clip
-    private void AssignAudioClip(AudioClip audClp)
-    {
-        // if the audio clip is not the clip we want
-        if (audSrc.clip != audClp)
-            // assign it
-            audSrc.clip = audClp;
-
-        // adjust the volume based on the clip
-        if (audClp == audClpCardShuffle)
-            audSrc.volume = fltCardShuffleVolume;
-        else if (audClp == audClpCardSlide)
-            audSrc.volume = fltCardSlideVolume;
-        else if (audClp == audClpWin)
-            audSrc.volume = fltWinVolume;
-        else if (audClp == audClpLose)
-            audSrc.volume = fltLoseVolume;
-        else if (audClp == audClpDraw)
-            audSrc.volume = fltDrawVolume;
-        else if (audClp == audClpBlackjack)
-            audSrc.volume = fltBlackjackVolume;
-    }
-
-    // reset the spawn offset
-    private void ResetSpawnOffset()
-    {
-        m_vecDealerCardOffset = Vector3.zero;
-        m_vecPlayerCardOffset = Vector3.zero;
-    }
-
-    // if there are no cards in the deck
-    private bool CheckForShuffle()
-    {
-        // if there is less than the min amount of cards in the deck
-        if (DeckManager.Instance.CountDeck() <= 0)
-        {
-            // shuffle the discard pile into the deck
-            DeckManager.Instance.ShuffleDecksTogether(DeckManager.Instance.deck, DeckManager.Instance.discardPile);
-
-            // play the shuffle sfx
-            AssignAudioClip(audClpCardShuffle);
-            audSrc.Play();
-
-            return true;
-        }
-
-        return false;
     }
     #endregion
 }
