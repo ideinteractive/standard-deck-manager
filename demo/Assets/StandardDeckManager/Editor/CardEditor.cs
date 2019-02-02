@@ -62,8 +62,12 @@ public class CardEditor : EditorWindow
         // try to draw our fields and if we can't turn them off
         try
         {
+            EditorGUILayout.HelpBox("Changing or editing a card with the Card Editor has no impact during play mode.", MessageType.Info);
+
+            EditorGUILayout.Space();
+
             // allow the user to edit the current selected card property
-            if(!Application.isPlaying)
+            if (!Application.isPlaying)
                 Undo.RecordObjects(deckManagerEditor.targets, "Edit card properties.");
             deck[intCardIndex].color = (Card.Color)EditorGUILayout.EnumPopup("Color", deck[intCardIndex].color);
             deck[intCardIndex].rank = (Card.Rank)EditorGUILayout.EnumPopup("Rank", deck[intCardIndex].rank);
@@ -150,8 +154,6 @@ public class CardEditor : EditorWindow
                 return;
             }
         }
-
-        EditorGUILayout.Space();
 
         // if we are editing the card
         if (blnEditingCardFromDeck)
