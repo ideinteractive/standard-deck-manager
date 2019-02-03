@@ -72,6 +72,16 @@ public class CardEditor : EditorWindow
             deck[intCardIndex].color = (Card.Color)EditorGUILayout.EnumPopup("Color", deck[intCardIndex].color);
             deck[intCardIndex].rank = (Card.Rank)EditorGUILayout.EnumPopup("Rank", deck[intCardIndex].rank);
 
+            // set up the correct suit based on our card suit
+            if (deck[intCardIndex].suit == Card.Suit.Clubs)
+                deck[intCardIndex].blackSuit = Card.BlackSuit.Clubs;
+            else if (deck[intCardIndex].suit == Card.Suit.Spades)
+                deck[intCardIndex].blackSuit = Card.BlackSuit.Spades;
+            if (deck[intCardIndex].suit == Card.Suit.Diamonds)
+                deck[intCardIndex].redSuit = Card.RedSuit.Diamonds;
+            else if (deck[intCardIndex].suit == Card.Suit.Hearts)
+                deck[intCardIndex].redSuit = Card.RedSuit.Hearts;
+
             // if our color is red
             if (deck[intCardIndex].color == Card.Color.Red)
             {
