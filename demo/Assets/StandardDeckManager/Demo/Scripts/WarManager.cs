@@ -41,6 +41,9 @@ public class WarManager : MonoBehaviour
     public AudioClip audClpWin;                         // audio clip for win state
     public AudioClip audClpLose;                        // audio clip for lose state
     public AudioClip audClpDraw;                        // audio clip for draw state
+    public AudioClip audClpFinalWin;                    // audio clip for final win state
+    public AudioClip audClpFinalLose;                   // audio clip for final lose state
+    public AudioClip audClpFinalDraw;                   // audio clip for final draw state
 
     [Header("Volume Levels")]
     public float fltCardSlideVolume = 0.5f;             // the volume for card slide  
@@ -48,6 +51,9 @@ public class WarManager : MonoBehaviour
     public float fltWinVolume = 0.5f;                   // the volume for our win sound
     public float fltLoseVolume = 0.5f;                  // the volume for our lose sound
     public float fltDrawVolume = 0.5f;                  // the volume for our draw sound
+    public float fltFinalWinVolume = 0.5f;              // the volume for our final win sound
+    public float fltFinalLoseVolume = 0.5f;             // the volume for our final lose sound
+    public float fltFinalDrawVolume = 0.5f;             // the volume for our final draw sound
 
     // private evariables
     private List<Card> m_col_opponentDeck;              // the opponent's deck
@@ -272,7 +278,7 @@ public class WarManager : MonoBehaviour
             if (m_col_playerDeck[0].value > m_col_opponentDeck[0].value)
             {
                 txtWinMessage.text = "You have won!";
-                AssignAudioClip(audClpWin);
+                AssignAudioClip(audClpFinalWin);
                 m_intPlayerScore++;
                 txtPlayerScore.text = "You: " + m_intPlayerScore;
             }
@@ -280,7 +286,7 @@ public class WarManager : MonoBehaviour
             {
                 // show the it is a draw
                 txtWinMessage.text = "Draw!";
-                AssignAudioClip(audClpDraw);
+                AssignAudioClip(audClpFinalDraw);
             }
             else
             {
@@ -288,7 +294,7 @@ public class WarManager : MonoBehaviour
                 txtWinMessage.text = "Your Opponent has won!";
                 m_intOpponentScore++;
                 txtOpponentScore.text = "Opponent: " + m_intOpponentScore;
-                AssignAudioClip(audClpLose);
+                AssignAudioClip(audClpFinalLose);
             }
 
             audSrc.Play();
@@ -353,6 +359,12 @@ public class WarManager : MonoBehaviour
             audSrc.volume = fltLoseVolume;
         else if (audClp == audClpDraw)
             audSrc.volume = fltDrawVolume;
+        else if (audClp == audClpFinalWin)
+            audSrc.volume = fltFinalWinVolume;
+        else if (audClp == audClpFinalLose)
+            audSrc.volume = fltFinalLoseVolume;
+        else if (audClp == audClpFinalDraw)
+            audSrc.volume = fltFinalDrawVolume;
     }
     #endregion
 
