@@ -278,7 +278,7 @@ public class WarManager : MonoBehaviour
             if (m_col_playerDeck[0].value > m_col_opponentDeck[0].value)
             {
                 txtWinMessage.text = "You have won!";
-                AssignAudioClip(audClpFinalWin);
+                AssignAudioClip(audClpWin);
                 m_intPlayerScore++;
                 txtPlayerScore.text = "You: " + m_intPlayerScore;
             }
@@ -286,7 +286,7 @@ public class WarManager : MonoBehaviour
             {
                 // show the it is a draw
                 txtWinMessage.text = "Draw!";
-                AssignAudioClip(audClpFinalDraw);
+                AssignAudioClip(audClpDraw);
             }
             else
             {
@@ -294,7 +294,7 @@ public class WarManager : MonoBehaviour
                 txtWinMessage.text = "Your Opponent has won!";
                 m_intOpponentScore++;
                 txtOpponentScore.text = "Opponent: " + m_intOpponentScore;
-                AssignAudioClip(audClpFinalLose);
+                AssignAudioClip(audClpLose);
             }
 
             audSrc.Play();
@@ -308,21 +308,21 @@ public class WarManager : MonoBehaviour
             if (m_intPlayerScore > m_intOpponentScore)
             {
                 txtWinMessage.text = "You have won the game!";
-                AssignAudioClip(audClpWin);
+                AssignAudioClip(audClpFinalWin);
                 txtPlayerScore.text = "You: " + m_intPlayerScore;
             }
             else if (m_intPlayerScore == m_intOpponentScore)
             {
                 // show the it is a draw
                 txtWinMessage.text = "You and Your Opponent had a Draw!";
-                AssignAudioClip(audClpDraw);
+                AssignAudioClip(audClpFinalDraw);
             }
             else
             {
                 // show that the opponent has won and increment the score
                 txtWinMessage.text = "Your Opponent has won the game!";
                 txtOpponentScore.text = "Opponent: " + m_intOpponentScore;
-                AssignAudioClip(audClpLose);
+                AssignAudioClip(audClpFinalLose);
             }
 
             audSrc.Play();
