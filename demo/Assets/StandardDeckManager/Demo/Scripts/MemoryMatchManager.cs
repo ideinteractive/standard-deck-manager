@@ -193,7 +193,7 @@ public class MemoryMatchManager : MonoBehaviour
             if (i < 4)
             {
                 // if there is less than 9 cards in the deck
-                while (DeckManager.Instance.CountDeck() == 0)
+                while (DeckManager.Instance.CountDeck() == 8)
                 {
                     if (CheckForShuffle())
                     {
