@@ -206,9 +206,10 @@ public class BlackjackManager : MonoBehaviour
         // create a new list for the dealer and player
         m_col_dealerHand = new List<Card>();
         m_col_playerHand = new List<Card>();
-       
+
         // for 4 loops
-        for (int i = 0; i < 4; i++)
+        int i = 0;
+        while (i < 4)
         {
             // infom the manager an action is in progress
             m_blnActionInProgress = true;
@@ -248,6 +249,7 @@ public class BlackjackManager : MonoBehaviour
 
                 yield return new WaitForSeconds(fltWaitTimeBeforeDeal);
             }
+            i++;
         }
 
         // turn on our buttons
@@ -336,35 +338,28 @@ public class BlackjackManager : MonoBehaviour
         bool t_blnContainsAce = false;
 
         // for each card in the hand
-        foreach (Card card in hand)
+        int i = 0;
+        while (i < hand.Count)
         {
             // get the card value and add it to the score
-            t_intScore += card.value;
+            t_intScore += hand[i].value;
 
             // if the card is an ace flag it
-            if (card.rank == Card.Rank.Ace)
+            if (hand[i].rank == Card.Rank.Ace)
             {
                 t_blnContainsAce = true;
             }
+            i++;
         }
 
         // if the hand contains an ace
         if (t_blnContainsAce)
         {
             // if the hand is not greater than 21 set the ace value to 11
-            if ((t_intScore - 1) + 11 <= 21)
+            if ((t_intScore - 1) + 11 < 21)
             {
                 t_intScore = (t_intScore - 1) + 11;
-
-                if (m_intPlayerScore >= 21)
-                {
-                    StartCoroutine(Stand());
-                }
-            }
-        }
-        else
-        {
-            if (m_intPlayerScore >= 21)
+            } else if ((t_intScore - 1) + 11 >= 21)
             {
                 StartCoroutine(Stand());
             }
