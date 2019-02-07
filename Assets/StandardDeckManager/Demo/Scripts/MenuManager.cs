@@ -9,6 +9,12 @@ using UnityEngine.SceneManagement;
 
 public class MenuManager : MonoBehaviour
 {
+    // on initialization
+    private void Start()
+    {
+        this.GetComponent<AudioSource>().Play();
+    }
+
     // go to blackjack demo
     public void GoToBlackjack()
     {
