@@ -355,12 +355,19 @@ public class BlackjackManager : MonoBehaviour
             if ((t_intScore - 1) + 11 <= 21)
             {
                 t_intScore = (t_intScore - 1) + 11;
+
+                if (m_intPlayerScore >= 21)
+                {
+                    StartCoroutine(Stand());
+                }
             }
         }
-
-        if (m_intPlayerScore >= 21)
+        else
         {
-            StartCoroutine(Stand());
+            if (m_intPlayerScore >= 21)
+            {
+                StartCoroutine(Stand());
+            }
         }
 
         // output our score onto the ui object
