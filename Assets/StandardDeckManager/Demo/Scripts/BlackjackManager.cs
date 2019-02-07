@@ -362,6 +362,7 @@ public class BlackjackManager : MonoBehaviour
             } else if ((t_intScore - 1) + 11 >= 21)
             {
                 t_intScore = (t_intScore - 1) + 11;
+                Debug.Log("21");
                 StartCoroutine(Stand());
             }
         }
