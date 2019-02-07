@@ -335,6 +335,11 @@ public class BlackjackManager : MonoBehaviour
         int t_intScore = 0;
         bool t_blnContainsAce = false;
 
+        if(hand == m_col_playerHand)
+        {
+            Debug.Log("ASD");
+        }
+
         // for each card in the hand
         int i = 0;
         while (i < hand.Count)
