@@ -339,7 +339,7 @@ public class BlackjackManager : MonoBehaviour
         int i = 0;
         while (i < hand.Count)
         {
-            Debug.Log('Hand' + hand.Count);
+            Debug.Log("Hand" + hand.Count);
             // get the card value and add it to the score
             t_intScore += hand[i].value;
 
