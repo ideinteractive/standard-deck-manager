@@ -336,25 +336,32 @@ public class BlackjackManager : MonoBehaviour
         bool t_blnContainsAce = false;
 
         // for each card in the hand
-        foreach (Card card in hand)
+        int i = 0;
+        while (i < hand.Count)
         {
+            Debug.Log('Hand' + hand.Count);
             // get the card value and add it to the score
-            t_intScore += card.value;
+            t_intScore += hand[i].value;
 
             // if the card is an ace flag it
-            if (card.rank == Card.Rank.Ace)
+            if (hand[i].rank == Card.Rank.Ace)
             {
                 t_blnContainsAce = true;
             }
+            i++;
         }
 
         // if the hand contains an ace
         if (t_blnContainsAce)
         {
+            t_intScore -= 1;
             // if the hand is not greater than 21 set the ace value to 11
-            if ((t_intScore - 1) + 11 <= 21)
+            if (t_intScore + 11 <= 21)
             {
-                t_intScore = (t_intScore - 1) + 11;
+                t_intScore = t_intScore + 11;
+            } else
+            {
+                t_intScore += 1;
             }
         }
 
@@ -444,7 +451,7 @@ public class BlackjackManager : MonoBehaviour
         CalculateHand(m_col_playerHand, txtPlayerHandCount);
 
         // check if the player's hand is greater than 21
-        if (int.Parse(txtPlayerHandCount.text) >= 21)
+        if (int.Parse(txtPlayerHandCount.text) > 21)
         {
             // hide the buttons
             btnHit.gameObject.SetActive(false);
