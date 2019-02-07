@@ -336,16 +336,18 @@ public class BlackjackManager : MonoBehaviour
         bool t_blnContainsAce = false;
 
         // for each card in the hand
-        foreach (Card card in hand)
+        int i = 0;
+        while (i < hand.Count)
         {
             // get the card value and add it to the score
-            t_intScore += card.value;
+            t_intScore += hand[i].value;
 
             // if the card is an ace flag it
-            if (card.rank == Card.Rank.Ace)
+            if (hand[i].rank == Card.Rank.Ace)
             {
                 t_blnContainsAce = true;
             }
+            i++;
         }
 
         // if the hand contains an ace
