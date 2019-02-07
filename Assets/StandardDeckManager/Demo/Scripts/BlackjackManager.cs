@@ -353,14 +353,15 @@ public class BlackjackManager : MonoBehaviour
         // if the hand contains an ace
         if (t_blnContainsAce)
         {
+            t_intScore = t_intScore - 1;
 
             // if the hand is not greater than 21 set the ace value to 11
-            if ((t_intScore - 1) + 11 <= 21)
+            if (t_intScore + 11 <= 21)
             {
-                t_intScore = (t_intScore - 1) + 11;
+                t_intScore = t_intScore + 11;
 
                 Debug.Log("Run");
-                if ((t_intScore - 1) + 11 == 21)
+                if (t_intScore + 11 >= 21)
                 {
                     StartCoroutine(Stand());
                     Debug.Log("21");
