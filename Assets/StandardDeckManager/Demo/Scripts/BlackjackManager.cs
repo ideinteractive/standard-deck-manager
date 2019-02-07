@@ -353,6 +353,7 @@ public class BlackjackManager : MonoBehaviour
         // if the hand contains an ace
         if (t_blnContainsAce)
         {
+
             // if the hand is not greater than 21 set the ace value to 11
             if ((t_intScore - 1) + 11 <= 21)
             {
