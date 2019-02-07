@@ -246,6 +246,11 @@ public class BlackjackManager : MonoBehaviour
                 // display the current score of the player
                 CalculateHand(m_col_playerHand, txtPlayerHandCount);
 
+                if(m_intPlayerScore >= 21)
+                {
+                    StartCoroutine(Stand());
+                }
+
                 yield return new WaitForSeconds(fltWaitTimeBeforeDeal);
             }
         }
@@ -335,38 +340,26 @@ public class BlackjackManager : MonoBehaviour
         int t_intScore = 0;
         bool t_blnContainsAce = false;
 
-        if(hand == m_col_playerHand)
-        {
-            Debug.Log("ASD");
-        }
-
         // for each card in the hand
-        int i = 0;
-        while (i < hand.Count)
+        foreach (Card card in hand)
         {
-            Debug.Log("Hand" + hand.Count);
             // get the card value and add it to the score
-            t_intScore += hand[i].value;
+            t_intScore += card.value;
 
             // if the card is an ace flag it
-            if (hand[i].rank == Card.Rank.Ace)
+            if (card.rank == Card.Rank.Ace)
             {
                 t_blnContainsAce = true;
             }
-            i++;
         }
 
         // if the hand contains an ace
         if (t_blnContainsAce)
         {
-            t_intScore -= 1;
             // if the hand is not greater than 21 set the ace value to 11
-            if (t_intScore + 11 <= 21)
+            if ((t_intScore - 1) + 11 <= 21)
             {
-                t_intScore = t_intScore + 11;
-            } else
-            {
-                t_intScore += 1;
+                t_intScore = (t_intScore - 1) + 11;
             }
         }
 
