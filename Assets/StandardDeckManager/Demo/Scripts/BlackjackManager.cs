@@ -246,11 +246,6 @@ public class BlackjackManager : MonoBehaviour
                 // display the current score of the player
                 CalculateHand(m_col_playerHand, txtPlayerHandCount);
 
-                if(m_intPlayerScore >= 21)
-                {
-                    StartCoroutine(Stand());
-                }
-
                 yield return new WaitForSeconds(fltWaitTimeBeforeDeal);
             }
         }
@@ -361,6 +356,11 @@ public class BlackjackManager : MonoBehaviour
             {
                 t_intScore = (t_intScore - 1) + 11;
             }
+        }
+
+        if (m_intPlayerScore >= 21)
+        {
+            StartCoroutine(Stand());
         }
 
         // output our score onto the ui object
