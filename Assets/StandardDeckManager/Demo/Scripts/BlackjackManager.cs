@@ -62,6 +62,7 @@ public class BlackjackManager : MonoBehaviour
     private int m_intPlayerScore;                       // the player's score
     private int m_intDealerScore;                       // the dealer's score
     private bool m_blnActionInProgress;                 // check if the player performed an action already
+    private bool m_blnPlayerWins;                       // check if the player wins during a new deal set
     #endregion
 
     // on initialization
@@ -183,6 +184,9 @@ public class BlackjackManager : MonoBehaviour
         // reset the spawn offset
         ResetSpawnOffset();
 
+        // mark player winning as false
+        m_blnPlayerWins = false;
+
         // deal a new hand 
         StartCoroutine(DealNewHand());
     }
@@ -250,9 +254,17 @@ public class BlackjackManager : MonoBehaviour
             }
         }
 
-        // turn on our buttons
-        btnHit.gameObject.SetActive(true);
-        btnStand.gameObject.SetActive(true);
+        // if the player did not win continue 
+        if (!m_blnPlayerWins)
+        {
+            // turn on our buttons
+            btnHit.gameObject.SetActive(true);
+            btnStand.gameObject.SetActive(true);
+        } else
+        {
+            // force a stand
+            StartCoroutine(Stand());
+        }
     }
 
     // deal a card
@@ -351,12 +363,16 @@ public class BlackjackManager : MonoBehaviour
         // if the hand contains an ace
         if (t_blnContainsAce)
         {
-            // if the hand is not greater than 21 set the ace value to 11
+            // if the hand is less than or equal to 21 set the ace value to 11
             if ((t_intScore - 1) + 11 <= 21)
             {
                 t_intScore = (t_intScore - 1) + 11;
             }
         }
+
+        // if the player has 21 indicate they won
+        if (t_intScore == 21)
+            m_blnPlayerWins = true;
 
         // output our score onto the ui object
         textOutput.text = t_intScore.ToString();
@@ -630,6 +646,9 @@ public class BlackjackManager : MonoBehaviour
 
         // reset the offsets
         ResetSpawnOffset();
+
+        // mark the player has won as false
+        m_blnPlayerWins = false;
 
         // deal a new hand to the player and dealer
         StartCoroutine(DealNewHand());
