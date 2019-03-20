@@ -508,6 +508,7 @@ public class DeckManagerEditor : Editor
         deckManager.deck.Add((Card)card);
         serializedObject.ApplyModifiedProperties();
         SpawnCard((Card)card);
+        EditorUtility.SetDirty(target);
     }
 
     // add in a new card to discard pile
@@ -517,6 +518,7 @@ public class DeckManagerEditor : Editor
         deckManager.discardPile.Add((Card)card);
         serializedObject.ApplyModifiedProperties();
         SpawnCard((Card)card);
+        EditorUtility.SetDirty(target);
     }
 
     // add in a new card to in use pile
@@ -526,5 +528,6 @@ public class DeckManagerEditor : Editor
         deckManager.inUsePile.Add((Card)card);
         serializedObject.ApplyModifiedProperties();
         SpawnCard((Card)card);
+        EditorUtility.SetDirty(target);
     }
 }
