@@ -219,7 +219,7 @@ public class DeckManagerEditor : Editor
         if (deck == deckManager.deck)
         {
             // if the discard card button is pressed
-            if (GUI.Button(new Rect(rect.width - 135, rect.y, 60, 15), "Discard"))
+            if (GUI.Button(new Rect(rect.width - 70, rect.y, 30, 15), "DP"))
             {
                 serializedObject.Update();
 
@@ -243,7 +243,7 @@ public class DeckManagerEditor : Editor
             }
             
             // if the in use card button is pressed
-            if (GUI.Button(new Rect(rect.width - 70, rect.y, 55, 15), "In Use"))
+            if (GUI.Button(new Rect(rect.width - 35, rect.y, 30, 15), "IU"))
             {
                 serializedObject.Update();
 
@@ -271,7 +271,7 @@ public class DeckManagerEditor : Editor
         if (deck == deckManager.discardPile)
         {
             // if the deck button is pressed
-            if (GUI.Button(new Rect(rect.width - 115, rect.y, 40, 15), "Deck"))
+            if (GUI.Button(new Rect(rect.width - 65, rect.y, 25, 15), "D"))
             {
                 serializedObject.Update();
 
@@ -295,7 +295,7 @@ public class DeckManagerEditor : Editor
             }
 
             // if the in use card button is pressed
-            if (GUI.Button(new Rect(rect.width - 70, rect.y, 55, 15), "In Use"))
+            if (GUI.Button(new Rect(rect.width - 35, rect.y, 30, 15), "IU"))
             {
                 serializedObject.Update();
 
@@ -323,7 +323,7 @@ public class DeckManagerEditor : Editor
         if (deck == deckManager.inUsePile)
         {
             // if the deck button is pressed
-            if (GUI.Button(new Rect(rect.width - 120, rect.y, 40, 15), "Deck"))
+            if (GUI.Button(new Rect(rect.width - 65, rect.y, 25, 15), "D"))
             {
                 serializedObject.Update();
 
@@ -347,7 +347,7 @@ public class DeckManagerEditor : Editor
             }
 
             // if the discard card button is pressed
-            if (GUI.Button(new Rect(rect.width - 75, rect.y, 60, 15), "Discard"))
+            if (GUI.Button(new Rect(rect.width - 35, rect.y, 30, 15), "DP"))
             {
                 serializedObject.Update();
 
@@ -372,7 +372,7 @@ public class DeckManagerEditor : Editor
         }
 
         // if the edit card button is pressed
-        if (GUI.Button(new Rect(rect.width - 10, rect.y, 40, 15), "Edit"))
+        if (GUI.Button(new Rect(rect.width, rect.y, 25, 15), "E"))
         {
             // edit the card with the card editor
             // get existing open window or if none, make a new one
