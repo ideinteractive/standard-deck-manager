@@ -9,23 +9,19 @@ using UnityEngine;
 
 public class CardEditor : EditorWindow
 {
-    // reference this window
-    public static CardEditor Instance { get; private set; }
-
-    // reference to the DeckManager
-    private static DeckManagerEditor deckManagerEditor;
+    public static CardEditor instance { get; private set; } // create a reference to this editor
+    private static DeckManagerEditor deckManagerEditor; // reference our deck manager editor
 
     // check if this window is open or not
     public static bool IsOpen
     {
-        get { return Instance != null; }
+        get { return instance != null; }
     }
 
-    // create a variable to hold card information
-    public int intCardIndex;
-    public bool blnEditingCardFromDeck;
-    public bool blnEditingCardFromDiscard;
-    public bool blnEditingCardFromInUse;
+    public int intCardIndex;    // reference our card index
+    public bool blnEditingCardFromDeck; // checks if we are editing from the deck
+    public bool blnEditingCardFromDiscard;  // checks if we are editing from the discard
+    public bool blnEditingCardFromInUse;    // checks if we are editing from the in use
 
     // on initialization
     [MenuItem("Standard Deck Manager/Card Editor")]
@@ -37,17 +33,14 @@ public class CardEditor : EditorWindow
         window.Show();
 
         // set the reference to the current inspected object
-        deckManagerEditor = DeckManagerEditor.Instance;
+        deckManagerEditor = DeckManagerEditor.instance;
     }
 
-    // when this is enabled and active
+    // on enable
     private void OnEnable()
     {
-        // set this instance
-        Instance = this;
-
-        // set the reference to the current inspected object
-        deckManagerEditor = DeckManagerEditor.Instance;
+        instance = this;    // set this instance
+        deckManagerEditor = DeckManagerEditor.instance; // set the reference to the current inspected object
     }
 
     // repaint the inspector if it gets updated
@@ -119,6 +112,21 @@ public class CardEditor : EditorWindow
         }
     }
 
+    // create a texture background
+    public static Texture2D SetBackground(int width, int height, Color color)
+    {
+        Color[] pixels = new Color[width * height];
+
+        for (int i = 0; i < pixels.Length; i++)
+            pixels[i] = color;
+
+        Texture2D result = new Texture2D(width, height);
+        result.SetPixels(pixels);
+        result.Apply();
+
+        return result;
+    }
+
     // draw the ui
     private void OnGUI()
     {
@@ -127,7 +135,7 @@ public class CardEditor : EditorWindow
         {
             padding = new RectOffset(0, 0, 3, 3)
         };
-        styleRowHeader.normal.background = EditorStyle.SetBackground(1, 1, new Color(0.1f, 0.1f, 0.1f, 0.2f));
+        styleRowHeader.normal.background = SetBackground(1, 1, new Color(0.1f, 0.1f, 0.1f, 0.2f));
 
         EditorGUILayout.Space();
         EditorGUILayout.BeginHorizontal(styleRowHeader);
@@ -151,9 +159,9 @@ public class CardEditor : EditorWindow
         if (deckManagerEditor == null)
         {
             // try and find a reference to the deck manager editor
-            if (DeckManagerEditor.Instance)
+            if (DeckManagerEditor.instance)
             {
-                deckManagerEditor = DeckManagerEditor.Instance;
+                deckManagerEditor = DeckManagerEditor.instance;
 
             }
             else

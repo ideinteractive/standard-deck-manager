@@ -11,21 +11,16 @@ using UnityEditorInternal;
 [CustomEditor(typeof(DeckManager))]
 public class DeckManagerEditor : Editor
 {
-    // reference this editor
-    public static DeckManagerEditor Instance { get; private set; }
+    public static DeckManagerEditor instance { get; private set; }  // create a reference to this editor
+    public DeckManager deckManager; // reference our deck manager
+    private ReorderableList reorderableDeck;    // create a reorderable list for our deck
+    private ReorderableList reorderableDiscardPile; // create a reorderable list for our discard pile
+    private ReorderableList reorderableInUsePile;   // create a reoderable list for our in use pile
 
-    // reference to the DeckManager
-    public DeckManager deckManager;
-
-    // reference to our reorderable lists
-    private ReorderableList reorderableDeck;
-    private ReorderableList reorderableDiscardPile;
-    private ReorderableList reorderableInUsePile;
-
-    // when this is enabled and active
+    // on enable
     private void OnEnable()
     {
-        Instance = this;    // set up this instance
+        instance = this;    // set this instance
         deckManager = (DeckManager)target;  // set up the reference to the current inspected object
 
         // create our reorderable list
@@ -33,8 +28,7 @@ public class DeckManagerEditor : Editor
         reorderableDiscardPile = new ReorderableList(serializedObject, serializedObject.FindProperty("discardPile"));
         reorderableInUsePile = new ReorderableList(serializedObject, serializedObject.FindProperty("inUsePile"));
 
-        // draw out our column headers
-        // and reorderable lists
+        // draw out our column headers and reorderable lists for our deck, discard pile and in use pile
         reorderableDeck.drawHeaderCallback = rect =>
         {
             EditorGUI.LabelField(new Rect(rect.x, rect.y, rect.width, rect.height), "Cards", EditorStyles.boldLabel);
@@ -67,33 +61,36 @@ public class DeckManagerEditor : Editor
     private void OnDestroy()
     {
         // remove a reference to this editor
-        Instance = null;
+        instance = null;
     }
 
     // callback for when we select a card in the deck
     private void SelectCard(ReorderableList deck)
     {
-        if (0 <= deck.index && deck.index < deck.count)
+        // if the deck index is greater than 0 and is less than the deck count
+        if (deck.index >= 0 && deck.index < deck.count)
         {
+            // check if the card editor is open
             if (CardEditor.IsOpen)
             {
                 // pass our information to the card editor
-                CardEditor.Instance.intCardIndex = deck.index;
+                CardEditor.instance.intCardIndex = deck.index;
 
+                // depending on which reorderable list we are using check it off in the card editor
                 if (deck == reorderableDeck)
-                    CardEditor.Instance.blnEditingCardFromDeck = true;
+                    CardEditor.instance.blnEditingCardFromDeck = true;
                 else
-                    CardEditor.Instance.blnEditingCardFromDeck = false;
+                    CardEditor.instance.blnEditingCardFromDeck = false;
 
                 if (deck == reorderableDiscardPile)
-                    CardEditor.Instance.blnEditingCardFromDiscard = true;
+                    CardEditor.instance.blnEditingCardFromDiscard = true;
                 else
-                    CardEditor.Instance.blnEditingCardFromDiscard = false;
+                    CardEditor.instance.blnEditingCardFromDiscard = false;
 
                 if (deck == reorderableInUsePile)
-                    CardEditor.Instance.blnEditingCardFromInUse = true;
+                    CardEditor.instance.blnEditingCardFromInUse = true;
                 else
-                    CardEditor.Instance.blnEditingCardFromInUse = false;
+                    CardEditor.instance.blnEditingCardFromInUse = false;
             }
         }
     }
@@ -101,29 +98,22 @@ public class DeckManagerEditor : Editor
     // callback for when we remove a card from the deck
     private void RemoveCard(ReorderableList deck)
     {
-        if (0 <= deck.index && deck.index < deck.count)
-        {
-            // determine which deck we are removing the card from
-            if (deck == reorderableDeck)
-            {
-                Undo.RecordObjects(targets, "Card removed from deck.");
-                DestroyAndRemoveCard(deckManager.deck, deck.index);
-                serializedObject.ApplyModifiedProperties();
+        if (0 <= deck.index && deck.index < deck.count) {
+        serializedObject.Update();
 
-            }
-            else if (deck == reorderableDiscardPile)
-            {
-                Undo.RecordObjects(targets, "Card removed from discard pile.");
-                DestroyAndRemoveCard(deckManager.discardPile, deck.index);
-                serializedObject.ApplyModifiedProperties();
-            }
-            else if (deck == reorderableInUsePile)
-            {
-                Undo.RecordObjects(targets, "Card removed from in use pile.");
-                DestroyAndRemoveCard(deckManager.inUsePile, deck.index);
-                serializedObject.ApplyModifiedProperties();
-            }
-        }
+        // remove our item
+        ReorderableList.defaultBehaviours.DoRemoveButton(deck);
+
+        // determine which deck we are removing the card from
+        if (deck == reorderableDeck)
+            DestroyAndRemoveCard(deckManager.deck, deck.index);
+        else if (deck == reorderableDiscardPile)
+            DestroyAndRemoveCard(deckManager.discardPile, deck.index);
+        else if (deck == reorderableInUsePile)
+            DestroyAndRemoveCard(deckManager.inUsePile, deck.index);
+
+        serializedObject.ApplyModifiedProperties(); 
+    }
     }
 
     // destroy and remove our card object
@@ -133,234 +123,408 @@ public class DeckManagerEditor : Editor
         if (Application.isPlaying)
             // delete the instantiated object
             Destroy(deck[index].card);
-
-        // remove the card from the deck
-        deck.Remove(deck[index]);
     }
 
-    // draw our our elements
+    // add an item to the appropriate reorderable list
+    private void AddItem(GUIContent content, bool on, Card card, ReorderableList deck, GenericMenu menu)
+    {
+        if (deck == reorderableDeck) {
+            menu.AddItem(content, false, () => {
+                serializedObject.Update();
+                // create a new item in our reoderable list
+                var index = reorderableDeck.serializedProperty.arraySize;
+                reorderableDeck.serializedProperty.arraySize++;
+                reorderableDeck.index = index;
+                var element = reorderableDeck.serializedProperty.GetArrayElementAtIndex(index);
+
+                // assign our properties
+                element.FindPropertyRelative("name").stringValue = card.color + " " + card.rank + " of " + card.suit;
+                element.FindPropertyRelative("color").enumValueIndex = (int)card.color;
+                element.FindPropertyRelative("suit").enumValueIndex = (int)card.suit;
+                element.FindPropertyRelative("rank").enumValueIndex = (int)card.rank;
+                element.FindPropertyRelative("card").objectReferenceValue = card.card as GameObject;
+
+                // spawn our card
+                SpawnCard((Card)card);
+                serializedObject.ApplyModifiedProperties(); 
+            });
+        }
+        else if (deck == reorderableDiscardPile) {
+            menu.AddItem(content, false, () => {
+                serializedObject.Update();
+                // create a new item in our reoderable list
+                var index = reorderableDiscardPile.serializedProperty.arraySize;
+                reorderableDiscardPile.serializedProperty.arraySize++;
+                reorderableDiscardPile.index = index;
+                var element = reorderableDiscardPile.serializedProperty.GetArrayElementAtIndex(index);
+
+                // assign our properties
+                element.FindPropertyRelative("name").stringValue = card.color + " " + card.rank + " of " + card.suit;
+                element.FindPropertyRelative("color").enumValueIndex = (int)card.color;
+                element.FindPropertyRelative("suit").enumValueIndex = (int)card.suit;
+                element.FindPropertyRelative("rank").enumValueIndex = (int)card.rank;
+                element.FindPropertyRelative("card").objectReferenceValue = card.card as GameObject;
+
+                // spawn our card
+                SpawnCard((Card)card);
+                serializedObject.ApplyModifiedProperties(); 
+            });
+        }
+        else if (deck == reorderableInUsePile) {
+             menu.AddItem(content, false, () => {
+                serializedObject.Update();
+                // create a new item in our reoderable list
+                var index = reorderableInUsePile.serializedProperty.arraySize;
+                reorderableInUsePile.serializedProperty.arraySize++;
+                reorderableInUsePile.index = index;
+                var element = reorderableInUsePile.serializedProperty.GetArrayElementAtIndex(index);
+
+                // assign our properties
+                element.FindPropertyRelative("name").stringValue = card.color + " " + card.rank + " of " + card.suit;
+                element.FindPropertyRelative("color").enumValueIndex = (int)card.color;
+                element.FindPropertyRelative("suit").enumValueIndex = (int)card.suit;
+                element.FindPropertyRelative("rank").enumValueIndex = (int)card.rank;
+                element.FindPropertyRelative("card").objectReferenceValue = card.card as GameObject;
+
+                // spawn our card
+                SpawnCard((Card)card);
+                serializedObject.ApplyModifiedProperties(); 
+            });
+        }
+    }
+
+    // spawn a card from the deck
+    private void SpawnCard(Card card)
+    {
+        // if the application is playing
+        if (Application.isPlaying)
+        {
+            // instantiate the object
+            Card tempCard = (Card)card;
+            GameObject goCard = Instantiate(tempCard.card, deckManager.transform.position, deckManager.transform.rotation);
+            goCard.SetActive(false);
+            goCard.transform.parent = deckManager.goPool.transform;
+            card.card = goCard;
+            goCard.name = tempCard.color + " " + tempCard.rank + " of " + tempCard.suit;
+        }
+    }
+
+    // draw our elements
     private void DrawElements(Rect rect, Card card, List<Card> deck)
     {
+        // output the card color, rank and suit
         EditorGUI.LabelField(new Rect(rect.x, rect.y + 2, rect.width, rect.height), card.color + " " + card.rank + " of " + card.suit);
 
         // if it is the main deck
         if (deck == deckManager.deck)
         {
-            // move the card to the discard pile
-            if (GUI.Button(new Rect(rect.width - 40, rect.y, 20, 15), "D"))
+            // if the discard card button is pressed
+            if (GUI.Button(new Rect(rect.width - 135, rect.y, 60, 15), "Discard"))
             {
-                Undo.RecordObjects(targets, "Card moved to discard pile.");
-                deckManager.MoveCardToDiscard(card, deckManager.deck);
+                serializedObject.Update();
 
-                if (EditorGUI.EndChangeCheck())
-                    EditorUtility.SetDirty(target);
+                // create a new item in our reoderable list
+                var index = reorderableDiscardPile.serializedProperty.arraySize;
+                reorderableDiscardPile.serializedProperty.arraySize++;
+                reorderableDiscardPile.index = index;
+                var element = reorderableDiscardPile.serializedProperty.GetArrayElementAtIndex(index);
 
-                // apply property modifications
-                serializedObject.ApplyModifiedProperties();
+                // assign our properties
+                element.FindPropertyRelative("name").stringValue = card.color + " " + card.rank + " of " + card.suit;
+                element.FindPropertyRelative("color").enumValueIndex = (int)card.color;
+                element.FindPropertyRelative("suit").enumValueIndex = (int)card.suit;
+                element.FindPropertyRelative("rank").enumValueIndex = (int)card.rank;
+                element.FindPropertyRelative("card").objectReferenceValue = card.card as GameObject;
+
+                // remove our item from the previous list
+                serializedObject.FindProperty("deck").DeleteArrayElementAtIndex(deckManager.deck.IndexOf(card));
+
+                serializedObject.ApplyModifiedProperties(); 
             }
-            // move the card to the in use pile
-            if (GUI.Button(new Rect(rect.width - 15, rect.y, 20, 15), "U"))
+            
+            // if the in use card button is pressed
+            if (GUI.Button(new Rect(rect.width - 70, rect.y, 55, 15), "In Use"))
             {
-                Undo.RecordObjects(targets, "Card moved to in use pile.");
-                deckManager.MoveCardToInUse(card, deckManager.deck);
+                serializedObject.Update();
 
-                if (EditorGUI.EndChangeCheck())
-                    EditorUtility.SetDirty(target);
+                // create a new item in our reoderable list
+                var index = reorderableInUsePile.serializedProperty.arraySize;
+                reorderableInUsePile.serializedProperty.arraySize++;
+                reorderableInUsePile.index = index;
+                var element = reorderableInUsePile.serializedProperty.GetArrayElementAtIndex(index);
 
-                // apply property modifications
-                serializedObject.ApplyModifiedProperties();
+                // assign our properties
+                element.FindPropertyRelative("name").stringValue = card.color + " " + card.rank + " of " + card.suit;
+                element.FindPropertyRelative("color").enumValueIndex = (int)card.color;
+                element.FindPropertyRelative("suit").enumValueIndex = (int)card.suit;
+                element.FindPropertyRelative("rank").enumValueIndex = (int)card.rank;
+                element.FindPropertyRelative("card").objectReferenceValue = card.card as GameObject;
+
+                // remove our item from the previous list
+                serializedObject.FindProperty("deck").DeleteArrayElementAtIndex(deckManager.deck.IndexOf(card));
+
+                serializedObject.ApplyModifiedProperties(); 
             }
         }
 
         // if it is the discard pile
         if (deck == deckManager.discardPile)
         {
-            // move the card to the deck
-            if (GUI.Button(new Rect(rect.width - 40, rect.y, 20, 15), "A"))
+            // if the deck button is pressed
+            if (GUI.Button(new Rect(rect.width - 115, rect.y, 40, 15), "Deck"))
             {
-                Undo.RecordObjects(targets, "Card moved to deck.");
-                deckManager.MoveCardToDeck(card, deckManager.discardPile);
+                serializedObject.Update();
 
-                if (EditorGUI.EndChangeCheck())
-                    EditorUtility.SetDirty(target);
+                // create a new item in our reoderable list
+                var index = reorderableDeck.serializedProperty.arraySize;
+                reorderableDeck.serializedProperty.arraySize++;
+                reorderableDeck.index = index;
+                var element = reorderableDeck.serializedProperty.GetArrayElementAtIndex(index);
 
-                // apply property modifications
-                serializedObject.ApplyModifiedProperties();
+                // assign our properties
+                element.FindPropertyRelative("name").stringValue = card.color + " " + card.rank + " of " + card.suit;
+                element.FindPropertyRelative("color").enumValueIndex = (int)card.color;
+                element.FindPropertyRelative("suit").enumValueIndex = (int)card.suit;
+                element.FindPropertyRelative("rank").enumValueIndex = (int)card.rank;
+                element.FindPropertyRelative("card").objectReferenceValue = card.card as GameObject;
+
+                // remove our item from the previous list
+                serializedObject.FindProperty("discardPile").DeleteArrayElementAtIndex(deckManager.discardPile.IndexOf(card));
+
+                serializedObject.ApplyModifiedProperties(); 
             }
-            // move the card to the in use pile
-            if (GUI.Button(new Rect(rect.width - 15, rect.y, 20, 15), "U"))
+
+            // if the in use card button is pressed
+            if (GUI.Button(new Rect(rect.width - 70, rect.y, 55, 15), "In Use"))
             {
-                Undo.RecordObjects(targets, "Card moved to in use pile.");
-                deckManager.MoveCardToInUse(card, deckManager.discardPile);
+                serializedObject.Update();
 
-                if (EditorGUI.EndChangeCheck())
-                    EditorUtility.SetDirty(target);
+                // create a new item in our reoderable list
+                var index = reorderableInUsePile.serializedProperty.arraySize;
+                reorderableInUsePile.serializedProperty.arraySize++;
+                reorderableInUsePile.index = index;
+                var element = reorderableInUsePile.serializedProperty.GetArrayElementAtIndex(index);
 
-                // apply property modifications
-                serializedObject.ApplyModifiedProperties();
+                // assign our properties
+                element.FindPropertyRelative("name").stringValue = card.color + " " + card.rank + " of " + card.suit;
+                element.FindPropertyRelative("color").enumValueIndex = (int)card.color;
+                element.FindPropertyRelative("suit").enumValueIndex = (int)card.suit;
+                element.FindPropertyRelative("rank").enumValueIndex = (int)card.rank;
+                element.FindPropertyRelative("card").objectReferenceValue = card.card as GameObject;
+
+                // remove our item from the previous list
+                serializedObject.FindProperty("discardPile").DeleteArrayElementAtIndex(deckManager.discardPile.IndexOf(card));
+
+                serializedObject.ApplyModifiedProperties(); 
             }
         }
 
         // if it is the in use pile
         if (deck == deckManager.inUsePile)
         {
-            // move the card to the deck
-            if (GUI.Button(new Rect(rect.width - 40, rect.y, 20, 15), "A"))
+            // if the deck button is pressed
+            if (GUI.Button(new Rect(rect.width - 120, rect.y, 40, 15), "Deck"))
             {
-                Undo.RecordObjects(targets, "Card moved to deck.");
-                deckManager.MoveCardToDeck(card, deckManager.inUsePile);
+                serializedObject.Update();
 
-                if (EditorGUI.EndChangeCheck())
-                    EditorUtility.SetDirty(target);
+                // create a new item in our reoderable list
+                var index = reorderableDeck.serializedProperty.arraySize;
+                reorderableDeck.serializedProperty.arraySize++;
+                reorderableDeck.index = index;
+                var element = reorderableDeck.serializedProperty.GetArrayElementAtIndex(index);
 
-                // apply property modifications
-                serializedObject.ApplyModifiedProperties();
+                // assign our properties
+                element.FindPropertyRelative("name").stringValue = card.color + " " + card.rank + " of " + card.suit;
+                element.FindPropertyRelative("color").enumValueIndex = (int)card.color;
+                element.FindPropertyRelative("suit").enumValueIndex = (int)card.suit;
+                element.FindPropertyRelative("rank").enumValueIndex = (int)card.rank;
+                element.FindPropertyRelative("card").objectReferenceValue = card.card as GameObject;
+
+                // remove our item from the previous list
+                serializedObject.FindProperty("inUsePile").DeleteArrayElementAtIndex(deckManager.inUsePile.IndexOf(card));
+
+                serializedObject.ApplyModifiedProperties(); 
             }
-            // move the card to the discard pile
-            if (GUI.Button(new Rect(rect.width - 15, rect.y, 20, 15), "D"))
+
+            // if the discard card button is pressed
+            if (GUI.Button(new Rect(rect.width - 75, rect.y, 60, 15), "Discard"))
             {
-                Undo.RecordObjects(targets, "Card moved to discard pile.");
-                deckManager.MoveCardToDiscard(card, deckManager.inUsePile);
+                serializedObject.Update();
 
-                if (EditorGUI.EndChangeCheck())
-                    EditorUtility.SetDirty(target);
+                // create a new item in our reoderable list
+                var index = reorderableDiscardPile.serializedProperty.arraySize;
+                reorderableDiscardPile.serializedProperty.arraySize++;
+                reorderableDiscardPile.index = index;
+                var element = reorderableDiscardPile.serializedProperty.GetArrayElementAtIndex(index);
 
-                // apply property modifications
-                serializedObject.ApplyModifiedProperties();
+                // assign our properties
+                element.FindPropertyRelative("name").stringValue = card.color + " " + card.rank + " of " + card.suit;
+                element.FindPropertyRelative("color").enumValueIndex = (int)card.color;
+                element.FindPropertyRelative("suit").enumValueIndex = (int)card.suit;
+                element.FindPropertyRelative("rank").enumValueIndex = (int)card.rank;
+                element.FindPropertyRelative("card").objectReferenceValue = card.card as GameObject;
+
+                // remove our item from the previous list
+                serializedObject.FindProperty("inUsePile").DeleteArrayElementAtIndex(deckManager.inUsePile.IndexOf(card));
+
+                serializedObject.ApplyModifiedProperties(); 
             }
         }
 
-        // edit the card with the card editor
-        if (GUI.Button(new Rect(rect.width + 10, rect.y, 20, 15), "E"))
+        // if the edit card button is pressed
+        if (GUI.Button(new Rect(rect.width - 10, rect.y, 40, 15), "Edit"))
         {
+            // edit the card with the card editor
             // get existing open window or if none, make a new one
             CardEditor window = (CardEditor)EditorWindow.GetWindow(typeof(CardEditor), false, "Card Editor");
             window.minSize = new Vector2(325, 140);
             window.Show();
 
             // pass our information to the card editor
-            CardEditor.Instance.intCardIndex = deck.IndexOf(card);
+            CardEditor.instance.intCardIndex = deck.IndexOf(card);
 
+            // depending on which reorderable list we are using check it off in the card editor
             if (deck == deckManager.deck)
-                CardEditor.Instance.blnEditingCardFromDeck = true;
+                CardEditor.instance.blnEditingCardFromDeck = true;
             else
-                CardEditor.Instance.blnEditingCardFromDeck = false;
+                CardEditor.instance.blnEditingCardFromDeck = false;
 
             if (deck == deckManager.discardPile)
-                CardEditor.Instance.blnEditingCardFromDiscard = true;
+                CardEditor.instance.blnEditingCardFromDiscard = true;
             else
-                CardEditor.Instance.blnEditingCardFromDiscard = false;
+                CardEditor.instance.blnEditingCardFromDiscard = false;
 
             if (deck == deckManager.inUsePile)
-                CardEditor.Instance.blnEditingCardFromInUse = true;
+                CardEditor.instance.blnEditingCardFromInUse = true;
             else
-                CardEditor.Instance.blnEditingCardFromInUse = false;
+                CardEditor.instance.blnEditingCardFromInUse = false;
         }
     }
 
-    // draw our our elements for the deck
+
+    // draw our elements for the deck
     private void DrawDeckElement(Rect rect, int index, bool active, bool focused)
     {
+        // get the current card
         Card card = deckManager.deck[index];
 
-        // draw our our elements
+        // draw our elements
         DrawElements(rect, card, deckManager.deck);
     }
 
-    // draw our our elements for the discard pile
+    // draw our elements for the discard pile
     private void DrawDiscardPileElement(Rect rect, int index, bool active, bool focused)
     {
+        // get the current card
         Card card = deckManager.discardPile[index];
 
-        // draw our our elements
+        // draw our elements
         DrawElements(rect, card, deckManager.discardPile);
     }
 
-    // draw our our elements for the in use pile
+    // draw our elements for the in use pile
     private void DrawInUsePileElement(Rect rect, int index, bool active, bool focused)
     {
+        // get the current card
         Card card = deckManager.inUsePile[index];
 
-        // draw our our elements
+        // draw our elements
         DrawElements(rect, card, deckManager.inUsePile);
     }
 
     // draw our generic menu for adding in new cards
     private void DrawGenericMenu(Rect rect, ReorderableList deck)
-    {
+    { 
+        // create a new menu to reference
         var menu = new GenericMenu();
+
+        // perform two loops for our two different colors
         for (int c = 0; c < 2; c++)
         {
             // if c is an odd number
             // return red
             if (c % 2 == 1)
             {
+                // perform two loops for our different suit matching out color
                 for (int s = 0; s < 2; s++)
                 {
-                    // if s is an odd number
-                    // return red
-                    if (s % 2 == 1)
-                        for (int r = 0; r < 13; r++)
-                        {
-                            Card card = new Card
-                            {
-                                color = Card.Color.Red,
-                                suit = Card.Suit.Hearts,
-                                rank = (Card.Rank)r
-                            };
-                            card.card = Resources.Load("Prefabs/" + card.color + " " + card.rank + " " + card.suit) as GameObject;
+                    // perform thirteen loops for our different ranks
+                    for (int r = 0; r < 13; r++)
+                    {
+                        // create a new card
+                        Card card = new Card();
+
+                        // assign our card properties
+                        card.color = Card.Color.Red;
+                        card.rank = (Card.Rank)r;
+                        card.card = Resources.Load("Prefabs/" + card.color + " " + card.rank + " " + card.suit) as GameObject;
+
+                        // if s is an odd number
+                        if (s % 2 == 1) {
+                            // return hearts
+                            card.suit = Card.Suit.Hearts;
+                            // add our card
                             AddItem(new GUIContent("Red/Hearts/" + (Card.Rank)r), false, card, deck, menu);
-                        }
-                    else
-                        for (int r = 0; r < 13; r++)
-                        {
-                            Card card = new Card
-                            {
-                                color = Card.Color.Red,
-                                suit = Card.Suit.Diamonds,
-                                rank = (Card.Rank)r
-                            };
-                            card.card = Resources.Load("Prefabs/" + card.color + " " + card.rank + " " + card.suit) as GameObject;
+                        } else {
+                            // return diamonds
+                            card.suit = Card.Suit.Diamonds;
+                            // add our card
                             AddItem(new GUIContent("Red/Diamonds/" + (Card.Rank)r), false, card, deck, menu);
                         }
+                    }
                 }
             }
             else
             {
+                // perform two loops for our different suit matching out color
                 for (int s = 0; s < 2; s++)
                 {
-                    // if s is an odd number
-                    // return red
-                    if (s % 2 == 1)
-                        for (int r = 0; r < 13; r++)
-                        {
-                            Card card = new Card
-                            {
-                                color = Card.Color.Black,
-                                suit = Card.Suit.Spades,
-                                rank = (Card.Rank)r
-                            };
-                            card.card = Resources.Load("Prefabs/" + card.color + " " + card.rank + " " + card.suit) as GameObject;
+                    // perform thirteen loops for our different ranks
+                    for (int r = 0; r < 13; r++)
+                    {
+                        // create a new card
+                        Card card = new Card();
+
+                        // assign our card properties
+                        card.color = Card.Color.Black;
+                        card.rank = (Card.Rank)r;
+                        card.card = Resources.Load("Prefabs/" + card.color + " " + card.rank + " " + card.suit) as GameObject;
+
+                        // if s is an odd number
+                        if (s % 2 == 1) {
+                            // return spades
+                            card.suit = Card.Suit.Spades;
+                            // add our card
                             AddItem(new GUIContent("Black/Spades/" + (Card.Rank)r), false, card, deck, menu);
-                        }
-                    else
-                        for (int r = 0; r < 13; r++)
-                        {
-                            Card card = new Card
-                            {
-                                color = Card.Color.Black,
-                                suit = Card.Suit.Clubs,
-                                rank = (Card.Rank)r
-                            };
-                            card.card = Resources.Load("Prefabs/" + card.color + " " + card.rank + " " + card.suit) as GameObject;
+                        } else {
+                            // return clubs
+                            card.suit = Card.Suit.Clubs;
+                            // add our card
                             AddItem(new GUIContent("Black/Clubs/" + (Card.Rank)r), false, card, deck, menu);
                         }
+                    }
                 }
             }
         }
+        // display our menu
         menu.ShowAsContext();
     }
-    
+
+    // create a texture background
+    public static Texture2D SetBackground(int width, int height, Color color)
+    {
+        Color[] pixels = new Color[width * height];
+
+        for (int i = 0; i < pixels.Length; i++)
+            pixels[i] = color;
+
+        Texture2D result = new Texture2D(width, height);
+        result.SetPixels(pixels);
+        result.Apply();
+
+        return result;
+    }
+
     // override our inspector interface
     public override void OnInspectorGUI()
     {
@@ -368,9 +532,9 @@ public class DeckManagerEditor : Editor
         serializedObject.Update();
 
         // if the instance is empty
-        if (Instance == null)
+        if (instance == null)
             // set this instance
-            Instance = this;
+            instance = this;
 
         /// GUI STYLES
 
@@ -379,19 +543,19 @@ public class DeckManagerEditor : Editor
         {
             padding = new RectOffset(0, 0, 3, 3)
         };
-        styleRowHeader.normal.background = EditorStyle.SetBackground(1, 1, new Color(0.1f, 0.1f, 0.1f, 0.2f));
+        styleRowHeader.normal.background = SetBackground(1, 1, new Color(0.1f, 0.1f, 0.1f, 0.2f));
 
         /// EDITOR
 
         EditorGUI.BeginChangeCheck();
         EditorGUILayout.Space();
         EditorGUILayout.BeginHorizontal(styleRowHeader);
-        EditorGUILayout.LabelField("Deck Manager Tools", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("Tools and Options", EditorStyles.boldLabel);
         EditorGUILayout.EndHorizontal();
         EditorGUILayout.Space();
 
         // optn the card editor window
-        if (GUILayout.Button("Card Editor"))
+        if (GUILayout.Button("Open Card Editor Window"))
         {
             // get existing open window or if none, make a new one
             CardEditor window = (CardEditor)EditorWindow.GetWindow(typeof(CardEditor), false, "Card Editor");
@@ -400,9 +564,9 @@ public class DeckManagerEditor : Editor
         }
 
         // get existing open window or if none, make a new one
-        if (GUILayout.Button("Deck Options"))
+        if (GUILayout.Button("Open Deck Shuffle Options"))
         {
-            DeckOptionsEditor window = (DeckOptionsEditor)EditorWindow.GetWindow(typeof(DeckOptionsEditor), false, "Deck Options");
+            DeckShuffleOptionsEditor window = (DeckShuffleOptionsEditor)EditorWindow.GetWindow(typeof(DeckShuffleOptionsEditor), false, "Deck Options");
             window.Show();
         }
 
@@ -422,10 +586,11 @@ public class DeckManagerEditor : Editor
 
         EditorGUILayout.Space();
         EditorGUILayout.BeginHorizontal(styleRowHeader);
-        EditorGUILayout.LabelField("In Use Pile / Deck / Discard Pile Cards", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("Deck / Discard Pile / In Use Pile", EditorStyles.boldLabel);
         EditorGUILayout.EndHorizontal();
         EditorGUILayout.Space();
 
+        // if the deck panel is expanded try and show our reorderable list
         deckManager.blnExpandDeckPnl = EditorGUILayout.Foldout(deckManager.blnExpandDeckPnl, "Deck [" + deckManager.deck.Count + "]");
         if (deckManager.blnExpandDeckPnl)
             try
@@ -437,6 +602,7 @@ public class DeckManagerEditor : Editor
                 return;
             }
 
+        // if the discard panel is expanded try and show our reorderable list
         deckManager.blnExpandDiscardPnl = EditorGUILayout.Foldout(deckManager.blnExpandDiscardPnl, "Discard Pile [" + deckManager.discardPile.Count + "]");
         if (deckManager.blnExpandDiscardPnl)
             try
@@ -448,6 +614,7 @@ public class DeckManagerEditor : Editor
                 return;
             }
 
+        // if the in use panel is expanded try and show our reorderable list
         deckManager.blnExpandInUsePnl = EditorGUILayout.Foldout(deckManager.blnExpandInUsePnl, "In Use Pile [" + deckManager.inUsePile.Count + "]");
         if (deckManager.blnExpandInUsePnl)
             try
@@ -461,73 +628,7 @@ public class DeckManagerEditor : Editor
 
         EditorGUILayout.Space();
 
-        try
-        {
-            if (EditorGUI.EndChangeCheck())
-                EditorUtility.SetDirty(target);
-        } catch
-        {
-            return;
-        }
-
         // apply property modifications
         serializedObject.ApplyModifiedProperties();
-    }
-
-    // add an item to the appropriate list
-    private void AddItem(GUIContent content, bool on, Card card, ReorderableList deck, GenericMenu menu)
-    {
-        if (deck == reorderableDeck)
-            menu.AddItem(content, on, AddNewCardToDeck, card);
-        else if (deck == reorderableDiscardPile)
-            menu.AddItem(content, on, AddNewCardToDiscardPile, card);
-        else if (deck == reorderableInUsePile)
-            menu.AddItem(content, on, AddNewCardToInUsePile, card);
-    }
-
-    // spawn the card from the deck
-    private void SpawnCard(Card card)
-    {
-        // if the application is playing
-        if (Application.isPlaying)
-        {
-            // instantiate the object
-            Card tempCard = (Card)card;
-            GameObject goCard = Instantiate(tempCard.card, deckManager.transform.position, deckManager.transform.rotation);
-            goCard.SetActive(false);
-            goCard.transform.parent = deckManager.goPool.transform;
-            card.card = goCard;
-            goCard.name = tempCard.color + " " + tempCard.rank + " of " + tempCard.suit;
-        }
-    }
-
-    // add in a new card to deck
-    private void AddNewCardToDeck(object card)
-    {
-        Undo.RecordObjects(targets, "Added card to deck.");
-        deckManager.deck.Add((Card)card);
-        serializedObject.ApplyModifiedProperties();
-        SpawnCard((Card)card);
-        EditorUtility.SetDirty(target);
-    }
-
-    // add in a new card to discard pile
-    private void AddNewCardToDiscardPile(object card)
-    {
-        Undo.RecordObjects(targets, "Added card to discard pile.");
-        deckManager.discardPile.Add((Card)card);
-        serializedObject.ApplyModifiedProperties();
-        SpawnCard((Card)card);
-        EditorUtility.SetDirty(target);
-    }
-
-    // add in a new card to in use pile
-    private void AddNewCardToInUsePile(object card)
-    {
-        Undo.RecordObjects(targets, "Added card to in use pile.");
-        deckManager.inUsePile.Add((Card)card);
-        serializedObject.ApplyModifiedProperties();
-        SpawnCard((Card)card);
-        EditorUtility.SetDirty(target);
     }
 }

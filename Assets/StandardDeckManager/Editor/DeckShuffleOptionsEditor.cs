@@ -1,50 +1,58 @@
 ﻿using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 /// <summary>
-/// DeckOptionsEditor
+/// DeckShuffleOptionsEditor
 /// Description: Handles all the various shuffle methods for our deck.
 /// </summary>
 
-public class DeckOptionsEditor : EditorWindow
+public class DeckShuffleOptionsEditor : EditorWindow
 {
-    // reference this editor
-    public static DeckOptionsEditor Instance { get; private set; }
-
-    // reference to the DeckManager
-    public static DeckManagerEditor deckManagerEditor;
-
-    // create an empty card for reference
-    private Vector2 m_vecScrollPos;
+    public static DeckShuffleOptionsEditor instance { get; private set; }   // create a reference to this editor
+    public static DeckManagerEditor deckManagerEditor;  // reference our deck manager editor
+    private Vector2 m_vecScrollPos; // create a reference to contain our scroll position
 
     // check if this window is open or not
     public static bool IsOpen
     {
-        get { return Instance != null; }
+        get { return instance != null; }
     }
 
     // on initialization
-    [MenuItem("Standard Deck Manager/Deck Options")]
+    [MenuItem("Standard Deck Manager/Deck Shuffle Options")]
     private static void Init()
     {
         // get existing open window or if none, make a new one
-        DeckOptionsEditor window = (DeckOptionsEditor)EditorWindow.GetWindow(typeof(DeckOptionsEditor), false, "Deck Options");
+        DeckShuffleOptionsEditor window = (DeckShuffleOptionsEditor)EditorWindow.GetWindow(typeof(DeckShuffleOptionsEditor), false, "Deck Options");
         window.Show();
 
         // set the reference to the current inspected object
-        deckManagerEditor = DeckManagerEditor.Instance;
+        deckManagerEditor = DeckManagerEditor.instance;
     }
 
     // when this is enabled and active
     private void OnEnable()
     {
         // set this instance
-        Instance = this;
+        instance = this;
 
         // set the reference to the current inspected object
-        deckManagerEditor = DeckManagerEditor.Instance;
+        deckManagerEditor = DeckManagerEditor.instance;
+    }
+
+    // create a texture background
+    public static Texture2D SetBackground(int width, int height, Color color)
+    {
+        Color[] pixels = new Color[width * height];
+
+        for (int i = 0; i < pixels.Length; i++)
+            pixels[i] = color;
+
+        Texture2D result = new Texture2D(width, height);
+        result.SetPixels(pixels);
+        result.Apply();
+
+        return result;
     }
 
     // repaint the inspector if it gets updated
@@ -62,9 +70,9 @@ public class DeckOptionsEditor : EditorWindow
         if (deckManagerEditor == null)
         {
             // try and find a reference to the deck manager editor
-            if (DeckManagerEditor.Instance)
+            if (DeckManagerEditor.instance)
             {
-                deckManagerEditor = DeckManagerEditor.Instance;
+                deckManagerEditor = DeckManagerEditor.instance;
 
             }
             else
@@ -81,7 +89,7 @@ public class DeckOptionsEditor : EditorWindow
         {
             padding = new RectOffset(0, 0, 3, 3)
         };
-        styleRowHeader.normal.background = EditorStyle.SetBackground(1, 1, new Color(0.1f, 0.1f, 0.1f, 0.2f));
+        styleRowHeader.normal.background = SetBackground(1, 1, new Color(0.1f, 0.1f, 0.1f, 0.2f));
 
         m_vecScrollPos = EditorGUILayout.BeginScrollView(m_vecScrollPos);
 

@@ -1,5 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// DeckManager
@@ -9,28 +10,28 @@ using System.Collections.Generic;
 public class DeckManager : MonoBehaviour
 {
     // global variables
-    public static DeckManager Instance;     // set this object as a global object
+    public static DeckManager instance; // set this object as a global object
 
     // public variables
-    public List<Card> deck = new List<Card>();         // contains a list of cards
-    public List<Card> discardPile = new List<Card>();         // contains a list of discarded cards
-    public List<Card> inUsePile = new List<Card>();         // contains a list of cards in use
+    public List<Card> deck  = new List<Card>(); // main deck that contains a list of cards
+    public List<Card> discardPile = new List<Card>();   // contains a list of discarded cards
+    public List<Card> inUsePile = new List<Card>();  // contains a list of cards in use
 
     [HideInInspector]
-    public GameObject goPool;                                       // object to nest our pooled objects
+    public GameObject goPool;   // game object to nest our pooled objects
 
-#if UNITY_EDITOR
-    // boolean to keep track of custom editor panel
-    public bool blnExpandDeckPnl;
-    public bool blnExpandDiscardPnl;
-    public bool blnExpandInUsePnl;
-#endif
+    #if UNITY_EDITOR
+    // render these variables only in the unity editor
+    public bool blnExpandDeckPnl;   // checks if we should expand the deck panel
+    public bool blnExpandDiscardPnl;    // checks if we should expand the discard panel
+    public bool blnExpandInUsePnl;  // checks if we should expand the in use panel
+    #endif
 
     // on awake
     private void Awake()
     {
         // set this object's reference
-        Instance = this;
+        instance = this;
 
         // spawn a new empty gameobject to contain our pooled objects
         goPool = new GameObject
@@ -391,7 +392,7 @@ public class DeckManager : MonoBehaviour
                             rank = (Card.Rank)c,
                             value = c + 1
                         };
-                        card.strName = card.color.ToString() + " " + card.rank.ToString() + " of " + card.suit.ToString();
+                        card.name = card.color.ToString() + " " + card.rank.ToString() + " of " + card.suit.ToString();
                         card.card = Resources.Load("Prefabs/" + card.color + " " + card.rank + " " + card.suit) as GameObject;
                         deck.Add(card);
                     }
@@ -410,7 +411,7 @@ public class DeckManager : MonoBehaviour
                             rank = (Card.Rank)c,
                             value = c + 1
                         };
-                        card.strName = card.color.ToString() + " " + card.rank.ToString() + " of " + card.suit.ToString();
+                        card.name = card.color.ToString() + " " + card.rank.ToString() + " of " + card.suit.ToString();
                         card.card = Resources.Load("Prefabs/" + card.color + " " + card.rank + " " + card.suit) as GameObject;
                         deck.Add(card);
                     }
@@ -446,71 +447,4 @@ public class DeckManager : MonoBehaviour
         // inform the user the deck has been updated
         Debug.Log("All Card Removed");
     }
-}
-
-/// <summary>
-/// Card
-/// Description: Properties for each individual card.
-/// </summary>
-
-[System.Serializable]
-public class Card
-{
-#if UNITY_EDITOR
-    public bool blnAutoAssign;      // auto assign gameobject based on selection
-
-    public enum RedSuit
-    {
-        Diamonds,
-        Hearts
-    }
-    public RedSuit redSuit;         // helps us allow only suit selections for red
-
-    public enum BlackSuit
-    {
-        Clubs,
-        Spades
-    }
-    public BlackSuit blackSuit;     // helps us allow only suit selections for black
-
-#endif
-
-    public enum Suit
-    {
-        Clubs,
-        Diamonds,
-        Spades,
-        Hearts
-    }
-
-    public enum Color
-    {
-        Black,
-        Red
-    }
-
-    public enum Rank
-    {
-        Ace,
-        Two,
-        Three,
-        Four,
-        Five,
-        Six,
-        Seven,
-        Eight,
-        Nine,
-        Ten,
-        Jack,
-        Queen,
-        King
-    }
-
-    public string strName;          // define our card name
-    public Suit suit;               // define the card's suit
-    [SerializeField]
-    public Color color;             // define the card's color
-    public Rank rank;               // define the card's rank
-    public int value;               // define the card's value
-    public GameObject card;         // the card gameobject
 }
