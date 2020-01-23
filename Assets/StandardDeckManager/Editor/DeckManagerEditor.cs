@@ -101,28 +101,25 @@ public class DeckManagerEditor : Editor
         if (0 <= deck.index && deck.index < deck.count) {
         serializedObject.Update();
 
+        // determine which deck we are removing the card from
+        if (deck == reorderableDeck) {
+            var element = reorderableDeck.serializedProperty.GetArrayElementAtIndex(deck.index);
+            Destroy(element.FindPropertyRelative("card").objectReferenceValue);
+        }
+        else if (deck == reorderableDiscardPile) {
+            var element = reorderableDiscardPile.serializedProperty.GetArrayElementAtIndex(deck.index);
+            Destroy(element.FindPropertyRelative("card").objectReferenceValue);
+        }
+        else if (deck == reorderableInUsePile) {
+            var element = reorderableInUsePile.serializedProperty.GetArrayElementAtIndex(deck.index);
+            Destroy(element.FindPropertyRelative("card").objectReferenceValue);
+        }
+
         // remove our item
         ReorderableList.defaultBehaviours.DoRemoveButton(deck);
 
-        // determine which deck we are removing the card from
-        if (deck == reorderableDeck)
-            DestroyAndRemoveCard(deckManager.deck, deck.index);
-        else if (deck == reorderableDiscardPile)
-            DestroyAndRemoveCard(deckManager.discardPile, deck.index);
-        else if (deck == reorderableInUsePile)
-            DestroyAndRemoveCard(deckManager.inUsePile, deck.index);
-
         serializedObject.ApplyModifiedProperties(); 
     }
-    }
-
-    // destroy and remove our card object
-    private void DestroyAndRemoveCard(List<Card> deck, int index)
-    {
-        // if the application is playing
-        if (Application.isPlaying)
-            // delete the instantiated object
-            Destroy(deck[index].card);
     }
 
     // add an item to the appropriate reorderable list
@@ -145,7 +142,7 @@ public class DeckManagerEditor : Editor
                 element.FindPropertyRelative("card").objectReferenceValue = card.card as GameObject;
 
                 // spawn our card
-                SpawnCard((Card)card);
+                SpawnCard((Card)card, element.FindPropertyRelative("card"));
                 serializedObject.ApplyModifiedProperties(); 
             });
         }
@@ -166,7 +163,7 @@ public class DeckManagerEditor : Editor
                 element.FindPropertyRelative("card").objectReferenceValue = card.card as GameObject;
 
                 // spawn our card
-                SpawnCard((Card)card);
+                SpawnCard((Card)card, element.FindPropertyRelative("card"));
                 serializedObject.ApplyModifiedProperties(); 
             });
         }
@@ -187,14 +184,14 @@ public class DeckManagerEditor : Editor
                 element.FindPropertyRelative("card").objectReferenceValue = card.card as GameObject;
 
                 // spawn our card
-                SpawnCard((Card)card);
+                SpawnCard((Card)card, element.FindPropertyRelative("card"));
                 serializedObject.ApplyModifiedProperties(); 
             });
         }
     }
 
     // spawn a card from the deck
-    private void SpawnCard(Card card)
+    private void SpawnCard(Card card, SerializedProperty deckCard)
     {
         // if the application is playing
         if (Application.isPlaying)
@@ -204,8 +201,8 @@ public class DeckManagerEditor : Editor
             GameObject goCard = Instantiate(tempCard.card, deckManager.transform.position, deckManager.transform.rotation);
             goCard.SetActive(false);
             goCard.transform.parent = deckManager.goPool.transform;
-            card.card = goCard;
             goCard.name = tempCard.color + " " + tempCard.rank + " of " + tempCard.suit;
+            deckCard.objectReferenceValue = goCard;
         }
     }
 
