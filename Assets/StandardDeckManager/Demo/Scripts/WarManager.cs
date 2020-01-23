@@ -86,19 +86,19 @@ public class WarManager : MonoBehaviour
         m_intOpponentScore = 0;
         m_intPlayerScore = 0;
 
-        while (DeckManager.Instance.CountDeck() != 52)
+        while (DeckManager.instance.CountDeck() != 52)
         {
             // check if all the decks together 
             // equal 52 cards and if they do not
-            if (DeckManager.Instance.CountAllDecks() != 52)
+            if (DeckManager.instance.CountAllDecks() != 52)
             {
                 // remoev everything and generate a new deck so we have 52 cards exactly
-                DeckManager.Instance.RemoveAllAndCreateNew();
+                DeckManager.instance.RemoveAllAndCreateNew();
             }
             else
             {
                 // shuffle all the decks together
-                DeckManager.Instance.ShuffleAllDecksTogether();
+                DeckManager.instance.ShuffleAllDecksTogether();
             }
         }
 
@@ -183,23 +183,23 @@ public class WarManager : MonoBehaviour
         m_col_opponentDeck = new List<Card>();
 
         // set up each deck's card value
-        SetUpDeck(DeckManager.Instance.deck);
+        SetUpDeck(DeckManager.instance.deck);
 
         // play our shuffle sfx
         AssignAudioClip(audClpCardShuffle);
         audSrc.Play();
 
         // shuffle the deck of cards
-        DeckManager.Instance.ShuffleDeck();
+        DeckManager.instance.ShuffleDeck();
 
         // split the deck between the player and the opponent
-        while (DeckManager.Instance.CountDeck() != 0)
+        while (DeckManager.instance.CountDeck() != 0)
         {
-            if (DeckManager.Instance.CountDeck() % 2 == 0)
-                m_col_playerDeck.Add(DeckManager.Instance.deck[0]);
+            if (DeckManager.instance.CountDeck() % 2 == 0)
+                m_col_playerDeck.Add(DeckManager.instance.deck[0]);
             else
-                m_col_opponentDeck.Add(DeckManager.Instance.deck[0]);
-            DeckManager.Instance.MoveCardToInUse(DeckManager.Instance.deck[0], DeckManager.Instance.deck);
+                m_col_opponentDeck.Add(DeckManager.instance.deck[0]);
+            DeckManager.instance.MoveCardToInUse(DeckManager.instance.deck[0], DeckManager.instance.deck);
         }
         yield return new WaitForSeconds(fltWaitTimeAfterShuffle);
 
@@ -222,12 +222,12 @@ public class WarManager : MonoBehaviour
         {
             // remove the card from each player's deck and also put it in the
             // discard pile and reset our variables for the current round
-            Card card = DeckManager.Instance.inUsePile.First(s => s == m_col_playerDeck[0]);
-            DeckManager.Instance.MoveCardToDiscard(card, DeckManager.Instance.inUsePile);
+            Card card = DeckManager.instance.inUsePile.First(s => s == m_col_playerDeck[0]);
+            DeckManager.instance.MoveCardToDiscard(card, DeckManager.instance.inUsePile);
             m_col_playerDeck[0].card.SetActive(false);
             m_col_playerDeck.Remove(m_col_playerDeck[0]);
-            card = DeckManager.Instance.inUsePile.First(s => s == m_col_opponentDeck[0]);
-            DeckManager.Instance.MoveCardToDiscard(card, DeckManager.Instance.inUsePile);
+            card = DeckManager.instance.inUsePile.First(s => s == m_col_opponentDeck[0]);
+            DeckManager.instance.MoveCardToDiscard(card, DeckManager.instance.inUsePile);
             m_col_opponentDeck[0].card.gameObject.SetActive(false);
             m_col_opponentDeck.Remove(m_col_opponentDeck[0]);
             m_blnCardInPlay = false;
@@ -391,7 +391,7 @@ public class WarManager : MonoBehaviour
         m_col_opponentDeck.Remove(m_col_opponentDeck[0]);
 
         // shuffle all the decks together
-        DeckManager.Instance.ShuffleAllDecksTogether();
+        DeckManager.instance.ShuffleAllDecksTogether();
 
         // turn back on some of our objects
         goPlayerBackFaceCard.gameObject.SetActive(true);

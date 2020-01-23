@@ -61,9 +61,9 @@ public class MemoryMatchManager : MonoBehaviour
         }
 
         // set up each deck's card value
-        SetUpDeck(DeckManager.Instance.deck);
-        SetUpDeck(DeckManager.Instance.discardPile);
-        SetUpDeck(DeckManager.Instance.inUsePile);
+        SetUpDeck(DeckManager.instance.deck);
+        SetUpDeck(DeckManager.instance.discardPile);
+        SetUpDeck(DeckManager.instance.inUsePile);
 
         // find all gameobjects with the tag card
         foreach (GameObject go in GameObject.FindGameObjectsWithTag("Card"))
@@ -78,10 +78,10 @@ public class MemoryMatchManager : MonoBehaviour
         slots.Reverse();
 
         // shuffle the deck of cards
-        DeckManager.Instance.ShuffleDeck();
+        DeckManager.instance.ShuffleDeck();
 
         // update the deck count
-        txtDeckCount.text = DeckManager.Instance.CountDeck().ToString();
+        txtDeckCount.text = DeckManager.instance.CountDeck().ToString();
 
         // play the shuffle sfx
         AssignAudioClip(audClpCardShuffle);
@@ -171,9 +171,9 @@ public class MemoryMatchManager : MonoBehaviour
     private IEnumerator DealNewSet()
     {
         // if there are cards in the in use pile
-        if (DeckManager.Instance.CountInUsePile() > 0)
+        if (DeckManager.instance.CountInUsePile() > 0)
             // put them in the discard pile
-            DeckManager.Instance.MoveAllCardToDiscard(DeckManager.Instance.inUsePile);
+            DeckManager.instance.MoveAllCardToDiscard(DeckManager.instance.inUsePile);
 
         // check if the discard pile should 
         // be shuffled back into the main deck
@@ -181,7 +181,7 @@ public class MemoryMatchManager : MonoBehaviour
             yield return new WaitForSeconds(fltWaitTimeAfterShuffle);
 
         // create a new temporary list of cards and select only distinct ranks
-        IEnumerable<Card> ienumerableCardList = DeckManager.Instance.deck.GroupBy(x => x.rank).Select(g => g.First()).Distinct().ToList();
+        IEnumerable<Card> ienumerableCardList = DeckManager.instance.deck.GroupBy(x => x.rank).Select(g => g.First()).Distinct().ToList();
         List<Card> tempListOfCards = ienumerableCardList.ToList();
 
         // for each card slot
@@ -193,20 +193,20 @@ public class MemoryMatchManager : MonoBehaviour
             if (i < 4)
             {
                 // if there is less than 9 cards in the deck
-                while (DeckManager.Instance.CountDeck() == 8)
+                while (DeckManager.instance.CountDeck() == 8)
                 {
                     if (CheckForShuffle())
                     {
                         // pull a new set of unqiue cards
-                        ienumerableCardList = DeckManager.Instance.deck.GroupBy(x => x.rank).Select(g => g.First()).Distinct().ToList();
+                        ienumerableCardList = DeckManager.instance.deck.GroupBy(x => x.rank).Select(g => g.First()).Distinct().ToList();
                         tempListOfCards = ienumerableCardList.ToList();
 
                         // for each card in our in use pile
                         int tc = 0;
-                        while (tc < DeckManager.Instance.CountInUsePile())
+                        while (tc < DeckManager.instance.CountInUsePile())
                         {
                             // check the list for duplicate ranks matching our in use pile and remove them
-                            tempListOfCards.RemoveAll(x => x.rank == DeckManager.Instance.inUsePile[tc].rank);
+                            tempListOfCards.RemoveAll(x => x.rank == DeckManager.instance.inUsePile[tc].rank);
                             tc++;
                         }
 
@@ -219,10 +219,10 @@ public class MemoryMatchManager : MonoBehaviour
                 }
 
                 // select a card from the top of the temp list of cards
-                Card card = DeckManager.Instance.deck.Single(s => s == tempListOfCards[i]);
+                Card card = DeckManager.instance.deck.Single(s => s == tempListOfCards[i]);
 
                 // move that card in the deck manager to the in use pile
-                DeckManager.Instance.MoveCardToInUse(card, DeckManager.Instance.deck);
+                DeckManager.instance.MoveCardToInUse(card, DeckManager.instance.deck);
             }
             else
             {
@@ -232,10 +232,10 @@ public class MemoryMatchManager : MonoBehaviour
                     yield return new WaitForSeconds(fltWaitTimeAfterShuffle);
 
                 // find a pair for each of the first four cards dealt
-                Card card = DeckManager.Instance.deck.First(s => s.rank == DeckManager.Instance.inUsePile[i - 4].rank);
+                Card card = DeckManager.instance.deck.First(s => s.rank == DeckManager.instance.inUsePile[i - 4].rank);
 
                 // move that card in the deck manager to the in use pile
-                DeckManager.Instance.MoveCardToInUse(card, DeckManager.Instance.deck);
+                DeckManager.instance.MoveCardToInUse(card, DeckManager.instance.deck);
             }
 
             // display the card slot and play the sfx
@@ -244,14 +244,14 @@ public class MemoryMatchManager : MonoBehaviour
             audSrc.Play();
 
             // update the deck count
-            txtDeckCount.text = DeckManager.Instance.CountDeck().ToString();
+            txtDeckCount.text = DeckManager.instance.CountDeck().ToString();
 
             yield return new WaitForSeconds(0.5f);
             i++;
         }
 
         // shuffle the cards again so the ordering is different
-        DeckManager.Instance.ShuffleInUsePile();
+        DeckManager.instance.ShuffleInUsePile();
 
         // start the game
         m_gameStarted = true;
@@ -279,7 +279,7 @@ public class MemoryMatchManager : MonoBehaviour
                     int index = slots.IndexOf(hit.collider.gameObject);
 
                     // check if the card being hit is the same card
-                    if (m_cardOne == DeckManager.Instance.inUsePile[index] || m_cardTwo == DeckManager.Instance.inUsePile[index])
+                    if (m_cardOne == DeckManager.instance.inUsePile[index] || m_cardTwo == DeckManager.instance.inUsePile[index])
                         return;
 
                     // assign the card slide sfx
@@ -287,18 +287,18 @@ public class MemoryMatchManager : MonoBehaviour
                     audSrc.Play();
 
                     // turn the card over in the correct slot
-                    DeckManager.Instance.inUsePile[index].card.transform.position = slots[index].transform.position;
-                    DeckManager.Instance.inUsePile[index].card.GetComponent<SpriteRenderer>().sortingOrder = 1;
-                    DeckManager.Instance.inUsePile[index].card.SetActive(true);
+                    DeckManager.instance.inUsePile[index].card.transform.position = slots[index].transform.position;
+                    DeckManager.instance.inUsePile[index].card.GetComponent<SpriteRenderer>().sortingOrder = 1;
+                    DeckManager.instance.inUsePile[index].card.SetActive(true);
 
                     // assign our card to the card slot
                     if (m_cardOne.card == null)
                     {
-                        m_cardOne = DeckManager.Instance.inUsePile[index];
+                        m_cardOne = DeckManager.instance.inUsePile[index];
                     }
                     else
                     {
-                        m_cardTwo = DeckManager.Instance.inUsePile[index];
+                        m_cardTwo = DeckManager.instance.inUsePile[index];
 
                         // check the pair of cards for a match
                         // only if we have a second card
@@ -319,8 +319,8 @@ public class MemoryMatchManager : MonoBehaviour
         if (m_cardOne.rank == m_cardTwo.rank)
         {
             // hide the card slots they are on
-            slots[DeckManager.Instance.inUsePile.IndexOf(m_cardOne)].SetActive(false);
-            slots[DeckManager.Instance.inUsePile.IndexOf(m_cardTwo)].SetActive(false);
+            slots[DeckManager.instance.inUsePile.IndexOf(m_cardOne)].SetActive(false);
+            slots[DeckManager.instance.inUsePile.IndexOf(m_cardTwo)].SetActive(false);
             
             // increase the score by 1
             m_score++;
@@ -411,10 +411,10 @@ public class MemoryMatchManager : MonoBehaviour
     private bool CheckForShuffle()
     {
         // if there is less than 9 cards in the deck
-        if (DeckManager.Instance.CountDeck() <= 8)
+        if (DeckManager.instance.CountDeck() <= 8)
         {
             // shuffle the discard pile into the deck
-            DeckManager.Instance.ShuffleDecksTogether(DeckManager.Instance.deck, DeckManager.Instance.discardPile);
+            DeckManager.instance.ShuffleDecksTogether(DeckManager.instance.deck, DeckManager.instance.discardPile);
 
             // play the shuffle sfx
             AssignAudioClip(audClpCardShuffle);

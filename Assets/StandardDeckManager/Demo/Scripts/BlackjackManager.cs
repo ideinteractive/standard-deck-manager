@@ -90,7 +90,7 @@ public class BlackjackManager : MonoBehaviour
         btnMainMenu.gameObject.SetActive(false);
          
         // update the deck count
-        txtDeckCount.text = DeckManager.Instance.CountDeck().ToString();
+        txtDeckCount.text = DeckManager.instance.CountDeck().ToString();
 
         // initialize the game
         StartCoroutine(InitializeGame());
@@ -168,16 +168,16 @@ public class BlackjackManager : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
 
         // set up each deck's card value
-        SetUpDeck(DeckManager.Instance.deck);
-        SetUpDeck(DeckManager.Instance.discardPile);
-        SetUpDeck(DeckManager.Instance.inUsePile);
+        SetUpDeck(DeckManager.instance.deck);
+        SetUpDeck(DeckManager.instance.discardPile);
+        SetUpDeck(DeckManager.instance.inUsePile);
 
         // play our shuffle sfx
         AssignAudioClip(audClpCardShuffle);
         audSrc.Play();
 
         // shuffle the deck of cards
-        DeckManager.Instance.ShuffleDeck();
+        DeckManager.instance.ShuffleDeck();
 
         yield return new WaitForSeconds(fltWaitTimeAfterShuffle);
 
@@ -198,9 +198,9 @@ public class BlackjackManager : MonoBehaviour
         m_blnActionInProgress = false;
 
         // if there are cards in the in use pile
-        if (DeckManager.Instance.CountInUsePile() > 0)
+        if (DeckManager.instance.CountInUsePile() > 0)
             // put them in the discard pile
-            DeckManager.Instance.MoveAllCardToDiscard(DeckManager.Instance.inUsePile);
+            DeckManager.instance.MoveAllCardToDiscard(DeckManager.instance.inUsePile);
 
         // check if the discard pile should 
         // be shuffled back into the main deck
@@ -278,14 +278,14 @@ public class BlackjackManager : MonoBehaviour
         }
 
         // add the card to the hand and set the sorting order
-        hand.Add(DeckManager.Instance.deck[0]);
-        DeckManager.Instance.deck[0].card.GetComponent<SpriteRenderer>().sortingOrder = hand.Count;
+        hand.Add(DeckManager.instance.deck[0]);
+        DeckManager.instance.deck[0].card.GetComponent<SpriteRenderer>().sortingOrder = hand.Count;
 
         // if we are dealing the player's card
         if (isPlayer)
         {
             // spawn the card and increment the offset
-            SpawnCardToSlot(slot, DeckManager.Instance.deck[0].card, m_vecPlayerCardOffset);
+            SpawnCardToSlot(slot, DeckManager.instance.deck[0].card, m_vecPlayerCardOffset);
             m_vecPlayerCardOffset += vecCardSpawnOffset;
         }
         else
@@ -294,7 +294,7 @@ public class BlackjackManager : MonoBehaviour
             if (hand.Count == 1)
             {
                 // spawn the card and increment the offset
-                SpawnCardToSlot(slot, DeckManager.Instance.deck[0].card, m_vecDealerCardOffset);
+                SpawnCardToSlot(slot, DeckManager.instance.deck[0].card, m_vecDealerCardOffset);
                 m_vecDealerCardOffset += vecCardSpawnOffset;
             }
             else if (hand.Count == 2)
@@ -306,7 +306,7 @@ public class BlackjackManager : MonoBehaviour
             }
             else
             {
-                SpawnCardToSlot(slot, DeckManager.Instance.deck[0].card, m_vecDealerCardOffset);
+                SpawnCardToSlot(slot, DeckManager.instance.deck[0].card, m_vecDealerCardOffset);
                 m_vecDealerCardOffset += vecCardSpawnOffset;
             }
         }
@@ -316,10 +316,10 @@ public class BlackjackManager : MonoBehaviour
         audSrc.Play();
 
         // move the current card in the deck manager to the in use pile
-        DeckManager.Instance.MoveCardToInUse(DeckManager.Instance.deck[0], DeckManager.Instance.deck);
+        DeckManager.instance.MoveCardToInUse(DeckManager.instance.deck[0], DeckManager.instance.deck);
 
         // update the deck count
-        txtDeckCount.text = DeckManager.Instance.CountDeck().ToString();
+        txtDeckCount.text = DeckManager.instance.CountDeck().ToString();
 
         // set action in progress to false
         // to allow the game to continue
@@ -569,10 +569,10 @@ public class BlackjackManager : MonoBehaviour
     private bool CheckForShuffle()
     {
         // if there is less than the min amount of cards in the deck
-        if (DeckManager.Instance.CountDeck() <= 0)
+        if (DeckManager.instance.CountDeck() <= 0)
         {
             // shuffle the discard pile into the deck
-            DeckManager.Instance.ShuffleDecksTogether(DeckManager.Instance.deck, DeckManager.Instance.discardPile);
+            DeckManager.instance.ShuffleDecksTogether(DeckManager.instance.deck, DeckManager.instance.discardPile);
 
             // play the shuffle sfx
             AssignAudioClip(audClpCardShuffle);
