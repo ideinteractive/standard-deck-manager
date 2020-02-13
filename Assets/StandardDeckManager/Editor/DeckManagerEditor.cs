@@ -190,6 +190,95 @@ public class DeckManagerEditor : Editor
         }
     }
 
+    // generate a new deck
+    public void RemoveAllAndCreateNew()
+    {
+        // remove all cards and generate new deck
+        Undo.RecordObjects(targets, "Generate new deck.");
+        deckManager.RemoveAll();
+
+        // while the deck count is under 52
+        while (DeckManager.instance.deck.Count < 52)
+        {
+            // for each suit 
+            for (int i = 0; i <= (int)Card.Suit.Hearts; i++)
+            {
+                // if i is an odd number
+                if (i % 2 == 1)
+                {
+                    // for each card
+                    for (int c = 0; c <= (int)Card.Rank.King; c++)
+                    {
+                        // create a new card and add it to the deck
+                        // add the card to the deck
+                        Card card = new Card
+                        {
+                            suit = (Card.Suit)i,
+                            color = (Card.Color)1,
+                            rank = (Card.Rank)c,
+                            value = c + 1
+                        };
+         
+                        serializedObject.Update();
+                        // create a new item in our reoderable list
+                        var index = reorderableDeck.serializedProperty.arraySize;
+                        reorderableDeck.serializedProperty.arraySize++;
+                        reorderableDeck.index = index;
+                        var element = reorderableDeck.serializedProperty.GetArrayElementAtIndex(index);
+
+                        // assign our properties
+                        element.FindPropertyRelative("name").stringValue = card.color + " " + card.rank + " of " + card.suit;
+                        element.FindPropertyRelative("color").enumValueIndex = (int)card.color;
+                        element.FindPropertyRelative("suit").enumValueIndex = (int)card.suit;
+                        element.FindPropertyRelative("rank").enumValueIndex = (int)card.rank;
+                        element.FindPropertyRelative("card").objectReferenceValue = card.card as GameObject;
+
+                        // spawn our card
+                        SpawnCard((Card)card, element.FindPropertyRelative("card"));
+                        serializedObject.ApplyModifiedProperties(); 
+                    }
+                }
+                else
+                {
+                    // for each card
+                    for (int c = 0; c <= (int)Card.Rank.King; c++)
+                    {
+                        // create a new card and add it to the deck
+                        // add the card to the deck
+                        Card card = new Card
+                        {
+                            suit = (Card.Suit)i,
+                            color = (Card.Color)0,
+                            rank = (Card.Rank)c,
+                            value = c + 1
+                        };
+                        
+                        serializedObject.Update();
+                        // create a new item in our reoderable list
+                        var index = reorderableDeck.serializedProperty.arraySize;
+                        reorderableDeck.serializedProperty.arraySize++;
+                        reorderableDeck.index = index;
+                        var element = reorderableDeck.serializedProperty.GetArrayElementAtIndex(index);
+
+                        // assign our properties
+                        element.FindPropertyRelative("name").stringValue = card.color + " " + card.rank + " of " + card.suit;
+                        element.FindPropertyRelative("color").enumValueIndex = (int)card.color;
+                        element.FindPropertyRelative("suit").enumValueIndex = (int)card.suit;
+                        element.FindPropertyRelative("rank").enumValueIndex = (int)card.rank;
+                        element.FindPropertyRelative("card").objectReferenceValue = card.card as GameObject;
+
+                        // spawn our card
+                        SpawnCard((Card)card, element.FindPropertyRelative("card"));
+                        serializedObject.ApplyModifiedProperties(); 
+                    }
+                }
+            }
+        }
+
+        // inform the user the deck has been updated
+        Debug.Log("Standard 52 Playing Card Deck - Imported");
+    }
+
     // spawn a card from the deck
     private void SpawnCard(Card card, SerializedProperty deckCard)
     {
@@ -627,5 +716,7 @@ public class DeckManagerEditor : Editor
 
         // apply property modifications
         serializedObject.ApplyModifiedProperties();
+
+        DrawDefaultInspector ();
     }
 }
