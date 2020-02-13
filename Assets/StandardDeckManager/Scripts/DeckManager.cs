@@ -368,8 +368,8 @@ public class DeckManager : MonoBehaviour
     // remove all playing cards and generate a new deck
     public void RemoveAllAndCreateNew()
     {
-        // create a new deck 
-        DeleteCardsInDeck(deck);
+        // remove all cards
+        RemoveAll();
 
         // while the deck count is under 52
         while (deck.Count < 52)
@@ -425,12 +425,6 @@ public class DeckManager : MonoBehaviour
             // spawn our cards
             SpawnCardPool(deck);
         }
-
-        // create a new discard pile
-        DeleteCardsInDeck(discardPile);
-
-        // create a new in use pile
-        DeleteCardsInDeck(inUsePile);
 
         // inform the user the deck has been updated
         Debug.Log("Standard 52 Playing Card Deck - Imported");
