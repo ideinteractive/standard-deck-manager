@@ -27,6 +27,7 @@ public class MemoryMatchManager : MonoBehaviour
     public float fltWaitTimeAfterShuffle = 0.7f;                // the wait time after the deck is shuffled
     public float fltWaitTimeBeforeDeal = 0.5f;                  // the wait time between when a dealer hits  
     public float fltWaitTimeBeforeResults = 0.5f;               // the wait time before the winner is determined
+    public float fltWaitTimeAfterCardFlipped = 0.5f;            // the wait time after a card pair is flipped
 
     [Header("Sound Effects")]
     public AudioSource audSrc;                                  // the audio source to play sounds from
@@ -45,11 +46,12 @@ public class MemoryMatchManager : MonoBehaviour
 
     // private variables
     private bool m_gameStarted = false;                         // check if the game has started
+    private bool m_audIsPlaying = false;                        // check if the audio is playing
     private Card m_cardOne;                                     // holds our first selected card
     private Card m_cardTwo;                                     // holds our second selected card
     private int m_totalScore;                                   // keeps track of the overall score
     private int m_score;                                        // keeps track of the current round's score
-
+    
     // on initialization
     void Start()
     {
@@ -262,7 +264,7 @@ public class MemoryMatchManager : MonoBehaviour
     {
         // if we are left mouse clicking
         // and we still have room to hold one or two cards
-        if (Input.GetMouseButtonDown(0) && (m_cardOne.card == null || m_cardTwo.card == null))
+        if (Input.GetMouseButtonDown(0) && (m_cardOne.card == null || m_cardTwo.card == null) && !m_audIsPlaying)
         {
             // draw a ray from the camera to our mouse position
             // and check if we've hit anything
@@ -330,11 +332,13 @@ public class MemoryMatchManager : MonoBehaviour
             // play the match sfx
             AssignAudioClip(audClpMatch);
             audSrc.Play();
+            m_audIsPlaying = true;
         } else
         {
             // play the no match sfx
             AssignAudioClip(audClpNoMatch);
             audSrc.Play();
+            m_audIsPlaying = true;
         }
 
         // reset the card one and two and hide our turned over cards
@@ -351,6 +355,13 @@ public class MemoryMatchManager : MonoBehaviour
             // the game is now over
             // show our win screen
             ShowWinScreen();
+        } else {
+            // while the audio source is playing wait for it to finish
+            while (m_audIsPlaying) {
+                // wait buffer so the sound effect can finish playing
+                yield return new WaitForSeconds(fltWaitTimeAfterCardFlipped);
+                m_audIsPlaying = false;
+            }
         }
     }
 
