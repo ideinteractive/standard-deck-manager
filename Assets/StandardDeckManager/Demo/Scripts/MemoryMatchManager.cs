@@ -352,6 +352,9 @@ public class MemoryMatchManager : MonoBehaviour
         {
             yield return new WaitForSeconds(fltWaitTimeBeforeResults);
 
+            // make sure the player is able to continue playing again by making our audio flag false
+            m_audIsPlaying = false;
+
             // the game is now over
             // show our win screen
             ShowWinScreen();
