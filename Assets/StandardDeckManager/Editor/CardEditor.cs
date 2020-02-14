@@ -59,9 +59,7 @@ public class CardEditor : EditorWindow
 
             EditorGUILayout.Space();
 
-            // allow the user to edit the current selected card property
-            if (!Application.isPlaying)
-                Undo.RecordObjects(deckManagerEditor.targets, "Edit card properties.");
+            // assign the color and rank
             deck[intCardIndex].color = (Card.Color)EditorGUILayout.EnumPopup("Color", deck[intCardIndex].color);
             deck[intCardIndex].rank = (Card.Rank)EditorGUILayout.EnumPopup("Rank", deck[intCardIndex].rank);
 
@@ -99,10 +97,12 @@ public class CardEditor : EditorWindow
             deck[intCardIndex].value = EditorGUILayout.IntField("Value", deck[intCardIndex].value);
             deck[intCardIndex].card = (GameObject)EditorGUILayout.ObjectField("Card", deck[intCardIndex].card, typeof(GameObject), true);
             deck[intCardIndex].blnAutoAssign = EditorGUILayout.Toggle("Auto Assign", deck[intCardIndex].blnAutoAssign);
+            
             // if auto assign is true automatically assign an object based on selection
             if(deck[intCardIndex].blnAutoAssign)
                 deck[intCardIndex].card = Resources.Load("Prefabs/" + deck[intCardIndex].color + " " + deck[intCardIndex].rank + " " + deck[intCardIndex].suit) as GameObject;
 
+            DeckManagerEditor.instance.EditCard(intCardIndex, deck[intCardIndex], deck);
         } catch
         {
             blnEditingCardFromDeck = false;

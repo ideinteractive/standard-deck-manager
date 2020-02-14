@@ -198,7 +198,7 @@ public class DeckManagerEditor : Editor
         deckManager.RemoveAll();
 
         // while the deck count is under 52
-        while (DeckManager.instance.deck.Count < 52)
+        while (reorderableDeck.serializedProperty.arraySize < 52)
         {
             // for each suit 
             for (int i = 0; i <= (int)Card.Suit.Hearts; i++)
@@ -277,6 +277,60 @@ public class DeckManagerEditor : Editor
 
         // inform the user the deck has been updated
         Debug.Log("Standard 52 Playing Card Deck - Imported");
+    }
+
+    // edit a card
+    public void EditCard(int index, Card card, List<Card> deck) {
+        serializedObject.Update();
+
+        if (deck == deckManager.deck) {
+            // get the current item in our deck
+            reorderableDeck.index = index;
+            var element = reorderableDeck.serializedProperty.GetArrayElementAtIndex(index);
+
+            // assign our properties
+            element.FindPropertyRelative("name").stringValue = card.color + " " + card.rank + " of " + card.suit;
+            element.FindPropertyRelative("color").enumValueIndex = (int)card.color;
+            element.FindPropertyRelative("suit").enumValueIndex = (int)card.suit;
+            element.FindPropertyRelative("rank").enumValueIndex = (int)card.rank;
+            element.FindPropertyRelative("card").objectReferenceValue = card.card as GameObject;
+            element.FindPropertyRelative("blnAutoAssign").boolValue = card.blnAutoAssign;
+
+            // spawn our card
+            SpawnCard((Card)card, element.FindPropertyRelative("card"));
+        } else if (deck == deckManager.discardPile) {
+            // get the current item in our deck
+            reorderableDiscardPile.index = index;
+            var element = reorderableDiscardPile.serializedProperty.GetArrayElementAtIndex(index);
+
+            // assign our properties
+            element.FindPropertyRelative("name").stringValue = card.color + " " + card.rank + " of " + card.suit;
+            element.FindPropertyRelative("color").enumValueIndex = (int)card.color;
+            element.FindPropertyRelative("suit").enumValueIndex = (int)card.suit;
+            element.FindPropertyRelative("rank").enumValueIndex = (int)card.rank;
+            element.FindPropertyRelative("card").objectReferenceValue = card.card as GameObject;
+            element.FindPropertyRelative("blnAutoAssign").boolValue = card.blnAutoAssign;
+
+            // spawn our card
+            SpawnCard((Card)card, element.FindPropertyRelative("card"));
+        } else if (deck == deckManager.inUsePile) {
+            // get the current item in our deck
+            reorderableInUsePile.index = index;
+            var element = reorderableInUsePile.serializedProperty.GetArrayElementAtIndex(index);
+
+            // assign our properties
+            element.FindPropertyRelative("name").stringValue = card.color + " " + card.rank + " of " + card.suit;
+            element.FindPropertyRelative("color").enumValueIndex = (int)card.color;
+            element.FindPropertyRelative("suit").enumValueIndex = (int)card.suit;
+            element.FindPropertyRelative("rank").enumValueIndex = (int)card.rank;
+            element.FindPropertyRelative("card").objectReferenceValue = card.card as GameObject;
+            element.FindPropertyRelative("blnAutoAssign").boolValue = card.blnAutoAssign;
+
+            // spawn our card
+            SpawnCard((Card)card, element.FindPropertyRelative("card"));
+        }
+
+        serializedObject.ApplyModifiedProperties(); 
     }
 
     // spawn a card from the deck
@@ -487,7 +541,6 @@ public class DeckManagerEditor : Editor
         }
     }
 
-
     // draw our elements for the deck
     private void DrawDeckElement(Rect rect, int index, bool active, bool focused)
     {
@@ -660,7 +713,7 @@ public class DeckManagerEditor : Editor
         if (GUILayout.Button("Generate a New Deck"))
         {
             Undo.RecordObjects(targets, "New deck generated.");
-            deckManager.RemoveAllAndCreateNew();
+            RemoveAllAndCreateNew();
         }
 
         // remove everything
@@ -716,7 +769,5 @@ public class DeckManagerEditor : Editor
 
         // apply property modifications
         serializedObject.ApplyModifiedProperties();
-
-        DrawDefaultInspector ();
     }
 }

@@ -11,6 +11,7 @@ public class Card
     #if UNITY_EDITOR
     // render these variables only in the unity editor
     [HideInInspector]
+    [SerializeField]
     public bool blnAutoAssign;      // auto assign gameobject based on selection
 
     public enum RedSuit
