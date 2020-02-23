@@ -75,14 +75,14 @@ namespace StandardDeckManager.Editor
             // check if the card editor is open
             if (!CardEditor.IsOpen) return;
             // pass our information to the card editor
-            CardEditor.instance.intCardIndex = deck.index;
+            CardEditor.Instance.intCardIndex = deck.index;
 
             // depending on which reorderable list we are using check it off in the card editor
-            CardEditor.instance.blnEditingCardFromDeck = deck == _reorderableDeck;
+            CardEditor.Instance.blnEditingCardFromDeck = deck == _reorderableDeck;
 
-            CardEditor.instance.blnEditingCardFromDiscard = deck == _reorderableDiscardPile;
+            CardEditor.Instance.blnEditingCardFromDiscard = deck == _reorderableDiscardPile;
 
-            CardEditor.instance.blnEditingCardFromInUse = deck == _reorderableInUsePile;
+            CardEditor.Instance.blnEditingCardFromInUse = deck == _reorderableInUsePile;
         }
 
         // callback for when we remove a card from the deck
@@ -499,14 +499,14 @@ namespace StandardDeckManager.Editor
                 window.Show();
 
                 // pass our information to the card editor
-                CardEditor.instance.intCardIndex = deck.IndexOf(card);
+                CardEditor.Instance.intCardIndex = deck.IndexOf(card);
 
                 // depending on which reorderable list we are using check it off in the card editor
-                CardEditor.instance.blnEditingCardFromDeck = Equals(deck, deckManager.deck);
+                CardEditor.Instance.blnEditingCardFromDeck = Equals(deck, deckManager.deck);
 
-                CardEditor.instance.blnEditingCardFromDiscard = Equals(deck, deckManager.discardPile);
+                CardEditor.Instance.blnEditingCardFromDiscard = Equals(deck, deckManager.discardPile);
 
-                CardEditor.instance.blnEditingCardFromInUse = Equals(deck, deckManager.inUsePile);
+                CardEditor.Instance.blnEditingCardFromInUse = Equals(deck, deckManager.inUsePile);
             }
         }
 
