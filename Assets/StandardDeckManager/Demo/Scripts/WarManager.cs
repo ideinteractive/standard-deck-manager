@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using StandardDeckManager.Scripts;
 
 /// <summary>
 /// WarManager

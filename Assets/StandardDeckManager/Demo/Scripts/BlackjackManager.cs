@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using StandardDeckManager.Scripts;
 using UnityEngine.SceneManagement;
 
 /// <summary>

@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using StandardDeckManager.Editor;
+using UnityEditor;
 using UnityEngine;
 
 /// <summary>
@@ -27,7 +28,7 @@ public class DeckShuffleOptionsEditor : EditorWindow
         window.Show();
 
         // set the reference to the current inspected object
-        deckManagerEditor = DeckManagerEditor.instance;
+        deckManagerEditor = DeckManagerEditor.Instance;
     }
 
     // when this is enabled and active
@@ -37,7 +38,7 @@ public class DeckShuffleOptionsEditor : EditorWindow
         instance = this;
 
         // set the reference to the current inspected object
-        deckManagerEditor = DeckManagerEditor.instance;
+        deckManagerEditor = DeckManagerEditor.Instance;
     }
 
     // create a texture background
@@ -70,9 +71,9 @@ public class DeckShuffleOptionsEditor : EditorWindow
         if (deckManagerEditor == null)
         {
             // try and find a reference to the deck manager editor
-            if (DeckManagerEditor.instance)
+            if (DeckManagerEditor.Instance)
             {
-                deckManagerEditor = DeckManagerEditor.instance;
+                deckManagerEditor = DeckManagerEditor.Instance;
 
             }
             else

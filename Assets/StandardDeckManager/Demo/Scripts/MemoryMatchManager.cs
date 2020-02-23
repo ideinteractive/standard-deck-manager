@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using StandardDeckManager.Scripts;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -343,9 +344,9 @@ public class MemoryMatchManager : MonoBehaviour
 
         // reset the card one and two and hide our turned over cards
         m_cardOne.card.SetActive(false);
-        m_cardOne = new Card();
+        m_cardOne = null;
         m_cardTwo.card.SetActive(false);
-        m_cardTwo = new Card();
+        m_cardTwo = null;
 
         // if the current round's score equals to half the value of our slot
         if (m_score == slots.Count / 2)
@@ -390,8 +391,8 @@ public class MemoryMatchManager : MonoBehaviour
     {
         // reset our variables and references
         m_gameStarted = false;
-        m_cardOne = new Card();
-        m_cardTwo = new Card();
+        m_cardOne = null;
+        m_cardTwo = null;
         m_score = 0;
         btnMainMenu.gameObject.SetActive(false);
         btnPlayAgain.gameObject.SetActive(false);
