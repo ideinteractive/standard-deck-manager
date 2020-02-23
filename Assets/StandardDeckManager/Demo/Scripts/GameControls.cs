@@ -1,60 +1,61 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// GameControls
-/// Description: Common game input shared throughout the scenes.
-/// </summary>
-
-public class GameControls : MonoBehaviour
+namespace StandardDeckManager.Demo.Scripts
 {
-    // static variables
-    private static GameControls Instance;
+    /// <summary>
+    /// GameControls
+    /// Description: Common game input shared throughout the scenes.
+    /// </summary>
 
-    // on awake
-    void Awake()
+    public class GameControls : MonoBehaviour
     {
-        // if we don't have an instance
-        if(!Instance)
-        {
-            // set this instance
-            Instance = this;
-        } else
-        {
-            // else destroy it
-            Destroy(this.gameObject);
-        }
+        // static variables
+        private static GameControls _instance;
 
-        // don't destroy this object on load
-        DontDestroyOnLoad(this);
-
-    }
-
-    // once per frame
-    private void Update()
-    {
-        // if the M key is pressed
-        if (Input.GetKeyDown(KeyCode.M))
+        // on awake
+        void Awake()
         {
-            // mute the audio source or unmute it
-            if (AudioListener.volume < 1)
-                AudioListener.volume = 1;
+            // if we don't have an instance
+            if (!_instance)
+            {
+                // set this instance
+                _instance = this;
+            }
             else
-                AudioListener.volume = 0;
+            {
+                // else destroy it
+                Destroy(this.gameObject);
+            }
+
+            // don't destroy this object on load
+            DontDestroyOnLoad(this);
+
         }
 
-        // if the R key is pressed
-        if (Input.GetKeyDown(KeyCode.R))
-            // restart the scene
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-
-        // if the B key is pressed
-        if (Input.GetKeyDown(KeyCode.B))
+        // once per frame
+        private void Update()
         {
-            // if the scene is not the main menu
-            if (SceneManager.GetActiveScene().name != "MainMenu")
-                // load the main menu scene
-                SceneManager.LoadScene("MainMenu");
+            // if the M key is pressed
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                // mute the audio source or unmute it
+                AudioListener.volume = AudioListener.volume < 1 ? 1 : 0;
+            }
+
+            // if the R key is pressed
+            if (Input.GetKeyDown(KeyCode.R))
+                // restart the scene
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+            // if the B key is pressed
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                // if the scene is not the main menu
+                if (SceneManager.GetActiveScene().name != "MainMenu")
+                    // load the main menu scene
+                    SceneManager.LoadScene("MainMenu");
+            }
         }
     }
 }
