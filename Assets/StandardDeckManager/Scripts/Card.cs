@@ -72,6 +72,15 @@ namespace StandardDeckManager.Scripts
         [SerializeField] public int value; // define the card's value
         [SerializeField] public GameObject card; // define the card's game object
 
+        public Card()
+        {
+            // assign our values
+            this.suit = Suit.Clubs;
+            this.color = Color.Black;
+            this.rank = Rank.Ace;
+            this.value = 0;
+        }
+        
         public Card(Suit suit, Color color, Rank rank, int value)
         {
             // assign our values

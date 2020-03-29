@@ -29,19 +29,19 @@ namespace StandardDeckManager.Editor
         private static void Init()
         {
             // get existing open window or if none, make a new one
-            CardEditor window = (CardEditor) EditorWindow.GetWindow(typeof(CardEditor), false, "Card Editor");
+            var window = (CardEditor) EditorWindow.GetWindow(typeof(CardEditor), false, "Card Editor");
             window.minSize = new Vector2(325, 140);
             window.Show();
 
             // set the reference to the current inspected object
-            _deckManagerEditor = DeckManagerEditor.Instance;
+            _deckManagerEditor = DeckManagerEditor.instance;
         }
 
         // on enable
         private void OnEnable()
         {
             Instance = this; // set this instance
-            _deckManagerEditor = DeckManagerEditor.Instance; // set the reference to the current inspected object
+            _deckManagerEditor = DeckManagerEditor.instance; // set the reference to the current inspected object
         }
 
         // repaint the inspector if it gets updated
@@ -119,7 +119,7 @@ namespace StandardDeckManager.Editor
                         Resources.Load("Prefabs/" + deck[intCardIndex].color + " " + deck[intCardIndex].rank + " " +
                                        deck[intCardIndex].suit) as GameObject;
 
-                DeckManagerEditor.Instance.EditCard(intCardIndex, deck[intCardIndex], deck);
+                DeckManagerEditor.instance.EditCard(intCardIndex, deck[intCardIndex], deck);
             }
             catch
             {
@@ -179,9 +179,9 @@ namespace StandardDeckManager.Editor
             if (_deckManagerEditor == null)
             {
                 // try and find a reference to the deck manager editor
-                if (DeckManagerEditor.Instance)
+                if (DeckManagerEditor.instance)
                 {
-                    _deckManagerEditor = DeckManagerEditor.Instance;
+                    _deckManagerEditor = DeckManagerEditor.instance;
 
                 }
                 else

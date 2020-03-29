@@ -24,7 +24,7 @@ namespace StandardDeckManager.Editor
             window.Show();
 
             // set the reference to the current inspected object
-            _deckManagerEditor = DeckManagerEditor.Instance;
+            _deckManagerEditor = DeckManagerEditor.instance;
         }
 
         // when this is enabled and active
@@ -33,7 +33,7 @@ namespace StandardDeckManager.Editor
             // set this instance
 
             // set the reference to the current inspected object
-            _deckManagerEditor = DeckManagerEditor.Instance;
+            _deckManagerEditor = DeckManagerEditor.instance;
         }
 
         // create a texture background
@@ -66,9 +66,9 @@ namespace StandardDeckManager.Editor
             if (_deckManagerEditor == null)
             {
                 // try and find a reference to the deck manager editor
-                if (DeckManagerEditor.Instance)
+                if (DeckManagerEditor.instance)
                 {
-                    _deckManagerEditor = DeckManagerEditor.Instance;
+                    _deckManagerEditor = DeckManagerEditor.instance;
 
                 }
                 else
