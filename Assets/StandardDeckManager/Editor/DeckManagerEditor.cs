@@ -68,7 +68,7 @@ namespace StandardDeckManager.Editor
         }
         
         // spawn a card from the deck
-        private void SpawnCard(Card card)
+        public void SpawnCard(Card card)
         {
             // if the application is not playing
             if (!Application.isPlaying) return;
@@ -82,17 +82,17 @@ namespace StandardDeckManager.Editor
             goCard.name = tempCard.color + " " + tempCard.rank + " of " + tempCard.suit;
             card.card = goCard;
         }
-        
+   
         // add an item to the appropriate reorderable list
         private void AddItem(GUIContent content, Card card, ReorderableList deck, GenericMenu menu)
         {
             if (deck == _reorderableDeck) {
                 menu.AddItem(content, false, () => {
+                    Debug.Log("---");
                     // create and spawn our card
                     Undo.RecordObject(target, "Added new card to deck.");
                     deckManager.AddCard(card, deckManager.deck);
                     PrefabUtility.RecordPrefabInstancePropertyModifications(target);
-                    SpawnCard(card);
                 });
             }
             else if (deck == _reorderableDiscardPile) {
@@ -101,7 +101,6 @@ namespace StandardDeckManager.Editor
                     Undo.RecordObject(target, "Added new card to discard pile.");
                     deckManager.AddCard(card, deckManager.discardPile);
                     PrefabUtility.RecordPrefabInstancePropertyModifications(target);
-                    SpawnCard(card);
                 });
             }
             else if (deck == _reorderableInUsePile) {
@@ -110,7 +109,6 @@ namespace StandardDeckManager.Editor
                     Undo.RecordObject(target, "Added new card to in use pile.");
                     deckManager.AddCard(card, deckManager.inUsePile);
                     PrefabUtility.RecordPrefabInstancePropertyModifications(target);
-                    SpawnCard(card);
                 });
             }
         }
@@ -203,16 +201,34 @@ namespace StandardDeckManager.Editor
             
             if (deck == _reorderableDeck) {
                 Undo.RecordObject(target, "Removed a card from deck.");
+                
+                // if we are in play mode
+                if (Application.isPlaying)
+                    // destroy card
+                    Destroy((deckManager.deck[deck.index].card));
+                
                 deckManager.deck.RemoveAt(deck.index);
                 PrefabUtility.RecordPrefabInstancePropertyModifications(target);
             }
             else if (deck == _reorderableDiscardPile) {
                 Undo.RecordObject(target, "Removed a card from discard pile.");
+                
+                // if we are in play mode
+                if (Application.isPlaying)
+                    // destroy card
+                    Destroy((deckManager.discardPile[deck.index].card));
+                
                 deckManager.discardPile.RemoveAt(deck.index);
                 PrefabUtility.RecordPrefabInstancePropertyModifications(target);
             }
             else if (deck == _reorderableInUsePile) {
                 Undo.RecordObject(target, "Removed a card from in use pile.");
+                
+                // if we are in play mode
+                if (Application.isPlaying)
+                    // destroy card
+                    Destroy((deckManager.inUsePile[deck.index].card));
+                
                 deckManager.inUsePile.RemoveAt(deck.index);
                 PrefabUtility.RecordPrefabInstancePropertyModifications(target);
             }

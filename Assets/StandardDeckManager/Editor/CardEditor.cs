@@ -115,9 +115,13 @@ namespace StandardDeckManager.Editor
 
                 // if auto assign is true automatically assign an object based on selection
                 if (deck[intCardIndex].blnAutoAssign)
-                    deck[intCardIndex].card =
-                        Resources.Load("Prefabs/" + deck[intCardIndex].color + " " + deck[intCardIndex].rank + " " +
-                                       deck[intCardIndex].suit) as GameObject;
+                {
+                    // if we are not in play mode
+                    if (!Application.isPlaying)
+                        deck[intCardIndex].card =
+                            Resources.Load("Prefabs/" + deck[intCardIndex].color + " " + deck[intCardIndex].rank + " " +
+                                           deck[intCardIndex].suit) as GameObject;
+                }
 
                 DeckManagerEditor.instance.EditCard(intCardIndex, deck[intCardIndex], deck);
             }
