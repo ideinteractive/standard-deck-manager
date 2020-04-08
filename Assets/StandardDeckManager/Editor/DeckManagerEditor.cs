@@ -70,8 +70,9 @@ namespace StandardDeckManager.Editor
         // spawn a card from the deck
         private void SpawnCard(Card card)
         {
-            // if the application is playing
+            // if the application is not playing
             if (!Application.isPlaying) return;
+ 
             // instantiate the object
             var tempCard = card;
             var deckTransform = deckManager.transform;
@@ -302,7 +303,11 @@ namespace StandardDeckManager.Editor
             tmpCard.rank = card.rank;
             tmpCard.card = card.card;
             tmpCard.blnAutoAssign = card.blnAutoAssign;
-            SpawnCard(card);
+            
+            // if the new card isn't the same as the current card
+            if (tmpCard.card != card.card)
+                SpawnCard(card);
+            
             PrefabUtility.RecordPrefabInstancePropertyModifications(target);
         }
         
