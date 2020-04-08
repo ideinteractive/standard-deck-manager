@@ -99,7 +99,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Deck shuffled.");
                 _deckManagerEditor.deckManager.ShuffleDeck();
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             // shuffle the discard pile
@@ -107,7 +107,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Discard pile shuffled.");
                 _deckManagerEditor.deckManager.ShuffleDiscardPile();
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             // shuffle the in use pile
@@ -115,7 +115,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "In use pile shuffled.");
                 _deckManagerEditor.deckManager.ShuffleInUsePile();
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             EditorGUILayout.Space();
@@ -130,7 +130,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Deck shuffled with discard pile.");
                 _deckManagerEditor.deckManager.ShuffleDecksTogether(_deckManagerEditor.deckManager.deck, _deckManagerEditor.deckManager.discardPile);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             // shuffle the deck with the in use pile
@@ -138,7 +138,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Deck shuffled with in use pile.");
                 _deckManagerEditor.deckManager.ShuffleDecksTogether(_deckManagerEditor.deckManager.deck, _deckManagerEditor.deckManager.inUsePile);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             EditorGUILayout.Space();
@@ -149,7 +149,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Discard pile shuffled with deck.");
                 _deckManagerEditor.deckManager.ShuffleDecksTogether(_deckManagerEditor.deckManager.discardPile, _deckManagerEditor.deckManager.deck);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             // shuffle the discard and in use pile
@@ -157,7 +157,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Discard pile shuffled with in use pile.");
                 _deckManagerEditor.deckManager.ShuffleDecksTogether(_deckManagerEditor.deckManager.discardPile, _deckManagerEditor.deckManager.inUsePile);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             EditorGUILayout.Space();
@@ -168,7 +168,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "In use pile shuffled with deck.");
                 _deckManagerEditor.deckManager.ShuffleDecksTogether(_deckManagerEditor.deckManager.inUsePile, _deckManagerEditor.deckManager.deck);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             // shuffle the in use pile and discard pile
@@ -176,7 +176,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "In use pile shuffled with discard pile.");
                 _deckManagerEditor.deckManager.ShuffleDecksTogether(_deckManagerEditor.deckManager.inUsePile, _deckManagerEditor.deckManager.discardPile);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             EditorGUILayout.Space();
@@ -191,7 +191,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Shuffled discard pile to top of deck.");
                 _deckManagerEditor.deckManager.ShuffleToTopOfDeck(_deckManagerEditor.deckManager.discardPile, _deckManagerEditor.deckManager.deck);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             // shuffle the in use pile and add it to the top of the deck
@@ -199,7 +199,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Shuffled in use pile to top of deck.");
                 _deckManagerEditor.deckManager.ShuffleToTopOfDeck(_deckManagerEditor.deckManager.inUsePile, _deckManagerEditor.deckManager.deck);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             EditorGUILayout.Space();
@@ -210,7 +210,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Shuffled deck to top of discard pile.");
                 _deckManagerEditor.deckManager.ShuffleToTopOfDeck(_deckManagerEditor.deckManager.deck, _deckManagerEditor.deckManager.discardPile);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             // shuffle the in use pile and add it to the top of the discard pile
@@ -218,7 +218,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Shuffled in use pile to top of discard pile.");
                 _deckManagerEditor.deckManager.ShuffleToTopOfDeck(_deckManagerEditor.deckManager.inUsePile, _deckManagerEditor.deckManager.discardPile);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             EditorGUILayout.Space();
@@ -229,7 +229,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Shuffled deck to top of in use pile.");
                 _deckManagerEditor.deckManager.ShuffleToTopOfDeck(_deckManagerEditor.deckManager.deck, _deckManagerEditor.deckManager.inUsePile);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             // shuffle the discard pile and add it to the top of the in use pile
@@ -237,7 +237,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Shuffled discard pile to top of in use pile.");
                 _deckManagerEditor.deckManager.ShuffleToTopOfDeck(_deckManagerEditor.deckManager.discardPile, _deckManagerEditor.deckManager.inUsePile);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             EditorGUILayout.Space();
@@ -252,7 +252,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Shuffled discard pile to bottom of deck.");
                 _deckManagerEditor.deckManager.ShuffleToBottomOfDeck(_deckManagerEditor.deckManager.discardPile, _deckManagerEditor.deckManager.deck);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             // shuffle the in use pile and add it to the bottom of the deck
@@ -260,7 +260,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Shuffled in use pile to bottom of deck.");
                 _deckManagerEditor.deckManager.ShuffleToBottomOfDeck(_deckManagerEditor.deckManager.inUsePile, _deckManagerEditor.deckManager.deck);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             EditorGUILayout.Space();
@@ -271,7 +271,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Shuffled deck to bottom of discard pile.");
                 _deckManagerEditor.deckManager.ShuffleToBottomOfDeck(_deckManagerEditor.deckManager.deck, _deckManagerEditor.deckManager.discardPile);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             // shuffle the in use pile and add it to the bottom of the discard pile
@@ -279,7 +279,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Shuffled in use pile to bottom of discard pile.");
                 _deckManagerEditor.deckManager.ShuffleToBottomOfDeck(_deckManagerEditor.deckManager.inUsePile, _deckManagerEditor.deckManager.discardPile);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             EditorGUILayout.Space();
@@ -290,7 +290,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Shuffled deck to bottom of in use pile.");
                 _deckManagerEditor.deckManager.ShuffleToBottomOfDeck(_deckManagerEditor.deckManager.deck, _deckManagerEditor.deckManager.inUsePile);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             // shuffle the discard pile and add it to the bottom of the in use pile
@@ -298,7 +298,7 @@ namespace StandardDeckManager.Editor
             {
                 Undo.RecordObjects(_deckManagerEditor.targets, "Shuffled discard pile to bottom of in use pile.");
                 _deckManagerEditor.deckManager.ShuffleToBottomOfDeck(_deckManagerEditor.deckManager.discardPile, _deckManagerEditor.deckManager.inUsePile);
-                EditorUtility.SetDirty(_deckManagerEditor.target);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(_deckManagerEditor.target);
             }
 
             EditorGUILayout.Space();
