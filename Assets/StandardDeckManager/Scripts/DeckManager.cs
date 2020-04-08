@@ -134,7 +134,7 @@ namespace StandardDeckManager.Scripts
             RandomizeList(currentDeck);
 
             // add the other deck to the bottom of the current deck
-            currentDeck.AddRange(otherDeck);
+            otherDeck.AddRange(currentDeck);
             
             // clear the current deck
             currentDeck.Clear();
